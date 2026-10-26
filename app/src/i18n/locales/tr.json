@@ -1,6 +1,7 @@
 {
   "common": {
     "app_title": "Unofficial Telegram Drive",
+    "telegram_api_notice": "Bu resmî olmayan uygulama Telegram API’sini kullanır. Telegram ile bağlantılı değildir; Telegram tarafından onaylanmamış veya desteklenmemiştir.",
     "logout": "Çıkış Yap",
     "signout_remote_unconfirmed": "Bu cihazda oturum kapatıldı, ancak Telegram oturumun sonlandırıldığını doğrulamadı. Telegram → Ayarlar → Cihazlar bölümünü açıp oturumu oradan sonlandırın.",
     "search_placeholder": "Dosya ara...",

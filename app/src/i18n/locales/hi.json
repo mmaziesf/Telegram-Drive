@@ -1,6 +1,7 @@
 {
   "common": {
     "app_title": "टेलीग्राम ड्राइव (अनौपचारिक)",
+    "telegram_api_notice": "यह अनौपचारिक ऐप Telegram API का उपयोग करता है। यह Telegram से संबद्ध नहीं है और Telegram द्वारा समर्थित या प्रायोजित नहीं है।",
     "logout": "लॉग आउट",
     "signout_remote_unconfirmed": "इस डिवाइस से साइन आउट हो गया, लेकिन Telegram ने सत्र समाप्त होने की पुष्टि नहीं की। Telegram → सेटिंग्स → डिवाइस खोलें और वहाँ सत्र समाप्त करें।",
     "search_placeholder": "फाइलें खोजें...",

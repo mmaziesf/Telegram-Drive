@@ -1,6 +1,7 @@
 {
   "common": {
     "app_title": "Unofficial Telegram Drive",
+    "telegram_api_notice": "Aplikasi tidak rasmi ini menggunakan Telegram API. Ia tidak bergabung dengan, disokong atau ditaja oleh Telegram.",
     "logout": "Log Keluar",
     "signout_remote_unconfirmed": "Anda telah log keluar pada peranti ini, tetapi Telegram tidak mengesahkan bahawa sesi telah ditamatkan. Buka Telegram → Tetapan → Peranti dan tamatkan sesi di sana.",
     "search_placeholder": "Cari fail...",

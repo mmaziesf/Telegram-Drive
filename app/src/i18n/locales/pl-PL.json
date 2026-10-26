@@ -1,6 +1,7 @@
 {
   "common": {
     "app_title": "Unofficial Telegram Drive",
+    "telegram_api_notice": "Ta nieoficjalna aplikacja korzysta z Telegram API. Nie jest powiązana z Telegram ani przez niego zatwierdzona lub sponsorowana.",
     "logout": "Wyloguj się",
     "signout_remote_unconfirmed": "Wylogowano na tym urządzeniu, ale Telegram nie potwierdził zakończenia sesji. Otwórz Telegram → Ustawienia → Urządzenia i zakończ ją tam.",
     "search_placeholder": "Wyszukaj pliki...",

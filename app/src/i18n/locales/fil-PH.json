@@ -1,6 +1,7 @@
 {
   "common": {
     "app_title": "Unofficial Telegram Drive",
+    "telegram_api_notice": "Ginagamit ng hindi opisyal na app na ito ang Telegram API. Hindi ito kaanib, inendorso o itinataguyod ng Telegram.",
     "logout": "Mag-log Out",
     "signout_remote_unconfirmed": "Naka-sign out ka na sa device na ito, ngunit hindi kinumpirma ng Telegram na natapos na ang session. Buksan ang Telegram → Settings → Devices at tapusin ito roon.",
     "search_placeholder": "Maghanap ng mga file...",
