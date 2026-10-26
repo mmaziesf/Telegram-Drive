@@ -133,7 +133,7 @@ export function EncryptionProvider({ children }: { children: ReactNode }) {
 
     useEffect(() => {
         if (!appSettingsLoaded) return;
-        let mobile = false;
+        let mobile: boolean;
         try {
             const platform = osType();
             mobile = platform === 'android' || platform === 'ios';
