@@ -20,7 +20,8 @@ const scripts = directives.get('script-src') || [];
 if (!scripts.includes("'self'") || scripts.some(value => ["'unsafe-inline'", "'unsafe-eval'", '*'].includes(value))) {
   throw new Error('WebView scripts must be self-hosted without inline/eval/wildcard execution.');
 }
-for (const [name, expected] of [['object-src', "'none'"], ['base-uri', "'self'"], ['form-action', "'self'"]]) {
+// Nothing in the app is framed; the removed sponsor iframe was the only user.
+for (const [name, expected] of [['object-src', "'none'"], ['frame-src', "'none'"], ['base-uri', "'self'"], ['form-action', "'self'"]]) {
   const sources = directives.get(name);
   if (sources?.length !== 1 || sources[0] !== expected) throw new Error(`Invalid ${name} restriction.`);
 }

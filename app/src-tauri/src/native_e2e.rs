@@ -1239,12 +1239,8 @@ impl Driver {
             | "search_index_saved" => self.dispatch_search(request).await,
             "webdav_upload_fixture"
             | "start_media_fixture"
-            | "start_ad_server"
-            | "stop_ad_server"
-            | "sponsor_load_verified"
             | "start_stream_server"
             | "api_seed_catalog"
-            | "supporter_verify"
             | "start_webdav"
             | "release_retained_sessions"
             | "start_api"
@@ -3613,36 +3609,6 @@ impl Driver {
                     json!({"url": format!("http://{address}/media?owner={owner}"), "credential":credential.map(|value| value.to_string())}),
                 )
             }
-            "start_ad_server" => {
-                let listener = crate::server::bind_ad_listener().map_err(error)?;
-                let address = listener.local_addr().map_err(error)?;
-                let server = if let Some(url) = request["fixtureUrl"].as_str() {
-                    crate::server::start_ad_fixture(listener, url.to_string())
-                } else {
-                    crate::server::start_ad_server(listener)
-                }
-                .map_err(error)?;
-                self.servers.push((server.handle(), tokio::spawn(server)));
-                Ok(
-                    json!({"url":format!("http://{address}"),"port":address.port(),"publishedStreamPort":crate::stream_port()}),
-                )
-            }
-            "stop_ad_server" => {
-                let (handle, task) = self.servers.pop().ok_or("No separate server")?;
-                handle.stop(true).await;
-                task.await.map_err(error)?.map_err(error)?;
-                Ok(json!({"sponsorPort":crate::server::sponsor_port()}))
-            }
-            "sponsor_load_verified" => {
-                crate::commands::supporter::load_sponsor_fixture(
-                    text(&request, "token")?,
-                    text(&request, "devicePublicKey")?,
-                    text(&request, "servicePublicKey")?,
-                    request["now"].as_i64().ok_or("Missing now")?,
-                )
-                .await?;
-                Ok(json!(true))
-            }
             "start_stream_server" => {
                 // Production bind path: the preferred port, or an assigned one
                 // when another process already holds it.
@@ -3719,12 +3685,6 @@ impl Driver {
                 );
                 Ok(json!(true))
             }
-            "supporter_verify" => crate::commands::supporter::verify_issued_token(
-                text(&request, "token")?,
-                text(&request, "devicePublicKey")?,
-                text(&request, "servicePublicKey")?,
-                request["now"].as_i64().ok_or("Missing now")?,
-            ),
             "start_webdav" => {
                 // The WebDAV server exactly as the application serves it;
                 // only the Telegram connection is absent.
