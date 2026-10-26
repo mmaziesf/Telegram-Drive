@@ -30,6 +30,8 @@ export interface Settings {
   supporterMode: boolean;
   supporterPromptLastShownAt: number;
   driveTourSeen: boolean;
+  /** Per-device: the first-run encryption setup prompt has been answered. */
+  encryptionSetupSeen: boolean;
   vaultRecoveryDrillCompleted: boolean;
   /** Vault the completed drill was run against; empty for drills recorded before 4.0. */
   vaultRecoveryDrillVaultId: string;

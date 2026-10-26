@@ -41,7 +41,7 @@ export async function desktopFixture(page: Page, options: {
   await page.addInitScript(options => {
     const stores = JSON.parse(localStorage.getItem('desktop-e2e-stores') || 'null') ?? {
       'config.json': { api_id: options.signedOut ? undefined : '12345', foldersLastSyncedAt: Date.now(), activeFolderId: 9, ad_gateway_passed: options.gatewaySeen ?? true },
-      'settings.json': { settings: { crashReportingEnabled: false, crashReportingConsentSeen: true, driveTourSeen: true, language: 'en', viewMode: 'list', ...(options.settings ?? {}) }, supporter_activation: 'preserve-existing-license' },
+      'settings.json': { settings: { crashReportingEnabled: false, crashReportingConsentSeen: true, driveTourSeen: true, encryptionSetupSeen: true, language: 'en', viewMode: 'list', ...(options.settings ?? {}) }, supporter_activation: 'preserve-existing-license' },
     };
     const persist = () => localStorage.setItem('desktop-e2e-stores', JSON.stringify(stores));
     const callbacks = new Map<number, (value: any) => void>();

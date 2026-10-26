@@ -11,6 +11,7 @@ import { TouchFileList } from './TouchFileList';
 import { ThemeToggle } from '../shared/ThemeToggle';
 import AdsterraBanner from '../shared/AdsterraBanner';
 import { DriveConceptTour } from '../desktop/dashboard/DriveConceptTour';
+import { useEncryptionSetupNeeded } from '../../hooks/useEncryptionSetupNeeded';
 import { ActionPopover, ActionItem } from './ActionPopover';
 import { ShareDialog } from '../desktop/dashboard/ShareDialog';
 import { RenameFolderSheet } from './RenameFolderSheet';
@@ -43,6 +44,7 @@ import {
 } from '../../services/supporterVisibility';
 import i18n from '../../i18n';
 
+const LazyEncryptionSetupPrompt = lazy(() => import('../shared/EncryptionSetupPrompt').then(module => ({ default: module.EncryptionSetupPrompt })));
 const LazyHelpCenterDialog = lazy(() => import('../desktop/dashboard/HelpCenterDialog').then((module) => ({ default: module.HelpCenterDialog })));
 const LazyMobileMediaPlayer = lazy(() => import('./MobileMediaPlayer').then((module) => ({ default: module.MobileMediaPlayer })));
 const LazyPdfViewer = lazy(() => import('../desktop/dashboard/PdfViewer').then((module) => ({ default: module.PdfViewer })));
@@ -86,6 +88,9 @@ export default function MobileDashboard({ onLogout }: { onLogout?: () => void })
   const { isAndroid, isTelevision } = usePlatform();
   const { theme } = useTheme();
   const { settings, updateSetting, isLoaded: settingsLoaded } = useSettings();
+  const encryptionSetupNeeded = useEncryptionSetupNeeded();
+  const [encryptionSetupDeferred, setEncryptionSetupDeferred] = useState(false);
+  const showEncryptionSetup = encryptionSetupNeeded && !encryptionSetupDeferred;
   const { status: supporterStatus } = useSupporter();
   const [showHelp, setShowHelp] = useState(false);
   const [supporterOfferTrigger, setSupporterOfferTrigger] = useState<SupporterPromptTrigger | null>(null);
@@ -367,7 +372,7 @@ export default function MobileDashboard({ onLogout }: { onLogout?: () => void })
   // Keep it suppressed during media, previews, dialogs, and active transfers so it
   // never covers playback controls or interrupts a bandwidth-sensitive operation.
   const adVisible = !playingFile && !pdfFile && !previewFile && !shareFile && !bulkShareLinks
-    && !showHelp && !supporterOfferTrigger && settings.driveTourSeen
+    && !showHelp && !supporterOfferTrigger && settings.driveTourSeen && !showEncryptionSetup
     && !uploadQueue.some(item => ['pending', 'uploading', 'downloading', 'encrypting', 'verifying'].includes(item.status))
     && !downloadQueue.some(item => ['pending', 'cooldown', 'downloading', 'decrypting', 'verifying'].includes(item.status));
 
@@ -1691,6 +1696,8 @@ export default function MobileDashboard({ onLogout }: { onLogout?: () => void })
           onOpenHelp={() => { updateSetting('driveTourSeen', true); setShowHelp(true); }}
         />
       )}
+
+      {showEncryptionSetup && <LazyFeatureBoundary><LazyEncryptionSetupPrompt onDefer={() => setEncryptionSetupDeferred(true)} /></LazyFeatureBoundary>}
 
       {showHelp && <LazyFeatureBoundary><LazyHelpCenterDialog onClose={() => setShowHelp(false)} /></LazyFeatureBoundary>}
 

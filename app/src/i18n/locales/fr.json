@@ -432,7 +432,8 @@
     "encryption_experimental_inventory_many": "{{count}} fichiers chiffrés expérimentaux sont indexés localement. Leurs textes chiffrés ont été conservés.",
     "current_vault_passphrase": "Phrase secrète actuelle du coffre",
     "videoFilenameCaption": "Noms de fichier en légende",
-    "videoFilenameCaptionDesc": "Ajoutez le nom original aux messages vidéo. Les envois chiffrés gardent ce nom privé."
+    "videoFilenameCaptionDesc": "Ajoutez le nom original aux messages vidéo. Les envois chiffrés gardent ce nom privé.",
+    "standard_mode_warning": "Les nouveaux envois ne sont pas chiffrés. Telegram, et toute personne accédant à votre compte Telegram, peut les lire."
   },
   "files": {
     "download": "Télécharger",
@@ -1375,7 +1376,6 @@
     "drill_passed": "Test de récupération réussi. Le coffre et sa phrase secrète restent inchangés.",
     "test_failed": "Échec du test de récupération : {{error}}",
     "export_failed": "Échec de l’export de récupération : {{error}}",
-    "vault_created": "Coffre créé. Terminez le test de récupération avant d’activer les envois protégés par défaut.",
     "safety_disabled": "La protection est désactivée par sécurité, car le service de sécurité local n’a pas réussi son contrôle initial. Relancez le contrôle ; les fichiers existants restent inchangés.",
     "safety_paused": "La protection reste en pause jusqu’à la réussite du contrôle de sécurité. Les fichiers existants restent inchangés.",
     "passphrase_placeholder": "Phrase secrète du paquet de récupération"
@@ -1466,7 +1466,9 @@
     "protect": "Conserver et protéger",
     "protect_description": "Chiffrez avant l’envoi avec vos paramètres de protection configurés.",
     "reload_app": "Recharger l’application",
-    "load_failed": "Les options d’envoi n’ont pas pu être chargées. Le rechargement annule cette sélection. Sélectionnez à nouveau vos fichiers ensuite."
+    "load_failed": "Les options d’envoi n’ont pas pu être chargées. Le rechargement annule cette sélection. Sélectionnez à nouveau vos fichiers ensuite.",
+    "recommended": "Recommandé",
+    "plain_warning": "Non chiffré : Telegram peut lire ce fichier."
   },
   "auth_copy": {
     "qr_title": "Connexion sécurisée par QR",
@@ -1597,5 +1599,19 @@
     "this_device": "envoyée par cet appareil",
     "other_device": "envoyée par un autre appareil",
     "none": "Aucune sauvegarde chiffrée des paramètres dans les 1,000 derniers Messages enregistrés."
+  },
+  "encryption_setup": {
+    "title": "Chiffrez vos envois",
+    "body": "Telegram Drive peut chiffrer les fichiers sur cet appareil avant leur envoi, afin que ni Telegram ni une personne accédant à votre compte ne puisse les lire. Créez une phrase secrète de coffre pour l’activer.",
+    "existing_files": "Les fichiers déjà envoyés restent lisibles. Seuls les nouveaux envois sont chiffrés.",
+    "enable": "Activer le chiffrement (recommandé)",
+    "keep_plain": "Garder les envois non chiffrés",
+    "later": "Plus tard",
+    "back": "Retour",
+    "finish": "Terminer",
+    "plain_warning_title": "Envoyer sans chiffrement ?",
+    "plain_warning_body": "Les nouveaux envois seront stockés sur Telegram sans chiffrement. Telegram, et toute personne accédant à votre compte Telegram, pourra les lire. Vous pourrez activer le chiffrement plus tard dans les Réglages.",
+    "confirm_plain": "Garder non chiffré",
+    "vault_created": "Coffre créé. Les nouveaux envois sont chiffrés. Enregistrez un kit de récupération pour ne jamais perdre l’accès."
   }
 }

@@ -38,6 +38,7 @@ import { DesktopAdBanner } from './dashboard/DesktopAdBanner';
 import { RemoteUploadModal } from './dashboard/RemoteUploadModal';
 import { KeyboardShortcutsDialog } from './dashboard/KeyboardShortcutsDialog';
 import { DriveConceptTour } from './dashboard/DriveConceptTour';
+import { useEncryptionSetupNeeded } from '../../hooks/useEncryptionSetupNeeded';
 import { LazyFeatureBoundary } from '../shared/LazyFeatureBoundary';
 import { SyncDashboard } from './sync/SyncDashboard';
 import { Files, Link, Copy, Check, X, Loader2, Share2 } from 'lucide-react';
@@ -61,6 +62,7 @@ import { fileQueryKey, invalidateFolderFileQueries, refreshFolderFiles, updateFi
 import { getAdjacentPreview, previewFileKey, samePreviewFile as sameFile } from '../../services/previewNavigation';
 import i18n from '../../i18n';
 
+const LazyEncryptionSetupPrompt = lazy(() => import('../shared/EncryptionSetupPrompt').then(module => ({ default: module.EncryptionSetupPrompt })));
 const LazyShareDialog = lazy(() => import('./dashboard/ShareDialog').then(module => ({ default: module.ShareDialog })));
 const LazyPreviewModal = lazy(() => import('./dashboard/PreviewModal').then((module) => ({ default: module.PreviewModal })));
 const LazyMediaPlayer = lazy(() => import('./dashboard/MediaPlayer').then((module) => ({ default: module.MediaPlayer })));
@@ -104,6 +106,9 @@ export function Dashboard({ onLogout }: { onLogout: () => void }) {
     }, [accountId, queryClient]);
 
     const { settings, updateSetting, updateSettings, isLoaded: settingsLoaded } = useSettings();
+    const encryptionSetupNeeded = useEncryptionSetupNeeded();
+    const [encryptionSetupDeferred, setEncryptionSetupDeferred] = useState(false);
+    const showEncryptionSetup = encryptionSetupNeeded && !encryptionSetupDeferred;
     const captureMutationScope = useActionScope(accountId);
     const { status: supporterStatus } = useSupporter();
 
@@ -343,7 +348,7 @@ export function Dashboard({ onLogout }: { onLogout: () => void }) {
     const showSupporterOffer = useSupporterPrompt(
         Boolean(!accountId || isLoading || isSyncing || previewFile || playingFile || pdfFile || archiveViewFile
             || localPreview || showSettings || showMoveModal || shareFile || showRemoteUpload || showHelp
-            || showShortcuts || renameFolder || renameFileTarget || bulkShareLinks || bulkShareLoading
+            || showShortcuts || renameFolder || renameFileTarget || bulkShareLinks || bulkShareLoading || showEncryptionSetup
             || internalDrag || selectedIds.length || workspaceKeys !== null || searchTerm
             || uploadQueue.some(item => ['pending', 'uploading', 'downloading', 'encrypting', 'verifying'].includes(item.status))
             || downloadQueue.some(item => ['pending', 'cooldown', 'downloading', 'decrypting', 'verifying'].includes(item.status))),
@@ -522,7 +527,7 @@ export function Dashboard({ onLogout }: { onLogout: () => void }) {
         enabled: !previewFile && !playingFile && !pdfFile && !archiveViewFile
             && !showMoveModal && !showSettings && !showShortcuts && !showHelp && !supporterOfferTrigger && workspaceKeys === null
             && !showRemoteUpload && !shareFile && !bulkShareLinks
-            && settings.driveTourSeen
+            && settings.driveTourSeen && !showEncryptionSetup
     });
 
     const handlePreview = (file: TelegramFile, orderedFiles?: TelegramFile[], localPath?: string) => {
@@ -1039,6 +1044,8 @@ export function Dashboard({ onLogout }: { onLogout: () => void }) {
                 />
             )}
 
+            {showEncryptionSetup && !showSettings && <LazyFeatureBoundary><LazyEncryptionSetupPrompt onDefer={() => setEncryptionSetupDeferred(true)} /></LazyFeatureBoundary>}
+
             {showHelp && <LazyFeatureBoundary><LazyHelpCenterDialog onClose={() => setShowHelp(false)} /></LazyFeatureBoundary>}
 
             {supporterOfferTrigger && (
@@ -1053,7 +1060,7 @@ export function Dashboard({ onLogout }: { onLogout: () => void }) {
                 suppressed={
                     uploadQueue.some(item => ['pending', 'uploading', 'downloading', 'encrypting', 'verifying'].includes(item.status))
                     || downloadQueue.some(item => ['pending', 'cooldown', 'downloading', 'decrypting', 'verifying'].includes(item.status))
-                    || Boolean(previewFile || playingFile || pdfFile || archiveViewFile || showSettings || showMoveModal || shareFile || showRemoteUpload || showHelp || supporterOfferTrigger || !settings.driveTourSeen)
+                    || Boolean(previewFile || playingFile || pdfFile || archiveViewFile || showSettings || showMoveModal || shareFile || showRemoteUpload || showHelp || supporterOfferTrigger || !settings.driveTourSeen || showEncryptionSetup)
                 }
                 onSupport={() => { setSettingsInitialTab('license'); setFocusSupporter(true); setShowSettings(true); }}
                 onManualDismiss={() => showSupporterOffer('ad_dismissed')}

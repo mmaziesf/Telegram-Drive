@@ -433,7 +433,8 @@
     "hide_passphrase": "Ukryj frazę hasła",
     "current_vault_passphrase": "Aktualne hasło sejfu",
     "videoFilenameCaption": "Nazwy plików w podpisach",
-    "videoFilenameCaptionDesc": "Dodaj oryginalną nazwę pliku do wiadomości wideo. Przy szyfrowanym przesyłaniu pozostaje ona prywatna."
+    "videoFilenameCaptionDesc": "Dodaj oryginalną nazwę pliku do wiadomości wideo. Przy szyfrowanym przesyłaniu pozostaje ona prywatna.",
+    "standard_mode_warning": "Nowe pliki nie są szyfrowane. Telegram i każdy, kto uzyska dostęp do Twojego konta Telegram, może je odczytać."
   },
   "files": {
     "download": "Pobierać",
@@ -1382,7 +1383,6 @@
     "drill_passed": "Test odzyskiwania zaliczony. Sejf i jego hasło pozostają niezmienione.",
     "test_failed": "Test odzyskiwania nie powiódł się: {{error}}",
     "export_failed": "Eksport odzyskiwania nie powiódł się: {{error}}",
-    "vault_created": "Sejf utworzony. Zakończ test odzyskiwania przed domyślnym włączeniem chronionego wysyłania.",
     "safety_disabled": "Ochrona jest wyłączona dla bezpieczeństwa, ponieważ lokalna usługa bezpieczeństwa nie przeszła kontroli startowej. Ponów kontrolę; istniejące pliki pozostają bez zmian.",
     "safety_paused": "Ochrona pozostaje wstrzymana do pomyślnej kontroli bezpieczeństwa. Istniejące pliki pozostają bez zmian.",
     "passphrase_placeholder": "Hasło pakietu odzyskiwania"
@@ -1473,7 +1473,9 @@
     "protect": "Zapisz i chroń",
     "protect_description": "Zaszyfruj przed wysłaniem z użyciem skonfigurowanych ustawień ochrony.",
     "reload_app": "Odśwież aplikację",
-    "load_failed": "Nie udało się wczytać opcji przesyłania. Odświeżenie anuluje ten wybór. Następnie wybierz pliki ponownie."
+    "load_failed": "Nie udało się wczytać opcji przesyłania. Odświeżenie anuluje ten wybór. Następnie wybierz pliki ponownie.",
+    "recommended": "Zalecane",
+    "plain_warning": "Bez szyfrowania: Telegram może odczytać ten plik."
   },
   "auth_copy": {
     "qr_title": "Bezpieczne logowanie przez QR",
@@ -1604,5 +1606,19 @@
     "this_device": "wysłana przez to urządzenie",
     "other_device": "wysłana przez inne urządzenie",
     "none": "Nie znaleziono zaszyfrowanej kopii ustawień w ostatnich 1,000 Zapisanych wiadomościach."
+  },
+  "encryption_setup": {
+    "title": "Szyfruj przesyłane pliki",
+    "body": "Telegram Drive może szyfrować pliki na tym urządzeniu przed wysłaniem, aby ani Telegram, ani nikt, kto uzyska dostęp do Twojego konta, nie mógł ich odczytać. Utwórz hasło sejfu, aby to włączyć.",
+    "existing_files": "Pliki przesłane wcześniej pozostają czytelne. Szyfrowane są tylko nowe przesyłki.",
+    "enable": "Włącz szyfrowanie (zalecane)",
+    "keep_plain": "Przesyłaj bez szyfrowania",
+    "later": "Nie teraz",
+    "back": "Wstecz",
+    "finish": "Zakończ",
+    "plain_warning_title": "Przesyłać bez szyfrowania?",
+    "plain_warning_body": "Nowe pliki będą przechowywane w Telegramie bez szyfrowania. Telegram i każdy, kto uzyska dostęp do Twojego konta Telegram, będzie mógł je odczytać. Szyfrowanie możesz włączyć później w Ustawieniach.",
+    "confirm_plain": "Pozostaw bez szyfrowania",
+    "vault_created": "Sejf utworzony. Nowe pliki są szyfrowane. Zapisz zestaw odzyskiwania, aby nigdy nie stracić dostępu."
   }
 }

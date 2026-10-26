@@ -431,7 +431,8 @@
     "hide_passphrase": "隐藏密码短语",
     "current_vault_passphrase": "当前保险库口令",
     "videoFilenameCaption": "文件名说明",
-    "videoFilenameCaptionDesc": "将原始文件名添加到视频消息说明中。加密上传会保护文件名隐私。"
+    "videoFilenameCaptionDesc": "将原始文件名添加到视频消息说明中。加密上传会保护文件名隐私。",
+    "standard_mode_warning": "新的上传未加密。Telegram 以及进入你 Telegram 账户的任何人都可以读取。"
   },
   "files": {
     "download": "下载",
@@ -1368,7 +1369,6 @@
     "drill_passed": "恢复演练通过。密钥库及其口令未更改。",
     "test_failed": "恢复测试失败：{{error}}",
     "export_failed": "恢复包导出失败：{{error}}",
-    "vault_created": "密钥库已创建。默认启用受保护上传之前，请完成恢复演练。",
     "safety_disabled": "本地安全服务未通过启动检查，因此为安全起见已禁用保护。请重试检查；现有文件不会更改。",
     "safety_paused": "保护将保持暂停，直到安全检查成功。现有文件不会更改。",
     "passphrase_placeholder": "恢复包口令"
@@ -1459,7 +1459,9 @@
     "protect": "存储并保护",
     "protect_description": "上传前使用已配置的保护设置进行加密。",
     "reload_app": "重新加载应用",
-    "load_failed": "无法加载上传选项。重新加载会取消此次选择。应用重新加载后，请再次选择文件。"
+    "load_failed": "无法加载上传选项。重新加载会取消此次选择。应用重新加载后，请再次选择文件。",
+    "recommended": "推荐",
+    "plain_warning": "未加密：Telegram 可以读取此文件。"
   },
   "auth_copy": {
     "qr_title": "优先使用 QR 安全登录",
@@ -1590,5 +1592,19 @@
     "this_device": "由此设备上传",
     "other_device": "由另一台设备上传",
     "none": "最近 1,000 条收藏夹消息中未找到加密设置备份。"
+  },
+  "encryption_setup": {
+    "title": "加密你的上传",
+    "body": "Telegram Drive 可以在上传前于本设备上加密文件，这样 Telegram 以及进入你账户的任何人都无法读取。创建保险库密码短语即可开启。",
+    "existing_files": "已上传的文件仍可读取。只有新的上传会被加密。",
+    "enable": "开启加密（推荐）",
+    "keep_plain": "保持上传不加密",
+    "later": "以后再说",
+    "back": "返回",
+    "finish": "完成",
+    "plain_warning_title": "不加密上传？",
+    "plain_warning_body": "新的上传将以未加密形式存储在 Telegram 上。Telegram 以及进入你 Telegram 账户的任何人都可以读取。你可以稍后在设置中开启加密。",
+    "confirm_plain": "保持不加密",
+    "vault_created": "保险库已创建。新的上传会被加密。请保存恢复套件，以免失去访问权限。"
   }
 }

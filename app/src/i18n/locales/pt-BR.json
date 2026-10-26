@@ -432,7 +432,8 @@
     "encryption_experimental_inventory_many": "{{count}} arquivos criptografados experimentais estão indexados localmente. Seus textos cifrados foram preservados.",
     "current_vault_passphrase": "Frase-senha atual do cofre",
     "videoFilenameCaption": "Nomes de arquivo nas legendas",
-    "videoFilenameCaptionDesc": "Adicione o nome original às mensagens de vídeo. Envios criptografados mantêm o nome privado."
+    "videoFilenameCaptionDesc": "Adicione o nome original às mensagens de vídeo. Envios criptografados mantêm o nome privado.",
+    "standard_mode_warning": "Os novos envios não são criptografados. O Telegram, e qualquer pessoa que acesse sua conta do Telegram, pode lê-los."
   },
   "files": {
     "download": "Baixar",
@@ -1375,7 +1376,6 @@
     "drill_passed": "Teste de recuperação aprovado. O cofre e sua frase secreta não foram alterados.",
     "test_failed": "O teste de recuperação falhou: {{error}}",
     "export_failed": "A exportação de recuperação falhou: {{error}}",
-    "vault_created": "Cofre criado. Conclua o teste de recuperação antes de ativar envios protegidos por padrão.",
     "safety_disabled": "A proteção foi desativada por segurança porque o serviço de segurança local não passou na verificação inicial. Tente novamente; os arquivos existentes permanecem intactos.",
     "safety_paused": "A proteção permanece pausada até a verificação de segurança ser concluída com sucesso. Os arquivos existentes não são alterados.",
     "passphrase_placeholder": "Frase secreta do pacote de recuperação"
@@ -1466,7 +1466,9 @@
     "protect": "Armazenar e proteger",
     "protect_description": "Criptografe antes do envio usando suas configurações de proteção.",
     "reload_app": "Recarregar aplicativo",
-    "load_failed": "Não foi possível carregar as opções de envio. Recarregar cancela esta seleção. Selecione seus arquivos novamente depois."
+    "load_failed": "Não foi possível carregar as opções de envio. Recarregar cancela esta seleção. Selecione seus arquivos novamente depois.",
+    "recommended": "Recomendado",
+    "plain_warning": "Sem criptografia: o Telegram pode ler este arquivo."
   },
   "auth_copy": {
     "qr_title": "Entrada segura por QR",
@@ -1597,5 +1599,19 @@
     "this_device": "enviado por este dispositivo",
     "other_device": "enviado por outro dispositivo",
     "none": "Nenhum backup criptografado de configurações nas últimas 1,000 Mensagens salvas."
+  },
+  "encryption_setup": {
+    "title": "Criptografe seus envios",
+    "body": "O Telegram Drive pode criptografar os arquivos neste dispositivo antes do envio, para que nem o Telegram nem quem acessar sua conta consiga lê-los. Crie uma frase-senha do cofre para ativar.",
+    "existing_files": "Os arquivos que você já enviou continuam legíveis. Apenas os novos envios são criptografados.",
+    "enable": "Ativar criptografia (recomendado)",
+    "keep_plain": "Manter envios sem criptografia",
+    "later": "Agora não",
+    "back": "Voltar",
+    "finish": "Concluir",
+    "plain_warning_title": "Enviar sem criptografia?",
+    "plain_warning_body": "Os novos envios serão armazenados no Telegram sem criptografia. O Telegram, e qualquer pessoa que acesse sua conta do Telegram, poderá lê-los. Você pode ativar a criptografia depois nas Configurações.",
+    "confirm_plain": "Manter sem criptografia",
+    "vault_created": "Cofre criado. Os novos envios são criptografados. Salve um kit de recuperação para nunca perder o acesso."
   }
 }

@@ -431,7 +431,8 @@
     "hide_passphrase": "Sembunyikan frasa sandi",
     "current_vault_passphrase": "Frasa sandi brankas saat ini",
     "videoFilenameCaption": "Nama berkas sebagai keterangan",
-    "videoFilenameCaptionDesc": "Tambahkan nama berkas asli ke pesan video. Unggahan terenkripsi menjaga nama tetap pribadi."
+    "videoFilenameCaptionDesc": "Tambahkan nama berkas asli ke pesan video. Unggahan terenkripsi menjaga nama tetap pribadi.",
+    "standard_mode_warning": "Unggahan baru tidak dienkripsi. Telegram, dan siapa pun yang masuk ke akun Telegram Anda, dapat membacanya."
   },
   "files": {
     "download": "Unduh",
@@ -1368,7 +1369,6 @@
     "drill_passed": "Uji pemulihan berhasil. Brankas dan frasa sandinya tidak berubah.",
     "test_failed": "Uji pemulihan gagal: {{error}}",
     "export_failed": "Ekspor pemulihan gagal: {{error}}",
-    "vault_created": "Brankas dibuat. Selesaikan uji pemulihan sebelum unggahan terlindungi diaktifkan secara bawaan.",
     "safety_disabled": "Perlindungan dinonaktifkan demi keamanan karena layanan keamanan lokal gagal pemeriksaan awal. Coba lagi; file yang ada tidak diubah.",
     "safety_paused": "Perlindungan tetap dijeda sampai pemeriksaan keamanan berhasil. File yang ada tidak diubah.",
     "passphrase_placeholder": "Frasa sandi bundel pemulihan"
@@ -1459,7 +1459,9 @@
     "protect": "Simpan dan lindungi",
     "protect_description": "Enkripsi sebelum diunggah menggunakan pengaturan perlindungan Anda.",
     "reload_app": "Muat ulang aplikasi",
-    "load_failed": "Opsi unggahan tidak dapat dimuat. Memuat ulang membatalkan pilihan ini. Pilih file Anda lagi setelah aplikasi dimuat ulang."
+    "load_failed": "Opsi unggahan tidak dapat dimuat. Memuat ulang membatalkan pilihan ini. Pilih file Anda lagi setelah aplikasi dimuat ulang.",
+    "recommended": "Disarankan",
+    "plain_warning": "Tidak terenkripsi: Telegram dapat membaca file ini."
   },
   "auth_copy": {
     "qr_title": "Masuk aman dengan QR",
@@ -1590,5 +1592,19 @@
     "this_device": "diunggah oleh perangkat ini",
     "other_device": "diunggah oleh perangkat lain",
     "none": "Tidak ditemukan cadangan pengaturan terenkripsi dalam 1,000 Pesan Tersimpan terbaru."
+  },
+  "encryption_setup": {
+    "title": "Enkripsi unggahan Anda",
+    "body": "Telegram Drive dapat mengenkripsi file di perangkat ini sebelum diunggah, sehingga Telegram maupun siapa pun yang masuk ke akun Anda tidak dapat membacanya. Buat frasa sandi brankas untuk mengaktifkannya.",
+    "existing_files": "File yang sudah Anda unggah tetap dapat dibaca. Hanya unggahan baru yang dienkripsi.",
+    "enable": "Aktifkan enkripsi (disarankan)",
+    "keep_plain": "Biarkan unggahan tidak terenkripsi",
+    "later": "Nanti saja",
+    "back": "Kembali",
+    "finish": "Selesai",
+    "plain_warning_title": "Unggah tanpa enkripsi?",
+    "plain_warning_body": "Unggahan baru akan disimpan di Telegram tanpa enkripsi. Telegram, dan siapa pun yang masuk ke akun Telegram Anda, dapat membacanya. Anda dapat mengaktifkan enkripsi nanti di Pengaturan.",
+    "confirm_plain": "Biarkan tidak terenkripsi",
+    "vault_created": "Brankas dibuat. Unggahan baru dienkripsi. Simpan kit pemulihan agar Anda tidak pernah kehilangan akses."
   }
 }

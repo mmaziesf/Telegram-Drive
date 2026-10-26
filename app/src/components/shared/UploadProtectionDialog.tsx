@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { LockKeyhole, UploadCloud } from 'lucide-react';
+import { AlertTriangle, LockKeyhole, UploadCloud } from 'lucide-react';
 import { useEncryption } from '../../hooks/useEncryption';
 import { useSettings } from '../../context/SettingsContext';
 import type { UploadChoice } from '../../context/UploadChoiceContext';
@@ -43,15 +43,16 @@ export default function UploadProtectionDialog({ count, onFinish }: { count: num
                             {encryption.capabilityState !== 'loading' && <button type="button" onClick={() => void encryption.refreshCapabilities()} className="quiet-control mt-2 min-h-11 px-3 text-app-accent">{i18n.t('settings.retry_encryption_check')}</button>}
                         </div>}
                         <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                            <button onClick={() => void chooseProtect()} className="quiet-surface border-app-accent/40 p-4 text-start hover:border-app-accent/60 hover:bg-app-hover">
+                                <LockKeyhole className="mb-3 h-5 w-5 text-app-success" />
+                                <span className="block text-sm font-semibold text-app-text">{i18n.t('upload_choice_copy.protect')} <span className="ms-1 rounded-full bg-app-success/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-app-success">{i18n.t('upload_choice_copy.recommended')}</span></span>
+                                <span className="mt-1 block text-xs leading-5 text-app-text-secondary">{i18n.t('upload_choice_copy.protect_description')}</span>
+                            </button>
                             <button onClick={() => onFinish('store')} className="quiet-surface p-4 text-start hover:border-app-accent/40 hover:bg-app-hover">
                                 <UploadCloud className="mb-3 h-5 w-5 text-app-accent" />
                                 <span className="block text-sm font-semibold text-app-text">{i18n.t('upload_choice_copy.store')}</span>
                                 <span className="mt-1 block text-xs leading-5 text-app-text-secondary">{i18n.t('upload_choice_copy.plain_description')}</span>
-                            </button>
-                            <button onClick={() => void chooseProtect()} className="quiet-surface p-4 text-start hover:border-app-accent/40 hover:bg-app-hover">
-                                <LockKeyhole className="mb-3 h-5 w-5 text-app-success" />
-                                <span className="block text-sm font-semibold text-app-text">{i18n.t('upload_choice_copy.protect')}</span>
-                                <span className="mt-1 block text-xs leading-5 text-app-text-secondary">{i18n.t('upload_choice_copy.protect_description')}</span>
+                                <span className="mt-2 flex items-start gap-1.5 text-xs leading-5 text-app-warning"><AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />{i18n.t('upload_choice_copy.plain_warning')}</span>
                             </button>
                         </div>
                         </>}

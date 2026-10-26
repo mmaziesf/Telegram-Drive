@@ -431,7 +431,8 @@
     "hide_passphrase": "Passphrase verbergen",
     "current_vault_passphrase": "Aktuelle Tresor-Passphrase",
     "videoFilenameCaption": "Dateinamen als Bildunterschrift",
-    "videoFilenameCaptionDesc": "Den ursprünglichen Dateinamen zu Videonachrichten hinzufügen. Bei verschlüsselten Uploads bleibt er privat."
+    "videoFilenameCaptionDesc": "Den ursprünglichen Dateinamen zu Videonachrichten hinzufügen. Bei verschlüsselten Uploads bleibt er privat.",
+    "standard_mode_warning": "Neue Uploads werden nicht verschlüsselt. Telegram und jeder, der Zugriff auf dein Telegram-Konto erhält, kann sie lesen."
   },
   "files": {
     "download": "Herunterladen",
@@ -1368,7 +1369,6 @@
     "drill_passed": "Wiederherstellungstest bestanden. Tresor und Passphrase bleiben unverändert.",
     "test_failed": "Wiederherstellungstest fehlgeschlagen: {{error}}",
     "export_failed": "Wiederherstellungsexport fehlgeschlagen: {{error}}",
-    "vault_created": "Tresor erstellt. Schließe den Wiederherstellungstest ab, bevor geschützte Uploads standardmäßig aktiviert werden.",
     "safety_disabled": "Der Schutz ist aus Sicherheitsgründen deaktiviert, weil der lokale Sicherheitsdienst den Starttest nicht bestanden hat. Wiederhole den Test; vorhandene Dateien bleiben unverändert.",
     "safety_paused": "Der Schutz bleibt pausiert, bis der Sicherheitstest erfolgreich ist. Vorhandene Dateien bleiben unverändert.",
     "passphrase_placeholder": "Passphrase des Wiederherstellungspakets"
@@ -1459,7 +1459,9 @@
     "protect": "Speichern & schützen",
     "protect_description": "Vor dem Upload mit deinen konfigurierten Schutzeinstellungen verschlüsseln.",
     "reload_app": "App neu laden",
-    "load_failed": "Die Upload-Optionen konnten nicht geladen werden. Beim Neuladen wird diese Auswahl verworfen. Wähle danach deine Dateien erneut aus."
+    "load_failed": "Die Upload-Optionen konnten nicht geladen werden. Beim Neuladen wird diese Auswahl verworfen. Wähle danach deine Dateien erneut aus.",
+    "recommended": "Empfohlen",
+    "plain_warning": "Nicht verschlüsselt: Telegram kann diese Datei lesen."
   },
   "auth_copy": {
     "qr_title": "Sichere Anmeldung per QR",
@@ -1590,5 +1592,19 @@
     "this_device": "von diesem Gerät hochgeladen",
     "other_device": "von einem anderen Gerät hochgeladen",
     "none": "Keine verschlüsselte Einstellungssicherung in den neuesten 1,000 Gespeicherten Nachrichten gefunden."
+  },
+  "encryption_setup": {
+    "title": "Uploads verschlüsseln",
+    "body": "Telegram Drive kann Dateien auf diesem Gerät verschlüsseln, bevor sie hochgeladen werden. So können weder Telegram noch jemand mit Zugriff auf dein Konto sie lesen. Lege eine Tresor-Passphrase fest, um dies zu aktivieren.",
+    "existing_files": "Bereits hochgeladene Dateien bleiben lesbar. Nur neue Uploads werden verschlüsselt.",
+    "enable": "Verschlüsselung aktivieren (empfohlen)",
+    "keep_plain": "Uploads unverschlüsselt lassen",
+    "later": "Nicht jetzt",
+    "back": "Zurück",
+    "finish": "Fertig",
+    "plain_warning_title": "Ohne Verschlüsselung hochladen?",
+    "plain_warning_body": "Neue Uploads werden unverschlüsselt bei Telegram gespeichert. Telegram und jeder, der Zugriff auf dein Telegram-Konto erhält, kann sie lesen. Du kannst die Verschlüsselung später in den Einstellungen aktivieren.",
+    "confirm_plain": "Unverschlüsselt lassen",
+    "vault_created": "Tresor erstellt. Neue Uploads werden verschlüsselt. Speichere ein Wiederherstellungskit, damit du nie den Zugriff verlierst."
   }
 }

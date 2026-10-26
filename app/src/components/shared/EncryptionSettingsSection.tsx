@@ -334,8 +334,10 @@ export function EncryptionSettingsSection({ vaultOnly = false }: { vaultOnly?: b
         setCreatingVault(true);
         try {
             await encryption.createVault(passphrase);
-            updateSettings({ vaultRecoveryDrillCompleted: false, vaultRecoveryDrillVaultId: '', ...(vaultOnly ? {} : { encryptionDefaultMode: 'standard' as const }) });
-            toast.success(t('recovery_copy.vault_created'));
+            // Uploads stay protected by default once a vault exists; the
+            // recovery drill is still offered right below the unlocked vault.
+            updateSettings({ vaultRecoveryDrillCompleted: false, vaultRecoveryDrillVaultId: '' });
+            toast.success(t('encryption_setup.vault_created'));
             setPassphrase('');
             setConfirmPassphrase('');
             setKeyLossAcknowledged(false);
@@ -489,6 +491,12 @@ export function EncryptionSettingsSection({ vaultOnly = false }: { vaultOnly?: b
                             <option value="vault_and_passphrase">{t('settings.encryption_mode_vault_and_passphrase')}</option>
                         </select>
                     } />
+                    {settings.encryptionDefaultMode === 'standard' && (
+                        <p role="alert" className="flex items-start gap-2 rounded-lg border border-app-warning/25 bg-app-warning/5 p-3 text-xs leading-5 text-app-text-secondary">
+                            <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-app-warning" aria-hidden="true" />
+                            {t('settings.standard_mode_warning')}
+                        </p>
+                    )}
                     <SettingsRow icon={<EyeOff className="h-4 w-4" />} title={t('settings.protect_metadata')} description={t('settings.protect_metadata_desc')} control={<SettingsToggle checked={settings.encryptionProtectMetadata} label={t('settings.protect_metadata')} onChange={() => updateSetting('encryptionProtectMetadata', !settings.encryptionProtectMetadata)} />} />
                     {vaultExists && <SettingsRow icon={<Clock className="h-4 w-4" />} title={t('settings.auto_lock_vault')} description={t('settings.auto_lock_vault_desc')} control={
                         <select aria-label={t('settings.auto_lock_vault')} value={settings.encryptionAutoLockMinutes} onChange={event => updateSetting('encryptionAutoLockMinutes', Number(event.target.value))} className="settings-select">

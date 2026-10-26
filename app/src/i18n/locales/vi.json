@@ -431,7 +431,8 @@
     "hide_passphrase": "Ẩn cụm mật khẩu",
     "current_vault_passphrase": "Mật khẩu kho hiện tại",
     "videoFilenameCaption": "Tên tệp trong chú thích",
-    "videoFilenameCaptionDesc": "Thêm tên tệp gốc vào tin nhắn video. Nội dung tải lên được mã hóa sẽ giữ tên riêng tư."
+    "videoFilenameCaptionDesc": "Thêm tên tệp gốc vào tin nhắn video. Nội dung tải lên được mã hóa sẽ giữ tên riêng tư.",
+    "standard_mode_warning": "Các tệp tải lên mới không được mã hóa. Telegram và bất kỳ ai vào được tài khoản Telegram của bạn đều có thể đọc chúng."
   },
   "files": {
     "download": "Tải xuống",
@@ -1368,7 +1369,6 @@
     "drill_passed": "Thử khôi phục thành công. Kho khóa và cụm mật khẩu của bạn không thay đổi.",
     "test_failed": "Thử khôi phục thất bại: {{error}}",
     "export_failed": "Xuất gói khôi phục thất bại: {{error}}",
-    "vault_created": "Đã tạo kho khóa. Hoàn tất thử khôi phục trước khi bật tải lên được bảo vệ theo mặc định.",
     "safety_disabled": "Bảo vệ bị tắt để đảm bảo an toàn vì dịch vụ bảo mật cục bộ không vượt qua kiểm tra lúc khởi động. Thử kiểm tra lại; các tệp hiện có không thay đổi.",
     "safety_paused": "Bảo vệ vẫn tạm dừng cho đến khi kiểm tra an toàn thành công. Các tệp hiện có không thay đổi.",
     "passphrase_placeholder": "Cụm mật khẩu của gói khôi phục"
@@ -1459,7 +1459,9 @@
     "protect": "Lưu và bảo vệ",
     "protect_description": "Mã hóa trước khi tải lên bằng thiết lập bảo vệ đã cấu hình.",
     "reload_app": "Tải lại ứng dụng",
-    "load_failed": "Không thể tải các tùy chọn tải lên. Tải lại sẽ hủy lựa chọn này. Hãy chọn lại tệp sau khi ứng dụng tải xong."
+    "load_failed": "Không thể tải các tùy chọn tải lên. Tải lại sẽ hủy lựa chọn này. Hãy chọn lại tệp sau khi ứng dụng tải xong.",
+    "recommended": "Khuyến nghị",
+    "plain_warning": "Không mã hóa: Telegram có thể đọc tệp này."
   },
   "auth_copy": {
     "qr_title": "Đăng nhập an toàn ưu tiên QR",
@@ -1590,5 +1592,19 @@
     "this_device": "được tải lên bởi thiết bị này",
     "other_device": "được tải lên bởi thiết bị khác",
     "none": "Không tìm thấy bản sao lưu cài đặt mã hóa trong 1,000 Tin nhắn đã lưu gần nhất."
+  },
+  "encryption_setup": {
+    "title": "Mã hóa tệp tải lên",
+    "body": "Telegram Drive có thể mã hóa tệp trên thiết bị này trước khi tải lên, để Telegram hay bất kỳ ai vào được tài khoản của bạn đều không đọc được. Hãy tạo cụm mật khẩu kho để bật tính năng này.",
+    "existing_files": "Các tệp bạn đã tải lên vẫn đọc được. Chỉ các tệp tải lên mới được mã hóa.",
+    "enable": "Bật mã hóa (khuyến nghị)",
+    "keep_plain": "Giữ tệp tải lên không mã hóa",
+    "later": "Để sau",
+    "back": "Quay lại",
+    "finish": "Hoàn tất",
+    "plain_warning_title": "Tải lên mà không mã hóa?",
+    "plain_warning_body": "Các tệp tải lên mới sẽ được lưu trên Telegram mà không mã hóa. Telegram và bất kỳ ai vào được tài khoản Telegram của bạn đều có thể đọc chúng. Bạn có thể bật mã hóa sau trong Cài đặt.",
+    "confirm_plain": "Giữ không mã hóa",
+    "vault_created": "Đã tạo kho. Các tệp tải lên mới được mã hóa. Hãy lưu bộ khôi phục để không bao giờ mất quyền truy cập."
   }
 }

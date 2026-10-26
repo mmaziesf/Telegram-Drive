@@ -431,7 +431,8 @@
     "hide_passphrase": "Hide passphrase",
     "current_vault_passphrase": "Current vault passphrase",
     "videoFilenameCaption": "Filename captions",
-    "videoFilenameCaptionDesc": "Add the original filename to video media messages. Encrypted uploads keep it private."
+    "videoFilenameCaptionDesc": "Add the original filename to video media messages. Encrypted uploads keep it private.",
+    "standard_mode_warning": "New uploads are not encrypted. Telegram, and anyone who gets into your Telegram account, can read them."
   },
   "files": {
     "download": "Download",
@@ -1368,7 +1369,6 @@
     "drill_passed": "Recovery drill passed. Your vault and its passphrase are unchanged.",
     "test_failed": "Recovery test failed: {{error}}",
     "export_failed": "Recovery export failed: {{error}}",
-    "vault_created": "Vault created. Complete the recovery drill before protected uploads are enabled by default.",
     "safety_disabled": "Protection is disabled for safety because the local security service did not pass its startup check. Retry the check; existing files remain untouched.",
     "safety_paused": "Protection remains paused until the safety check succeeds. Existing files are left unchanged.",
     "passphrase_placeholder": "Recovery-bundle passphrase"
@@ -1459,7 +1459,9 @@
     "protect": "Store & protect",
     "protect_description": "Encrypt before upload using your configured protection settings.",
     "reload_app": "Reload app",
-    "load_failed": "Upload options could not load. Reloading cancels this selection. Select your files again after the app reloads."
+    "load_failed": "Upload options could not load. Reloading cancels this selection. Select your files again after the app reloads.",
+    "recommended": "Recommended",
+    "plain_warning": "Not encrypted: Telegram can read this file."
   },
   "auth_copy": {
     "qr_title": "QR-first secure sign in",
@@ -1590,5 +1592,19 @@
     "this_device": "uploaded by this device",
     "other_device": "uploaded by another device",
     "none": "No encrypted settings backup was found in the latest 1,000 Saved Messages."
+  },
+  "encryption_setup": {
+    "title": "Encrypt your uploads",
+    "body": "Telegram Drive can encrypt files on this device before they are uploaded, so Telegram and anyone who gets into your account cannot read them. Create a vault passphrase to turn it on.",
+    "existing_files": "Files you already uploaded stay readable. Only new uploads are encrypted.",
+    "enable": "Turn on encryption (recommended)",
+    "keep_plain": "Keep uploads unencrypted",
+    "later": "Not now",
+    "back": "Back",
+    "finish": "Finish",
+    "plain_warning_title": "Upload without encryption?",
+    "plain_warning_body": "New uploads will be stored on Telegram unencrypted. Telegram, and anyone who gets into your Telegram account, can read them. You can turn encryption on later in Settings.",
+    "confirm_plain": "Keep unencrypted",
+    "vault_created": "Vault created. New uploads are encrypted. Save a recovery kit so you never lose access."
   }
 }
