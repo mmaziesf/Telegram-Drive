@@ -102,6 +102,10 @@ jobs:
         working-directory: app
         run: npm run build:verify
 
+      - name: Run crypto envelope property tests
+        working-directory: app/src-tauri
+        run: cargo test --locked --test crypto_envelope
+
       - name: Run native process and HTTP end-to-end journeys
         working-directory: app/src-tauri
         run: cargo test --locked --features native-e2e --test native_e2e
