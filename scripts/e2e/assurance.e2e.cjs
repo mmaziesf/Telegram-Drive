@@ -492,7 +492,7 @@ test('packaged startup smoke requires application readiness and reaps the isolat
 const root=process.env.TELEGRAM_DRIVE_STARTUP_SMOKE_ROOT;
 fs.writeFileSync(path.join(root,'child-pid'),String(process.pid));
 if(process.argv[2]==='exit')process.exit(3);
-if(process.argv[2]==='ready')fs.writeFileSync(path.join(root,'startup-ready.json'),JSON.stringify({process_id:process.pid,database_ready:true,app_data_ready:true,streaming_runtime_ready:true,app_data_dir:path.join(root,'data'),version:'4.0.0',run_token:process.env.TELEGRAM_DRIVE_STARTUP_SMOKE_TOKEN,profile_identifier:'com.cameronamer.telegramdrive.smoke.'+process.env.TELEGRAM_DRIVE_STARTUP_SMOKE_TOKEN,...Object.fromEntries(['app_data_dir','app_cache_dir','app_config_dir','app_local_data_dir'].map(name=>[name,path.join(root,name,'com.cameronamer.telegramdrive.smoke.'+process.env.TELEGRAM_DRIVE_STARTUP_SMOKE_TOKEN)]))}));
+if(process.argv[2]==='ready')fs.writeFileSync(path.join(root,'startup-ready.json'),JSON.stringify({process_id:process.pid,database_ready:true,app_data_ready:true,streaming_runtime_ready:true,app_data_dir:path.join(root,'data'),version:'4.0.0',run_token:process.env.TELEGRAM_DRIVE_STARTUP_SMOKE_TOKEN,profile_identifier:'io.github.mmaziesf.unofficialtelegramdrive.smoke.'+process.env.TELEGRAM_DRIVE_STARTUP_SMOKE_TOKEN,...Object.fromEntries(['app_data_dir','app_cache_dir','app_config_dir','app_local_data_dir'].map(name=>[name,path.join(root,name,'io.github.mmaziesf.unofficialtelegramdrive.smoke.'+process.env.TELEGRAM_DRIVE_STARTUP_SMOKE_TOKEN)]))}));
 setInterval(()=>{},1000);
 `);
   const invoke = (mode, timeout = '2000') => new Promise((resolve, reject) => {

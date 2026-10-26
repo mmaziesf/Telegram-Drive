@@ -352,7 +352,7 @@ jobs:
           bundle="app/src-tauri/target/${{ matrix.target }}/release/bundle"
           application="${bundle}/macos/Unofficial Telegram Drive.app"
           codesign --verify --deep --strict --verbose=2 "${application}"
-          codesign --display --verbose=2 "${application}" 2>&1 | grep -F 'Identifier=com.cameronamer.telegramdrive'
+          codesign --display --verbose=2 "${application}" 2>&1 | grep -F 'Identifier=io.github.mmaziesf.unofficialtelegramdrive'
           xcrun stapler validate "${application}"
           spctl --assess --type execute --verbose=2 "${application}"
 
@@ -477,7 +477,7 @@ jobs:
         run: |
           set -euo pipefail
           package_path="$(find arch-package -maxdepth 1 -type f -name 'telegram-drive-bin-*.pkg.tar.zst' -print -quit)"
-          seed_directory='/home/arch-builder/.local/share/com.cameronamer.telegramdrive'
+          seed_directory='/home/arch-builder/.local/share/io.github.mmaziesf.unofficialtelegramdrive'
           install -d -o arch-builder -g arch-builder "${seed_directory}"
           runuser -u arch-builder -- sh -c 'printf preserved > "$1/arch-package-preservation-test"' _ "${seed_directory}"
           pacman -U --noconfirm "${package_path}"

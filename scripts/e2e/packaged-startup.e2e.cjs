@@ -19,7 +19,7 @@ test('smoke CLI accepts numeric-leading nonce with a valid isolated identity and
   const { result, record } = journey(t, 'ready', ['--run-token', token, '--expected-bundle-type', 'nsis']);
   assert.equal(result.status, 0, result.stderr);
   assert.equal(record.token, token);
-  assert.equal(record.identifier, `com.cameronamer.telegramdrive.smoke.r${token}`);
+  assert.equal(record.identifier, `io.github.mmaziesf.unofficialtelegramdrive.smoke.r${token}`);
   assert.equal(fs.existsSync(record.root), false);
 });
 test('smoke CLI rejects incorrect runtime package metadata', t => {

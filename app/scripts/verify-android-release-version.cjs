@@ -54,7 +54,7 @@ function verifyReleaseVersions({ appRoot, tag, changelog, previousManifest, gene
 
   if (previousManifest) {
     const previous = JSON.parse(fs.readFileSync(previousManifest, 'utf8'));
-    if (previous.packageName !== 'com.cameronamer.telegramdrive') {
+    if (previous.packageName !== 'io.github.mmaziesf.unofficialtelegramdrive') {
       mismatches.push('previous Android update manifest has the wrong package name');
     }
     if (!Number.isSafeInteger(previous.versionCode) || parsed.versionCode <= previous.versionCode) {

@@ -9,7 +9,7 @@ The supporter feature in supported desktop and Android builds is backed by a Clo
 
 - PayPal credentials, the webhook ID, the Ed25519 private JWK, and recovery-code keys are Cloudflare Worker secrets and must never be committed or placed in GitHub variables.
 - Supported application builds embed only the public Ed25519 verification key and public service URL.
-- On desktop, device private keys, recovery codes, and short-lived checkout secrets use macOS Keychain, Windows Credential Manager, or Linux Secret Service under the stable service name `com.cameronamer.telegramdrive.supporter`. Android protects the same credential account identifiers with Android Keystore-backed encryption.
+- On desktop, device private keys, recovery codes, and short-lived checkout secrets use macOS Keychain, Windows Credential Manager, or Linux Secret Service under the stable service name `io.github.mmaziesf.unofficialtelegramdrive.supporter`. Android protects the same credential account identifiers with Android Keystore-backed encryption.
 - Signed tokens are valid for 30 days with a seven-day offline grace period. The app attempts a refresh on startup, so a verified refund or reversal takes effect when the service is reachable.
 - PayPal webhook signatures are verified through PayPal before events are processed. Event IDs are deduplicated, and failed processing remains retryable.
 - Checkout creation records the exact supporter-terms version and acceptance timestamp before redirecting to PayPal.
