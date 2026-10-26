@@ -1,7 +1,7 @@
 {
 "en":{
 "qr_title":"QR-first secure sign in",
-"qr_description":"Desktop sign-in uses Telegram's QR device flow. A one-time API ID and hash are still required by Telegram to identify this open-source client.",
+"qr_description":"Desktop sign-in uses Telegram's QR device flow. A one-time API ID and hash are still required by Telegram to identify this client.",
 "advanced":"Advanced client credentials",
 "continue_phone":"Continue to phone sign in",
 "continue_qr":"Continue to QR sign in",
