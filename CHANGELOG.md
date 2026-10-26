@@ -1,5 +1,15 @@
 ## [Unreleased]
 
+### Fork identity and no auto-update
+
+- Remove the built-in updater: the Tauri updater and process plugins, their capabilities, the upstream update signing public key, the update banner, the "What's new" dialog and the "Check for updates" control in About. This build never contacts the upstream release feed. `node scripts/check-app-security.cjs` now fails if an `updater:` or `process:` permission, an updater plugin config or updater artifacts come back.
+- Change the bundle identifier from `com.cameronamer.telegramdrive` to `io.github.mmaziesf.unofficialtelegramdrive`, including keychain service names, the Linux desktop entry, Android class names referenced from Rust, packaging scripts, workflows and the docs that name it. This is a separate app: it does not read the sessions, vaults, settings or keychain entries of an upstream install.
+- Publish nothing automatically. `release.yml` runs only on a manual dispatch and no longer signs updater artifacts, writes an updater manifest or refreshes the upstream product page. The GitHub Pages workflow that deployed the upstream product site is removed. `node scripts/check-workflow-pins.cjs` now fails on a `push:` trigger in `release.yml` or any `actions/deploy-pages` step.
+- Point the README, About, Help and Privacy links at this fork, replace the download section with build-from-source instructions and credit the original project and author in About (desktop and Android) in all 24 locales. A browser journey checks both links in desktop About.
+- `SECURITY.md` asks for private reports through GitHub private vulnerability reporting on this fork and states that there are no releases or auto-updater.
+- Bundle ceilings: initial JavaScript falls from 504923 to 378375 bytes because framer-motion no longer loads with the update banner; the desktop route rises from 302094 to 420791 bytes because the library now loads there; total JavaScript and locale data both fall. All changed ceilings are set to the measured sizes.
+- Not done: Android strings and Microsoft Store packaging cannot be renamed because neither the Android project nor a Store configuration is in this repository. Supporter and funding links still point to the upstream author until the monetization decision is made.
+
 ### Telegram API disclosure
 
 - State on the sign-in screen, on the first step of the first-run introduction and in About (desktop and Android) that this unofficial app uses the Telegram API and is not affiliated with, endorsed by or sponsored by Telegram. The text is translated into all 24 locales.
