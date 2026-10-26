@@ -3,10 +3,10 @@
   "maxJavaScriptChunkBytes": 550000,
   "maxTotalJavaScriptBytes": 3300000,
   "maxTotalCssBytes": 140000,
-  "maxTotalLocaleDataBytes": 1961726,
-  "maxLocaleDataBytes": 139412,
+  "maxTotalLocaleDataBytes": 1965509,
+  "maxLocaleDataBytes": 139648,
   "routeJavaScriptBudgets": {
-    "src/components/desktop/DesktopDashboard.tsx": 302000
+    "src/components/desktop/DesktopDashboard.tsx": 302094
   },
   "featureChunkBudgets": {
     "src/components/desktop/dashboard/SettingsModal.tsx": 159000,
@@ -15,5 +15,5 @@
     "src/components/desktop/dashboard/ArchiveViewerModal.tsx": 25000,
     "node_modules/hls.js/dist/hls.mjs": 540000
   },
-  "policy": "Initial JavaScript, desktop route and Settings ceilings were lowered after measured P2 reductions. Other reviewed ceilings remain unchanged. The PDF viewer feature ceiling rose from 500000 to 510000 for the PDF.js 6 security upgrade (GHSA-hq66-cqwq-w95j); the chunk loads only when a PDF is opened. Locale-only ceilings include the existing reviewed 24-language supporter UI expansion, the shared key dictionary and every canonical translated value. Further increases require a performance review. The 4.1.0 performance review adds exactly 9002 canonical locale bytes (0.461%) and 611 bytes to the largest catalog for four caption/reload labels in all 24 locales. Dictionary plus English grows 368 bytes; dictionary plus the largest selected catalog grows 744 bytes, with unchanged loading requests. JavaScript, CSS, route, feature and literal ceilings are unchanged. The Telegram API ToS rename (common.app_title becomes \"Unofficial Telegram Drive\") adds exactly 290 canonical locale bytes and 11 bytes to the largest catalog; nothing else changes."
+  "policy": "Initial JavaScript, desktop route and Settings ceilings were lowered after measured P2 reductions. Other reviewed ceilings remain unchanged. The PDF viewer feature ceiling rose from 500000 to 510000 for the PDF.js 6 security upgrade (GHSA-hq66-cqwq-w95j); the chunk loads only when a PDF is opened. Locale-only ceilings include the existing reviewed 24-language supporter UI expansion, the shared key dictionary and every canonical translated value. Further increases require a performance review. The 4.1.0 performance review adds exactly 9002 canonical locale bytes (0.461%) and 611 bytes to the largest catalog for four caption/reload labels in all 24 locales. Dictionary plus English grows 368 bytes; dictionary plus the largest selected catalog grows 744 bytes, with unchanged loading requests. JavaScript, CSS, route, feature and literal ceilings are unchanged. The Telegram API ToS rename (common.app_title becomes \"Unofficial Telegram Drive\") adds exactly 290 canonical locale bytes and 11 bytes to the largest catalog; nothing else changes. The Telegram API disclosure (common.telegram_api_notice, shown at sign-in, in the first-run introduction and in About) adds exactly 4053 canonical locale bytes and 319 bytes to the largest catalog, measured after the accurate-claims wording change; the locale ceilings are set to the measured totals. The desktop route grows 305 bytes for the shared notice component, so its ceiling rises 94 bytes to the measured size."
 }
