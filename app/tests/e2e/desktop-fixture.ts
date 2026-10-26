@@ -35,6 +35,8 @@ export async function desktopFixture(page: Page, options: {
   networkEnabled?: boolean;
   platform?: 'windows' | 'android';
   isTelevision?: boolean;
+  /** How the saved Telegram session is protected at rest; defaults to an unlocked keychain key. */
+  sessionProtection?: 'keychain' | 'keychain-unavailable' | 'passphrase-locked' | 'passphrase-setup';
 } = {}) {
   await page.route(`http://localhost:${options.streamingPort ?? 14201}/**`, route => route.fulfill({ status: 200, contentType: 'text/html', body: '<!doctype html><p>Offline sponsor fixture</p>' }));
   if (options.sponsorPort) await page.route(`http://localhost:${options.sponsorPort}/**`, route => route.fulfill({status:200,contentType:"text/html",body:"<!doctype html><p>Offline separate sponsor fixture</p>"}));
@@ -57,7 +59,10 @@ export async function desktopFixture(page: Page, options: {
     let releaseStartupHealth: (()=>void) | undefined;
     const startupHealthGate=new Promise<void>(resolve=>{releaseStartupHealth=resolve;});
     const savedTransfers = options.persistTransfersAcrossReload ? JSON.parse(sessionStorage.getItem('desktop-e2e-native-transfers') || 'null') : null;
+    const sessionProtection = options.sessionProtection ?? 'keychain';
     const state = {
+      sessionLocked: sessionProtection.startsWith('passphrase'), sessionSetup: sessionProtection === 'passphrase-setup',
+      sessionPassphrase: 'fixture session passphrase', keychainUnavailable: sessionProtection === 'keychain-unavailable',
       vaultExists:options.vaultState !== undefined && options.vaultState !== 'none',
       jobs: savedTransfers?.jobs ?? (options.populatedTransfers ? [
         {id:'upload-active',direction:'upload',kind:'local_upload',status:'uploading',filename:'Fixture upload.bin',path:'/fixture/Fixture upload.bin'},
@@ -120,6 +125,14 @@ export async function desktopFixture(page: Page, options: {
           if (command === 'cmd_get_settings_sync_status') return {available:true,updated_at:1_790_000_000,device_id:'other-fixture-device',current_device:false};
           if (command === 'cmd_upload_settings_sync') return {available:true,updated_at:1_790_000_001,device_id:'this-fixture-device',current_device:true};
           if (command === 'cmd_get_startup_health') {if(state.holdStartupHealth)await startupHealthGate;return { ready: true, sponsor_port: state.sponsorPort, streaming_port: options.streamingPort ?? 14201, streaming_port_is_fallback: (options.streamingPort ?? 14201) !== 14201 };}
+          // Native session errors reject with the plain `CODE: message` string.
+          if (command === 'cmd_session_storage_status') return { protection: sessionProtection.startsWith('passphrase') ? 'passphrase' : 'keychain', locked: state.sessionLocked, setup: state.sessionSetup };
+          if (command === 'cmd_unlock_session') {
+            if (state.sessionSetup && args.passphrase.length < 12) throw 'SESSION_PASSPHRASE_TOO_SHORT: Use at least 12 characters';
+            if (!state.sessionSetup && args.passphrase !== state.sessionPassphrase) throw 'SESSION_PASSPHRASE_INCORRECT: The passphrase is incorrect';
+            state.sessionPassphrase = args.passphrase; state.sessionLocked = false; state.sessionSetup = false; return;
+          }
+          if (command === 'cmd_connect' && state.keychainUnavailable) throw 'SESSION_KEYCHAIN_UNAVAILABLE: The system credential store is unavailable (fixture)';
           if (command === 'cmd_auth_qr_login') return 'tg://login?token=browser-fixture-only';
           if (command === 'cmd_auth_qr_poll') return { success: false };
           if (command === 'cmd_auth_request_code') return { status: 'code_required', delivery: 'telegram_app', codeLength: 5, numericCode: true };
@@ -212,6 +225,8 @@ export async function desktopFixture(page: Page, options: {
           if (command === 'cmd_activate_supporter') { state.supporterState = 'active'; return status(); }
           if (command === 'cmd_logout') {
             if (state.logoutFails) throw new Error('Private native diagnostic');
+            // Without a credential store the next session needs a new passphrase.
+            if (sessionProtection.startsWith('passphrase')) { state.sessionLocked = true; state.sessionSetup = true; }
             return { signed_out: true, remote_session_revoked: !state.remoteSignOutUnconfirmed };
           }
           if (command === 'cmd_get_encryption_capabilities') return { contract_version: 2, availability: 'ready', vault: true, per_file: true, core_available:options.encryptionReady ?? false, features:{upload:true,read:true,per_file_passphrase:true,recovery:true,share:true,migration:false},readable_formats:[2],writable_formats:[2],supported_suites:[1],blockers:[],vault_backend:'persistent_file',mode_alpha:false,upload_enabled:true,read_enabled:true,share_enabled:true,migration_enabled:false,envelope_version:2,app_version:'fixture',backend_build_id:'fixture' };
