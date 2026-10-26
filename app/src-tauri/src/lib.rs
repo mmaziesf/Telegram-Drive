@@ -109,6 +109,8 @@ pub mod mp4_utils;
 pub mod server;
 mod server_lifecycle;
 pub(crate) mod session_protection;
+#[cfg(not(any(target_os = "android", target_os = "ios")))]
+pub mod session_store;
 pub mod share_routes;
 #[cfg(not(any(target_os = "android", target_os = "ios")))]
 mod sponsor_link_bridge;
@@ -1425,6 +1427,10 @@ pub fn run() {
             upload_service::cmd_stop_foreground_service,
             upload_service::cmd_update_foreground_service,
             commands::cmd_connect,
+            #[cfg(not(any(target_os = "android", target_os = "ios")))]
+            commands::cmd_session_storage_status,
+            #[cfg(not(any(target_os = "android", target_os = "ios")))]
+            commands::cmd_unlock_session,
             commands::cmd_delete_file,
             commands::cmd_download_file,
             commands::cmd_move_files,
@@ -1701,6 +1707,13 @@ pub fn run() {
                         if let Some(handle) = webdav_server.0.begin_shutdown() {
                             log::info!("Stopping WebDAV server...");
                             handle.stop(true).await;
+                        }
+                    }
+                    // Write session changes that were waiting to be batched.
+                    #[cfg(not(any(target_os = "android", target_os = "ios")))]
+                    if let Some(telegram) = app_handle.try_state::<TelegramState>() {
+                        if let Some(session) = telegram.session.lock().await.as_ref() {
+                            session.flush();
                         }
                     }
                     app_handle.exit(exit_code);

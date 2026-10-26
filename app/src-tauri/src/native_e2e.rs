@@ -1132,6 +1132,7 @@ impl Driver {
             | "database_mode"
             | "database"
             | "seed_account"
+            | "rewrite_session_owner"
             | "open_account_session"
             | "account_validation_status"
             | "capture_account"
@@ -1548,6 +1549,18 @@ impl Driver {
                 if prepared.is_err() {let _ = std::fs::remove_file(&staged);}
                 prepared?;
                 Ok(json!({"owner": crate::workspace::current_owner(&root)?}))
+            }
+            "rewrite_session_owner" => {
+                // Another process signs a different account into the saved
+                // session in place, as a second app instance would.
+                let owner = request["owner"]
+                    .as_i64()
+                    .filter(|value| *value > 0)
+                    .ok_or("Invalid fixture owner")?;
+                let session = crate::session_store::open(&self.root.join("telegram.session"))
+                    .map_err(error)?;
+                session.cache_peer(&PeerInfo::User {id:owner,auth:None,bot:Some(false),is_self:Some(true)});
+                Ok(json!({"written": session.flush()}))
             }
             "open_account_session" => {
                 // Open the saved session exactly as a starting runner does.
@@ -5025,6 +5038,8 @@ pub async fn run() -> Result<(), String> {
     {
         return Err("Refusing to access a non-fixture directory".into());
     }
+    // Session keys stay inside the fixture instead of the desktop keychain.
+    crate::session_store::use_directory_key_store(root.join(".native-e2e-session-keys"));
     let mut initial_network = std::fs::read_to_string(root.join("network_settings.json"))
         .ok()
         .and_then(|bytes| {

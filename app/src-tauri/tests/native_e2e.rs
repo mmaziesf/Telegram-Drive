@@ -253,6 +253,12 @@ fn telegram_session_files_are_owner_only_and_older_installs_are_tightened() {
     let database = account.join("telegram.session");
     assert_eq!(file_mode(&account), 0o700);
     assert_eq!(file_mode(&database), 0o600);
+    // The seeded plaintext session was moved to encrypted storage on open.
+    let sealed = std::fs::read(&database).unwrap();
+    assert!(sealed.starts_with(b"TDSESS\0\x01"));
+    assert!(!sealed
+        .windows(15)
+        .any(|window| window == b"SQLite format 3"));
     app.stop();
 
     // A session written by an earlier release with default modes, including
@@ -295,7 +301,7 @@ fn telegram_session_files_are_owner_only_and_older_installs_are_tightened() {
 }
 
 #[test]
-fn account_isolation_survives_restart_contention_and_account_switch() {
+fn account_isolation_survives_restart_and_account_switch() {
     let fixture = Fixture::new();
     let mut app = Backend::start(&fixture.0);
     app.ok(json!({"command":"seed_account","owner":101}));
@@ -308,16 +314,13 @@ fn account_isolation_survives_restart_contention_and_account_switch() {
         "Account A private collection"
     );
     app.ok(json!({"command":"capture_account","owner":"101"}));
-    // Hold the writer until the reader reports its bounded failure; no sleeps decide ordering.
-    let writer = sqlite::open(fixture.path("telegram.session")).unwrap();
-    writer
-        .execute("BEGIN EXCLUSIVE; UPDATE peer_info SET peer_id=202 WHERE subtype=1")
-        .unwrap();
-    assert!(app
-        .failure(json!({"command":"validate_account"}))
-        .starts_with("ACCOUNT_UNAVAILABLE:"));
-    writer.execute("COMMIT").unwrap();
-    drop(writer);
+    // The session is encrypted at rest, so it can only change through the store.
+    assert_eq!(
+        app.ok(json!({"command":"rewrite_session_owner","owner":202}))["written"],
+        true
+    );
+    let sealed = std::fs::read(fixture.path("telegram.session")).unwrap();
+    assert!(sealed.starts_with(b"TDSESS\0\x01"));
     assert!(app
         .failure(json!({"command":"validate_account"}))
         .starts_with("ACCOUNT_CHANGED:"));

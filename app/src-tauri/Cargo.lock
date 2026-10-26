@@ -2648,6 +2648,8 @@ source = "git+https://github.com/Lonami/grammers?rev=d07f96f#d07f96f6bee22a3a850
 dependencies = [
  "grammers-tl-types",
  "log",
+ "serde",
+ "serde_with",
  "sqlite",
 ]
 

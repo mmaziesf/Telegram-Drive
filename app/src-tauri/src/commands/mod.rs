@@ -1,5 +1,6 @@
 use grammers_client::types::{PasswordToken, Peer};
 use grammers_client::Client;
+#[cfg(any(target_os = "android", target_os = "ios"))]
 use grammers_session::storages::SqliteSession;
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
@@ -7,6 +8,15 @@ use std::time::Instant;
 use tokio::sync::Mutex;
 
 use crate::models::AuthCodeRequestResult;
+
+/// The Telegram session: encrypted at rest on desktop, and the library's
+/// SQLite storage on mobile, where the app sandbox protects it.
+#[cfg(not(any(target_os = "android", target_os = "ios")))]
+pub type ClientSession = crate::session_store::SealedSession;
+/// The Telegram session: encrypted at rest on desktop, and the library's
+/// SQLite storage on mobile, where the app sandbox protects it.
+#[cfg(any(target_os = "android", target_os = "ios"))]
+pub type ClientSession = SqliteSession;
 
 #[derive(Clone)]
 pub struct PhoneLoginState {
@@ -26,7 +36,7 @@ pub struct PhoneLoginState {
 #[derive(Clone)]
 pub struct TelegramState {
     pub client: Arc<Mutex<Option<Client>>>,
-    pub session: Arc<Mutex<Option<Arc<SqliteSession>>>>,
+    pub session: Arc<Mutex<Option<Arc<ClientSession>>>>,
     pub phone_login: Arc<Mutex<Option<PhoneLoginState>>>,
     pub password_token: Arc<Mutex<Option<PasswordToken>>>,
     pub api_id: Arc<Mutex<Option<i32>>>,
