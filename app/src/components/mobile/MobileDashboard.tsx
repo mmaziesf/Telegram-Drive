@@ -1,4 +1,5 @@
 import { lazy, useState, useCallback, useMemo, useEffect, useRef } from 'react';
+import { TelegramApiNotice } from '../shared/TelegramApiNotice';
 import { Folder, Download, Menu, LogOut, RefreshCw, UploadCloud, MoreVertical, Trash2, Pencil, Globe, Shield, Lock, ChevronDown, Share2, Link, Copy, Check, X, Loader2, Wifi, Activity, Zap, Eye, EyeOff, HelpCircle, ExternalLink, Pause, Play, RotateCcw, CheckCircle2, Database, Heart } from 'lucide-react';
 import { invoke } from '@tauri-apps/api/core';
 import { openUrl } from '@tauri-apps/plugin-opener';
@@ -1491,6 +1492,7 @@ export default function MobileDashboard({ onLogout }: { onLogout?: () => void })
                 <p className="text-[10px] text-telegram-subtext/60 leading-relaxed text-center px-2">
                   {t('settings.tagline')}
                 </p>
+                <TelegramApiNotice className="text-[10px] text-telegram-subtext/60 leading-relaxed text-center px-2" />
               </div>
             </div>
 

@@ -1,4 +1,5 @@
 import {useTranslation} from 'react-i18next';
+import { TelegramApiNotice } from '../../../shared/TelegramApiNotice';
 import { lazy, useEffect, useState, type ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import { Bug, Cloud, Database, Globe, HardDrive, Megaphone, Shield, Zap, Clipboard, Loader2, RefreshCw, Upload, Download } from 'lucide-react';
@@ -284,6 +285,7 @@ export function AboutSettingsTab({ appVersion, diagnosticsLoading, t, onCopyDiag
           </button>
         </div>
         <p className="max-w-[280px] text-center text-[11px] leading-relaxed text-telegram-subtext">{t('settings.tagline')}</p>
+        <TelegramApiNotice className="max-w-[280px] text-center text-[11px] leading-relaxed text-telegram-subtext" />
       </div>
     </motion.section>
   );
