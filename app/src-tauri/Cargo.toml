@@ -126,7 +126,15 @@ path = "test-support/heic_helper.rs"
 required-features = ["native-e2e"]
 test = false
 
+# In-memory adversarial and property tests for the public crypto API.
+[[test]]
+name = "crypto_envelope"
+path = "tests/crypto_envelope.rs"
+
 [[test]]
 name = "native_e2e"
 path = "tests/native_e2e.rs"
 required-features = ["native-e2e"]
+
+[dev-dependencies]
+proptest = { version = "1", default-features = false, features = ["std"] }
