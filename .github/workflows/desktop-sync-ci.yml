@@ -118,7 +118,7 @@ jobs:
       - name: Exercise smoke harness process ownership and failure journeys
         run: node scripts/e2e/packaged-startup.e2e.cjs
 
-      - name: Build disposable CI installers with updater archives
+      - name: Build disposable CI installers
         working-directory: app
         run: npm run tauri -- build --ci --no-sign ${{ matrix.target && format('--target {0}', matrix.target) || '' }}
 
