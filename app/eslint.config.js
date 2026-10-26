@@ -33,8 +33,7 @@ export default tseslint.config(
             // Not yet enforced. The existing code has 141 `any` types and 43
             // incomplete hook dependency lists. Changing hook dependencies can
             // alter effect timing, so each one needs its own reviewed change.
-            // These rules stay off until that cleanup is done; see "Known
-            // limitations" in CONTRIBUTING.md.
+            // These rules stay off until that cleanup is done.
             '@typescript-eslint/no-explicit-any': 'off',
             'react-hooks/exhaustive-deps': 'off',
         },
