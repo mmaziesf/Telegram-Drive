@@ -24,41 +24,28 @@ for(const locale of ['es','ar','ja'])test(`mobile supporter copy and purchase re
   expect(await nativeCalls(page,'cmd_begin_supporter_checkout')).toHaveLength(0);
 });
 
-test('startup steps and update notices use the saved language through the application',async({page})=>{
- await desktopFixture(page,{holdStartupHealth:true,update:true,settings:{language:'es'}});await page.goto('/');
+test('startup steps use the saved language through the application',async({page})=>{
+ await desktopFixture(page,{holdStartupHealth:true,settings:{language:'es'}});await page.goto('/');
  await expect(page.getByText('Comprobando servicios locales',{exact:true})).toBeVisible();
  await expect(page.getByText('Verificando la base de datos y el servicio de transmisión…',{exact:true})).toBeVisible();
  await expect(page.getByLabel('18% completado',{exact:true})).toBeVisible();
  expect(await nativeCalls(page,'cmd_connect')).toHaveLength(0);
  await page.evaluate(()=>{(window as any).__desktopTest.releaseStartupHealth();});
  await expect(page.getByText('Holiday folder photo.jpg',{exact:true})).toBeVisible({timeout:30_000});
- await expect(page.getByText('¡Hay una nueva versión (3.9.6) disponible!',{exact:true})).toBeVisible({timeout:15_000});
 });
 
-test('update phases, release notes and crash recovery react to language changes',async({page})=>{
+test('crash recovery reacts to language changes',async({page})=>{
  await desktopFixture(page);await page.goto('/?a11y-fixture=runtime-copy&locale=es');
  await expect(page.locator('[data-runtime-language="es"]')).toBeVisible();
- await page.getByRole('button',{name:'Download phase',exact:true}).click();
- await expect(page.getByText('Descargando actualización… 42%',{exact:true})).toBeVisible();
- await page.getByRole('button',{name:'Verify phase',exact:true}).click();
- await expect(page.getByText('Verificando la actualización firmada…',{exact:true})).toBeVisible();
- await page.getByRole('button',{name:'Install phase',exact:true}).click();
- await expect(page.getByText('Instalando actualización…',{exact:true})).toBeVisible();
- await page.getByRole('button',{name:'Open release notes',exact:true}).click();
- const dialog=page.getByRole('dialog');await expect(dialog.getByRole('heading',{name:'Novedades de 4.0.0',exact:true})).toBeVisible();
- await expect(dialog).toContainText('La actualización firmada se verificó antes de instalarse.');
- await dialog.getByRole('button',{name:'Continuar',exact:true}).click();
  await page.getByRole('button',{name:'Fail rendering',exact:true}).click();
  await expect(page.getByRole('heading',{name:'Algo salió mal',exact:true})).toBeVisible();
  await page.getByLabel('Fixture language').selectOption('ar');
  await expect(page.getByRole('heading',{name:'حدث خطأ',exact:true})).toBeVisible();
- await expect(page.getByText('جارٍ تثبيت التحديث…',{exact:true})).toBeVisible();
  await expect(page.locator('html')).toHaveAttribute('dir','rtl');
  await page.getByText('تفاصيل تقنية',{exact:true}).click();await expect(page.getByText('Controlled browser render failure',{exact:true})).toBeVisible();
  expect(await page.evaluate(()=>sessionStorage.getItem('telegram-drive-recovered-session'))).toBe('true');
  await page.getByRole('button',{name:'استعادة الجلسة',exact:true}).click();
  await expect(page.getByText('Healthy content',{exact:true})).toBeVisible();
- expect(await nativeCalls(page,'plugin:updater|install')).toHaveLength(0);
  expect(await nativeCalls(page,'cmd_begin_supporter_checkout')).toHaveLength(0);
 });
 

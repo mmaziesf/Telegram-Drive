@@ -32,7 +32,11 @@ if (mobile.platforms?.length !== 1 || mobile.platforms[0] !== 'android') {
 if (desktop.platforms?.length !== 3 || !['linux', 'macOS', 'windows'].every(value => desktop.platforms.includes(value))) {
   throw new Error('Desktop capabilities must remain restricted to desktop platforms.');
 }
-if (!desktop.permissions?.includes('updater:default')) throw new Error('Signed desktop updater permission is required.');
+// This fork publishes no signed releases, so it must not carry an updater that
+// could install binaries signed by someone else's key.
+if (desktop.permissions?.some(value => typeof value === 'string' && /^(updater|process):/.test(value))) {
+  throw new Error('Updater and process-restart permissions must stay removed until the fork has its own signing key.');
+}
 if (![mobile.identifier, desktop.identifier].every(value => config.app.security.capabilities.includes(value))) {
   throw new Error('The application must declare its platform-specific capabilities.');
 }
@@ -45,10 +49,8 @@ for (const capability of [mobile, desktop]) {
   }
 }
 if (!desktop.permissions.includes('opener:allow-reveal-item-in-dir')) throw new Error('Download reveal permission is required.');
-// Updates are fetched over HTTPS only, and verified with the configured public key.
-const updater = config.plugins?.updater;
-if (!updater?.pubkey || !updater.endpoints?.length || !updater.endpoints.every(value => value.startsWith('https://'))) {
-  throw new Error('Signed desktop updates require a public key and HTTPS endpoints.');
+if (config.plugins?.updater || config.bundle?.createUpdaterArtifacts) {
+  throw new Error('The updater configuration must stay removed until the fork has its own signing key.');
 }
 // The published REST contract and the registered routes describe the same API.
 const routes = new Set([...fs.readFileSync(path.join(root, 'src-tauri/src/api_routes.rs'), 'utf8')
@@ -58,4 +60,4 @@ const contract = new Set(Object.entries(json('src-tauri/api/openapi-v1.json').pa
 const drift = [...routes].filter(value => !contract.has(value)).map(value => `undocumented: ${value}`)
   .concat([...contract].filter(value => !routes.has(value)).map(value => `not implemented: ${value}`));
 if (!routes.size || drift.length) throw new Error(`REST contract differs from the routes: ${drift.join('; ') || 'no routes found'}`);
-console.log('[app-security] WebView CSP, capability, updater and REST contract configuration passed.');
+console.log('[app-security] WebView CSP, capability, no-updater and REST contract configuration passed.');

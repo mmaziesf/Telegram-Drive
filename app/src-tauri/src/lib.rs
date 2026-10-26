@@ -972,7 +972,6 @@ pub fn run() {
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
-        .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_plugin_clipboard_manager::init());
 
@@ -981,11 +980,6 @@ pub fn run() {
 
     #[cfg(not(any(target_os = "android", target_os = "ios")))]
     let builder = builder.plugin(tauri_plugin_notification::init());
-
-    // The updater plugin is not supported on Android and can cause crashes
-    // (APKs are managed by the Play Store; the plugin attempts restricted FS ops).
-    #[cfg(not(target_os = "android"))]
-    let builder = builder.plugin(tauri_plugin_updater::Builder::new().build());
 
     #[cfg(not(any(target_os = "android", target_os = "ios")))]
     let builder = builder.plugin(tauri_plugin_window_state::Builder::default().build());
@@ -1563,7 +1557,6 @@ pub fn run() {
             cmd_list_cached_files,
             cmd_remove_cached_path,
             cmd_get_system_diagnostics,
-            installation::cmd_get_installation_info,
             android_security::cmd_get_android_authentication_available,
             android_security::cmd_android_authenticate,
             android_security::cmd_configure_android_privacy,

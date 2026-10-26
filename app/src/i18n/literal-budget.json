@@ -30,7 +30,7 @@
       ]
     },
     "transfersAndLocalServices": {
-      "maxFindings": 90,
+      "maxFindings": 87,
       "patterns": [
         "TransferCenter",
         "ShareDialog",
@@ -56,7 +56,7 @@
       ]
     },
     "other": {
-      "maxFindings": 138,
+      "maxFindings": 135,
       "patterns": []
     }
   },
