@@ -230,6 +230,7 @@ TDENC2-protected audio, video, and PDF content can stream in supported in-app vi
 - Telegram session data, settings, transfer state, sync metadata, encryption registry data, and vault material are stored locally in the application's data directories.
 - Standard uploads send ordinary file content to Telegram. TDENC2 uploads send ciphertext, although Telegram can still observe transport/account metadata such as ciphertext size, time, account, and destination channel.
 - The project does not operate a separate file-relay service.
+- Sponsor placements load content from third-party ad networks, and the desktop app resolves one ad host through Cloudflare DNS-over-HTTPS (`app/src-tauri/src/server.rs`). The in-app sign-in note therefore says that credentials and the session go only to Telegram, not that all traffic does.
 - Crash reporting is disabled by default and requires explicit consent. Reports exclude file names, paths, contents, messages, Telegram identifiers, credentials, phone numbers, and user-entered values.
 - The REST API and WebDAV server are disabled by default and bind only to `127.0.0.1`.
 - The REST API stores only a hash of its generated key; the plaintext key is shown once.
