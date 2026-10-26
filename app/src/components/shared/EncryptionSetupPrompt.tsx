@@ -8,6 +8,13 @@ import { EncryptionSettingsSection } from './EncryptionSettingsSection';
 
 type Step = 'intro' | 'vault' | 'confirm_plain';
 
+/**
+ * First-run dialog that makes encrypted uploads the default. It walks the
+ * user through creating or unlocking a vault; keeping plaintext uploads
+ * requires an explicit confirmation of the risk. Answering either way
+ * records `encryptionSetupSeen`, while `onDefer` closes the dialog without
+ * changing settings so it is offered again later.
+ */
 export function EncryptionSetupPrompt({ onDefer }: { onDefer: () => void }) {
     const { t } = useTranslation();
     const { settings, updateSettings } = useSettings();
