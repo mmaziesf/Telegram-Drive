@@ -8,6 +8,7 @@
 - Workflows use read-only tokens by default, pin every action to a commit SHA and do not persist checkout credentials. Only the CodeQL job can write security events.
 - Fix the frontend lint findings, including 22 conditional hook calls in the sign-in screen. Two rules stay off with an inline reason: `no-explicit-any` (141 uses) and `react-hooks/exhaustive-deps` (43 uses).
 - `cargo audit` ignores the same advisories as `deny.toml`, with the same reasons. `.gitleaksignore` lists each known false positive with its reason.
+- Fix the TV keyboard journey in `accessibility.spec.ts`. After Escape releases the native select, the test now presses ArrowLeft to reach the number field beside it. It used to press ArrowDown, which correctly moves to the list below, so the test failed on every run.
 
 ### Dependency security
 
