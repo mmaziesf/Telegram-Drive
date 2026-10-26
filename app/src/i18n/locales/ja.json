@@ -215,6 +215,7 @@
     "revoke_link": "リンクを失効",
     "copy_diagnostics": "診断情報をコピー",
     "tagline": "Telegram アカウントを活用する、ローカルファーストのファイルワークスペース。無料で利用できます。",
+    "upstream_credit": "{{author}} によるオリジナルの Telegram Drive をベースにしています:",
     "reset_defaults": "既定値に戻す",
     "done": "完了",
     "auto": "自動",

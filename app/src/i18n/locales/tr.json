@@ -215,6 +215,7 @@
     "revoke_link": "Bağlantıyı iptal et",
     "copy_diagnostics": "Tanı bilgilerini kopyala",
     "tagline": "Telegram hesabınızla çalışan, yerel öncelikli bir dosya çalışma alanı. Ücretsiz.",
+    "upstream_credit": "{{author}} tarafından geliştirilen orijinal Telegram Drive temel alınmıştır:",
     "reset_defaults": "Varsayılanları geri yükle",
     "done": "Bitti",
     "auto": "Otomatik",

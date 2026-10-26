@@ -215,6 +215,7 @@
     "revoke_link": "Cabut tautan",
     "copy_diagnostics": "Salin diagnostik",
     "tagline": "Ruang kerja file yang mengutamakan perangkat lokal dan didukung akun Telegram Anda. Gratis digunakan.",
+    "upstream_credit": "Berdasarkan Telegram Drive asli karya {{author}}:",
     "reset_defaults": "Kembalikan pengaturan bawaan",
     "done": "Selesai",
     "auto": "Otomatis",

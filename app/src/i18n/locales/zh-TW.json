@@ -274,6 +274,7 @@
     "revoke_link": "撤銷鏈接",
     "copy_diagnostics": "複製診斷",
     "tagline": "由您的 Telegram 帳戶支援、以本機為優先的檔案工作區。可免費使用。",
+    "upstream_credit": "基於 {{author}} 開發的原版 Telegram Drive：",
     "reset_defaults": "重設為預設值",
     "done": "完成",
     "clear_local_cache": "清除本機快取",

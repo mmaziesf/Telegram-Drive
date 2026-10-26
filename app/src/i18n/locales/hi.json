@@ -215,6 +215,7 @@
     "revoke_link": "लिंक रद्द करें",
     "copy_diagnostics": "जाँच जानकारी कॉपी करें",
     "tagline": "आपके Telegram खाते से संचालित, लोकल-फर्स्ट फ़ाइल वर्कस्पेस। उपयोग के लिए मुफ़्त।",
+    "upstream_credit": "{{author}} के मूल Telegram Drive पर आधारित:",
     "reset_defaults": "डिफ़ॉल्ट सेटिंग रीसेट करें",
     "done": "हो गया",
     "auto": "अपने आप",

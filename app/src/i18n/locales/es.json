@@ -215,6 +215,7 @@
     "revoke_link": "Revocar enlace",
     "copy_diagnostics": "Copiar diagnóstico",
     "tagline": "Un espacio de trabajo de archivos local, impulsado por tu cuenta de Telegram. De uso gratuito.",
+    "upstream_credit": "Basado en el Telegram Drive original de {{author}}:",
     "reset_defaults": "Restablecer valores predeterminados",
     "done": "Listo",
     "auto": "Automático",

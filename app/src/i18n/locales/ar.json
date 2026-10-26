@@ -215,6 +215,7 @@
     "revoke_link": "إلغاء الرابط",
     "copy_diagnostics": "نسخ بيانات التشخيص",
     "tagline": "مساحة عمل محلية أولاً للملفات تعتمد على حساب Telegram الخاص بك. مجانية الاستخدام.",
+    "upstream_credit": "مبني على Telegram Drive الأصلي من تطوير {{author}}:",
     "reset_defaults": "استعادة الإعدادات الافتراضية",
     "done": "تم",
     "auto": "تلقائي",

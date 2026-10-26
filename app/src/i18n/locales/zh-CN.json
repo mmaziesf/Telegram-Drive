@@ -215,6 +215,7 @@
     "revoke_link": "撤销链接",
     "copy_diagnostics": "复制诊断信息",
     "tagline": "由您的 Telegram 帐户提供支持的本地优先文件工作区。可免费使用。",
+    "upstream_credit": "基于 {{author}} 开发的原版 Telegram Drive：",
     "reset_defaults": "恢复默认设置",
     "done": "完成",
     "auto": "自动",

@@ -274,6 +274,7 @@
     "revoke_link": "Batalkan pautan",
     "copy_diagnostics": "Salin Diagnostik",
     "tagline": "Ruang kerja fail berasaskan setempat yang dikuasakan oleh akaun Telegram anda. Percuma untuk digunakan.",
+    "upstream_credit": "Berdasarkan Telegram Drive asal oleh {{author}}:",
     "reset_defaults": "Tetapkan semula kepada Lalai",
     "done": "Selesai",
     "clear_local_cache": "Kosongkan Cache Tempatan",

@@ -274,6 +274,7 @@
     "revoke_link": "Revoke link",
     "copy_diagnostics": "Copy Diagnostics",
     "tagline": "A local-first file workspace powered by your Telegram account. Free to use.",
+    "upstream_credit": "Based on the original Telegram Drive by {{author}}:",
     "reset_defaults": "Reset to Defaults",
     "done": "Done",
     "clear_local_cache": "Clear Local Cache",

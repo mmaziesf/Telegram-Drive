@@ -274,6 +274,7 @@
     "revoke_link": "لغو پیوند",
     "copy_diagnostics": "کپی تشخیص",
     "tagline": "یک فضای کاری فایل با اولویت ذخیره‌سازی محلی، مبتنی بر حساب Telegram شما. رایگان برای استفاده.",
+    "upstream_credit": "بر پایهٔ Telegram Drive اصلی ساختهٔ {{author}}:",
     "reset_defaults": "به حالت پیش فرض بازنشانی کنید",
     "done": "انجام شد",
     "clear_local_cache": "کش محلی را پاک کنید",

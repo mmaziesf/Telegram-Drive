@@ -274,6 +274,7 @@
     "revoke_link": "Unieważnij link",
     "copy_diagnostics": "Kopiuj diagnostykę",
     "tagline": "Lokalny obszar roboczy plików oparty na Twoim koncie Telegram. Bezpłatny w użyciu.",
+    "upstream_credit": "Na podstawie oryginalnego Telegram Drive autorstwa {{author}}:",
     "reset_defaults": "Przywróć ustawienia domyślne",
     "done": "Zrobione",
     "clear_local_cache": "Wyczyść lokalną pamięć podręczną",

@@ -215,6 +215,7 @@
     "revoke_link": "Revogar link",
     "copy_diagnostics": "Copiar diagnóstico",
     "tagline": "Um espaço de trabalho de arquivos com prioridade local, usando sua conta do Telegram. Gratuito para usar.",
+    "upstream_credit": "Baseado no Telegram Drive original de {{author}}:",
     "reset_defaults": "Restaurar padrões",
     "done": "Concluído",
     "auto": "Automático",

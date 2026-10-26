@@ -274,6 +274,7 @@
     "revoke_link": "Bawiin ang link",
     "copy_diagnostics": "Kopyahin ang Diagnostics",
     "tagline": "Isang local-first na file workspace na pinapagana ng iyong Telegram account. Libreng gamitin.",
+    "upstream_credit": "Batay sa orihinal na Telegram Drive ni {{author}}:",
     "reset_defaults": "I-reset sa Mga Default",
     "done": "Tapos na",
     "clear_local_cache": "I-clear ang Lokal na Cache",

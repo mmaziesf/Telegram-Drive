@@ -274,6 +274,7 @@
     "revoke_link": "لنک منسوخ کریں۔",
     "copy_diagnostics": "ڈائیگناسٹک کاپی کریں۔",
     "tagline": "آپ کے Telegram اکاؤنٹ سے چلنے والی، مقامی ترجیح والی فائل ورک اسپیس۔ استعمال کے لیے مفت۔",
+    "upstream_credit": "{{author}} کے اصل Telegram Drive پر مبنی:",
     "reset_defaults": "ڈیفالٹس پر ری سیٹ کریں۔",
     "done": "ہو گیا",
     "clear_local_cache": "مقامی کیشے کو صاف کریں۔",
