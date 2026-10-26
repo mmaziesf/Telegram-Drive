@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+### Clearing the legacy preview cache no longer skips a file being hashed
+
+- Clearing previews while a cancelled legacy preview was still being hashed could leave that file on disk and still report success. The hashing worker now ends its claim on the file before it releases the cache category, so the waiting clear removes it.
+
 ### Telegram session file protection
 
 - On Unix, `telegram.session` and its SQLite sidecars are now created owner-only (`0600`) inside an owner-only account directory (`0700`). The files are opened without following symlinks.
