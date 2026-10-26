@@ -5,6 +5,7 @@
 - Update tokio, rustls-webpki, webpki-roots, webpki-root-certs, quinn-proto, actix-http (with zstd) and clipboard-win to releases that fix their published RUSTSEC advisories.
 - Move the archive viewer and extractor to `zip` 9. Entry names that `zip` 9 cannot decode are refused with an error that names the entry index.
 - `zip` 4 remains only inside `tauri-plugin-updater` (2.14 still requires `zip` ^4). It only unpacks minisign-verified update archives, so RUSTSEC-2026-0367, -0368 and -0369 are recorded as reviewed exceptions in `deny.toml` and the advisory baseline, to be removed when the updater moves to `zip` 9.
+- Raise the supporter service's pinned `undici` override (used only by the `miniflare` test harness) from 7.29.1 to 7.30.1, fixing GHSA-4qv8-2p9j-2685, GHSA-f72v-6w45-q472 and GHSA-xjj6-f33q-929c.
 
 ## [4.1.2] - 2026-10-14
 
