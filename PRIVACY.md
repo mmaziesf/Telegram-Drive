@@ -40,4 +40,4 @@ PayPal processes the payment under PayPal's own terms and privacy policy. Cloudf
 
 Users can clear caches, disable crash reporting, stop local servers, revoke share links, lock the encryption vault, and remove local settings. Files stored in Telegram remain governed by the user's Telegram account until the user deletes them. Payment records that must be retained for fraud prevention, entitlement enforcement, refunds, disputes, accounting, or legal obligations are kept only as long as reasonably necessary for those purposes.
 
-Security reports should not include credentials or private file data. Contact the maintainer through [cameronamer.com](https://www.cameronamer.com) to arrange private disclosure.
+Security reports should not include credentials or private file data. Report vulnerabilities privately as described in [SECURITY.md](SECURITY.md).

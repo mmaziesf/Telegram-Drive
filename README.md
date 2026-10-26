@@ -8,15 +8,7 @@
 
 Organize, transfer, preview, stream, sync, and share the files you keep in Saved Messages and Telegram channels—on Windows, macOS, Linux, Android, and Google TV.
 
-[![Latest release](https://img.shields.io/github/v/release/caamer20/Telegram-Drive?display_name=tag&sort=semver)](https://github.com/caamer20/Telegram-Drive/releases/latest)
-[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux%20%7C%20Android-blue)](https://github.com/caamer20/Telegram-Drive/releases)
-[![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/caamer20/Telegram-Drive/total?style=flat)](https://github.com/caamer20/Telegram-Drive/releases)
-[![Release](https://github.com/caamer20/Telegram-Drive/actions/workflows/release.yml/badge.svg)](https://github.com/caamer20/Telegram-Drive/actions/workflows/release.yml)
-[![oosmetrics](https://api.oosmetrics.com/api/v1/badge/achievement/ae8e5a6b-e815-4799-a408-4a59980cf9c8.svg)](https://oosmetrics.com/repo/caamer20/Telegram-Drive)
-[![oosmetrics](https://api.oosmetrics.com/api/v1/badge/achievement/029fb97b-a54a-4566-a1eb-aa1a5039065d.svg)](https://oosmetrics.com/repo/caamer20/Telegram-Drive)
-[![oosmetrics](https://api.oosmetrics.com/api/v1/badge/achievement/2aa6f3f9-fd8a-4523-bd73-6625ee6a948a.svg)](https://oosmetrics.com/repo/caamer20/Telegram-Drive)
-
-[Download for desktop](https://github.com/caamer20/Telegram-Drive/releases/latest) · [Download Android 4.1.0](https://github.com/caamer20/Telegram-Drive/releases/tag/Androidv4.1.0) · [Product website](https://telegram-drive.com/) · [Changelog](CHANGELOG.md)
+[Build from source](#build-from-source) · [Security policy](SECURITY.md) · [Changelog](CHANGELOG.md)
 
 </div>
 
@@ -29,14 +21,14 @@ Telegram Drive turns Telegram's familiar file storage into a focused, desktop-st
 
 ## Contents
 
-- [Download and install](#download-and-install)
+- [Installation](#installation)
 - [First-time setup](#first-time-setup)
 - [Features](#features)
 - [Screenshots](#screenshots)
 - [Folder Sync](#folder-sync-desktop)
 - [Encryption](#optional-client-side-encryption-beta-format-frozen)
 - [Privacy and security](#privacy-and-security)
-- [Android and Google TV](#android-and-google-tv-signed-apk)
+- [Android and Google TV](#android-and-google-tv)
 - [Documentation](#documentation)
 - [Build from source](#build-from-source)
 
@@ -53,22 +45,11 @@ Telegram Drive turns Telegram's familiar file storage into a focused, desktop-st
 | **Languages** | 24 selectable locales plus automatic system-language selection |
 | **Price** | Every feature is free; an optional one-time $5 supporter license removes sponsor placements for life on up to three supported devices total |
 
-## Download and install
+## Installation
 
-Desktop **4.1.2** and Android / Google TV **4.1.0** use separate version lines. The desktop release does not update or include Android or Google TV. Downloads are listed below.
+This fork publishes no release binaries and has no auto-updater. To run it, [build from source](#build-from-source). Installers published elsewhere, including the original project's releases, are not produced by this repository and do not contain this fork's changes.
 
-| Platform | Download | Notes |
-| --- | --- | --- |
-| **Windows x64** | [Installer](https://github.com/caamer20/Telegram-Drive/releases/download/v4.1.2/Telegram.Drive_4.1.2_x64-setup.exe) | Includes the required Microsoft Visual C++ runtime setup |
-| **macOS — Apple Silicon** | [DMG](https://github.com/caamer20/Telegram-Drive/releases/download/v4.1.2/Telegram.Drive_4.1.2_aarch64.dmg) | For M-series Macs |
-| **macOS — Intel** | [DMG](https://github.com/caamer20/Telegram-Drive/releases/download/v4.1.2/Telegram.Drive_4.1.2_x64.dmg) | For Intel-based Macs |
-| **Linux x64** | [AppImage](https://github.com/caamer20/Telegram-Drive/releases/download/v4.1.2/Telegram.Drive_4.1.2_amd64.AppImage) · [Debian](https://github.com/caamer20/Telegram-Drive/releases/download/v4.1.2/Telegram.Drive_4.1.2_amd64.deb) · [RPM](https://github.com/caamer20/Telegram-Drive/releases/download/v4.1.2/Telegram.Drive-4.1.2-1.x86_64.rpm) · [Arch](https://github.com/caamer20/Telegram-Drive/releases/download/v4.1.2/telegram-drive-bin-4.1.2-1-x86_64.pkg.tar.zst) | Choose your distribution; Arch updates remain managed by pacman |
-| **Android phones and tablets** | [Signed universal APK](https://github.com/caamer20/Telegram-Drive/releases/download/Androidv4.1.0/Telegram-Drive-v4.1.0-android-universal.apk) | Android 7.0 or newer; supports ARM64, ARMv7, x86, and x86_64 |
-| **Android TV / Google TV** | [Signed TV-compatible APK](https://github.com/caamer20/Telegram-Drive/releases/download/Androidv4.1.0/Telegram-Drive-v4.1.0-android-universal.apk) | The same universal package includes the TV launcher and remote navigation |
-
-The new desktop workspace adds collections, saved searches, a media timeline, Continue Watching, offline trip packs, transfer activity, storage controls, cleanup, and sync previews. Android 4.1.0 includes the latest native media and offline improvements and fixes the folder sidebar reported in [issue #212](https://github.com/caamer20/Telegram-Drive/issues/212). Install the signed APK over your existing app to preserve its data and activation.
-
-Desktop release assets also include updater/signature sidecars where applicable. Download installers only from this repository's GitHub Releases page. See the [Linux packaging and rendering guide](Docs/LINUX_PACKAGING.md) for Arch installation, updater ownership, diagnostics, and AppImage safe mode.
+The [Linux packaging and rendering guide](Docs/LINUX_PACKAGING.md) covers Arch packaging, diagnostics and AppImage safe mode for local builds.
 
 ## First-time setup
 
@@ -76,7 +57,7 @@ Telegram requires third-party clients to use an application API ID and API hash.
 
 1. Sign in at [my.telegram.org](https://my.telegram.org) and open **API development tools**.
 2. Create a Telegram application and copy its `api_id` and `api_hash`.
-3. Install and open Telegram Drive, then enter those credentials locally.
+3. Build and open the app, then enter those credentials locally.
 4. Authenticate with your phone number and login code, or use QR login. If Telegram cloud-password protection is enabled, complete that step as well.
 5. Open **Saved Messages** or select/create Telegram channels to use as folders.
 
@@ -154,7 +135,6 @@ Some media depends on operating-system codec support or FFmpeg. Supported protec
 - Right-to-left document direction and bidirectional-text protections for Arabic, Persian, and Urdu.
 - SOCKS5 and HTTP/HTTPS proxy routing with proxy credentials stored in the operating system's secure credential manager.
 - Configurable VPN-oriented timeouts, retries, keep-alive behavior, polling, bandwidth, transfer chunk size, and archive limits.
-- Signed desktop updates on supported self-updating packages; pacman-managed Arch installs open the verified release for package-manager updates.
 - Android share-sheet intake, foreground transfers, and native downloaded-file publication.
 
 ## Screenshots
@@ -269,28 +249,9 @@ Every Telegram Drive feature is available to non-paying users. Supported desktop
 > [!WARNING]
 > Save the recovery code shown after activation. Payment alone does not bypass verification. Refunds are not automatic or guaranteed except where required by law. A refund, payment reversal, chargeback, or upheld dispute revokes the associated ad-free entitlement. Read the [Supporter Terms](SUPPORTER_TERMS.md) before paying.
 
-## Android and Google TV (signed APK)
+## Android and Google TV
 
-The Android build is currently distributed separately from the desktop release as a signed sideload release. It is not available through Google Play.
-
-1. Open the [Android / Android TV 4.1.0 release](https://github.com/caamer20/Telegram-Drive/releases/tag/Androidv4.1.0).
-2. Download the signed universal Android APK listed in that release.
-3. On Android, allow **Install unknown apps** for the browser or file manager you used.
-4. Open the APK and choose **Install**.
-5. Enter your own Telegram API ID and API hash on first launch.
-
-Android requirements and notes:
-
-- Android 7.0 / API 24 or newer.
-- One signed APK supports phones, tablets, Android TV, and Google TV.
-- Google TV users can transfer the APK to the television or install it with ADB:
-
-  ```bash
-  adb install -r Telegram-Drive-v4.1.0-android-universal.apk
-  ```
-
-- Android validates the package signature during installation. Future compatible updates must use the same signing identity.
-- Release maintainers should follow the [Android and Google TV release runbook](Docs/ANDROID_SIDELOAD_RELEASE.md).
+This fork publishes no Android package. The Kotlin sources that the Android build overlays (`app/android-overrides/`) are not part of this repository, so an Android build cannot currently be reproduced from it. The Rust and TypeScript Android code paths remain in the tree.
 
 ## Local REST API and WebDAV
 
@@ -354,7 +315,7 @@ Common requirements:
 ### Install and run
 
 ```bash
-git clone https://github.com/caamer20/Telegram-Drive.git
+git clone https://github.com/mmaziesf/Telegram-Drive.git
 cd Telegram-Drive/app
 npm ci
 npm run tauri dev
@@ -362,7 +323,7 @@ npm run tauri dev
 
 The first run downloads and compiles the Rust dependency graph and may take several minutes. Later builds reuse Cargo's compilation cache.
 
-Create release bundles with:
+Create local, unsigned installer bundles with:
 
 ```bash
 cd app
@@ -391,8 +352,7 @@ The application is built with Tauri 2, Rust, React 19, TypeScript, Tailwind CSS 
 
 ## Support and community
 
-- Report reproducible, non-sensitive problems through [GitHub Issues](https://github.com/caamer20/Telegram-Drive/issues).
-- Use [GitHub Discussions](https://github.com/caamer20/Telegram-Drive/discussions) for questions, ideas, and general feedback.
+- Report reproducible, non-sensitive problems through [GitHub Issues](https://github.com/mmaziesf/Telegram-Drive/issues).
 - Never include Telegram credentials, session data, payment identifiers, recovery codes, encryption keys, private filenames, or file contents in a public report.
 - For a sensitive security report, follow the private-disclosure guidance in the [Security Policy](SECURITY.md).
 
