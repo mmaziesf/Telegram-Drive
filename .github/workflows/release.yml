@@ -315,7 +315,7 @@ jobs:
               for (const name of ['WIN_ENDPOINT', 'WIN_ACCOUNT', 'WIN_PROFILE']) {
                 if (!/^[A-Za-z0-9:/._-]+$/.test(value(name))) throw new Error(`${name} contains unexpected characters.`);
               }
-              const command = `artifact-signing-cli -e ${value('WIN_ENDPOINT')} -a ${value('WIN_ACCOUNT')} -c ${value('WIN_PROFILE')} -d "Telegram Drive" %1`;
+              const command = `artifact-signing-cli -e ${value('WIN_ENDPOINT')} -a ${value('WIN_ACCOUNT')} -c ${value('WIN_PROFILE')} -d "Unofficial Telegram Drive" %1`;
               fs.writeFileSync('app/src-tauri/tauri.signing.conf.json', JSON.stringify({ bundle: { windows: { signCommand: command } } }));
               exportEnv('AZURE_CLIENT_ID', value('WIN_CLIENT_ID'));
               exportEnv('AZURE_CLIENT_SECRET', value('WIN_CLIENT_SECRET'));
@@ -350,7 +350,7 @@ jobs:
         run: |
           set -euo pipefail
           bundle="app/src-tauri/target/${{ matrix.target }}/release/bundle"
-          application="${bundle}/macos/Telegram Drive.app"
+          application="${bundle}/macos/Unofficial Telegram Drive.app"
           codesign --verify --deep --strict --verbose=2 "${application}"
           codesign --display --verbose=2 "${application}" 2>&1 | grep -F 'Identifier=com.cameronamer.telegramdrive'
           xcrun stapler validate "${application}"
@@ -443,7 +443,7 @@ jobs:
         run: |
           set -euo pipefail
           version="$(node scripts/release-tag-policy.cjs --tag "$GITHUB_REF_NAME" | jq -r .applicationVersion)"
-          deb_package="upstream-linux/Telegram.Drive_${version}_amd64.deb"
+          deb_package="upstream-linux/Unofficial.Telegram.Drive_${version}_amd64.deb"
           bash scripts/render-arch-pkgbuild.sh "${deb_package}" "${version}" arch-package
           useradd --create-home --shell /bin/bash arch-builder
           chown -R arch-builder:arch-builder arch-package
