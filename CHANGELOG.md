@@ -1,3 +1,10 @@
+## [Unreleased]
+
+### Crypto test coverage
+
+- Add `tests/crypto_envelope.rs`, an in-memory suite that exercises the public envelope, key-slot and recovery-bundle API. It covers round-trips under random sizes, metadata and download fragmentation; rejection of every flipped bit, truncation, trailing bytes, reordered, dropped or cross-file records, and wrong keys; key-slot binding of the file identity, slot ID, kind and salt; nonce and file-identity uniqueness; and byte-identical resumed uploads. Property cases use `proptest` (a dev-dependency only).
+- CI runs the suite alongside the native journeys, and TESTING.md documents it.
+
 ## [4.1.2] - 2026-10-14
 
 ### Desktop video streaming metadata
