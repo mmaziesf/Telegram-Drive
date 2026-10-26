@@ -1,3 +1,10 @@
+## [Unreleased]
+
+### Telegram session file protection
+
+- On Unix, `telegram.session` and its SQLite sidecars are now created owner-only (`0600`) inside an owner-only account directory (`0700`). The files are opened without following symlinks.
+- Existing installs are tightened the next time the app starts or signs in. On file systems without Unix permissions, a warning is logged and sign-in continues.
+
 ## [4.1.2] - 2026-10-14
 
 ### Desktop video streaming metadata
