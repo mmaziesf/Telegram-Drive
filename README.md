@@ -18,6 +18,10 @@ Telegram Drive turns Telegram's familiar file storage into a focused, desktop-st
 
 > [!IMPORTANT]
 > **Unofficial Telegram Drive is an unofficial third-party client.** It is an independent project and is not affiliated with, endorsed by, or sponsored by Telegram FZ-LLC. It uses the Telegram API under the [Telegram API Terms of Service](https://core.telegram.org/api/terms), which require third-party apps that use "Telegram" in their title to mark themselves as "Unofficial". Files remain subject to Telegram's account, service, and per-file limits. Telegram Drive should not be treated as literally unlimited storage or as the only backup of important data.
+>
+> - **Fork of [github.com/caamer20/Telegram-Drive](https://github.com/caamer20/Telegram-Drive).** The original code is © Cameron Amer. That repository publishes no license, so this fork grants no license to the original code, and none is implied. Credit for the app belongs to the original author.
+> - **No releases.** This fork publishes no binaries and has no auto-updater. Build from source.
+> - **Your own Telegram credentials.** The app uses the Telegram API with an `api_id` and `api_hash` that you create. None are shipped.
 
 ## Contents
 
@@ -28,6 +32,8 @@ Telegram Drive turns Telegram's familiar file storage into a focused, desktop-st
 - [Folder Sync](#folder-sync-desktop)
 - [Encryption](#optional-client-side-encryption-beta-format-frozen)
 - [Privacy and security](#privacy-and-security)
+- [Security hardening by Grok Bot](#security-hardening-by-grok-bot)
+- [Known limitations](#known-limitations)
 - [Android and Google TV](#android-and-google-tv)
 - [Documentation](#documentation)
 - [Build from source](#build-from-source)
@@ -219,6 +225,32 @@ TDENC2-protected audio, video, and PDF content can stream in supported in-app vi
 
 Read the complete [Privacy Policy](PRIVACY.md), [WebDAV guide](WEBDAV_GUIDE.md), and [REST API reference](REST_API_Documentation.md).
 
+## Security hardening by Grok Bot
+
+This fork has a security, compliance and quality review, with fixes made by Grok Bot, an AI agent working for the fork owner. Each change is a separate pull request. Each row names the evidence for its claim. A change is in effect only after its pull request is merged.
+
+| Change | Pull request | Evidence |
+| --- | --- | --- |
+| New uploads are encrypted by default (vault mode). Sync never falls back to plaintext. Opting out shows a warning. | [#1](https://github.com/mmaziesf/Telegram-Drive/pull/1) | `app/tests/e2e/encryption-default.spec.ts` (5 tests) |
+| The Telegram session directory is 0700 and the session files are 0600 on Unix-like systems. Older installs are tightened in place. | [#2](https://github.com/mmaziesf/Telegram-Drive/pull/2) | Native test `telegram_session_files_are_owner_only_and_older_installs_are_tightened` |
+| The app is named "Unofficial Telegram Drive", as the Telegram API terms require. | [#3](https://github.com/mmaziesf/Telegram-Drive/pull/3) | Locale catalogs; tray label assertion in `native_e2e.rs` |
+| Rust dependencies with RUSTSEC advisories are updated, the archive code moves to `zip` 9, and the test-only `undici` is patched. | [#4](https://github.com/mmaziesf/Telegram-Drive/pull/4) | `cargo deny check` and `cargo audit` pass; `npm audit` reports 0 for the supporter service |
+| Adversarial and property tests cover the TDENC2 envelope. | [#5](https://github.com/mmaziesf/Telegram-Drive/pull/5) | `app/src-tauri/tests/crypto_envelope.rs` (11 tests); see [CRYPTO.md](Docs/CRYPTO.md) |
+| CI runs lint, type checks, Playwright, Clippy `-D warnings`, native tests, `cargo deny`, `cargo audit`, gitleaks, CodeQL and Dependabot. Actions are SHA-pinned with read-only tokens. | [#6](https://github.com/mmaziesf/Telegram-Drive/pull/6) | `.github/workflows/ci.yml`, `codeql.yml`; `actionlint` clean |
+| Inaccurate "open source", "E2EE" and "no third-party servers" claims are removed. | [#7](https://github.com/mmaziesf/Telegram-Drive/pull/7) | `rg -i 'open[- ]source\|E2EE\|third-party servers'` finds no product claims |
+| The app discloses its use of the Telegram API and credits the original project. | [#8](https://github.com/mmaziesf/Telegram-Drive/pull/8) | `app/tests/e2e/telegram-api-disclosure.spec.ts` |
+| The fork uses its own app identifier, has no auto-updater, releases only manually and does not publish to the original project's pages. | [#9](https://github.com/mmaziesf/Telegram-Drive/pull/9) | `tauri.conf.json`; `cargo tree` has no `tauri-plugin-updater`; `release.yml` triggers only on `workflow_dispatch` |
+
+Design notes: [threat model](Docs/THREAT_MODEL.md) and [cryptography overview](Docs/CRYPTO.md). The review covers this fork only. It is not an independent audit.
+
+## Known limitations
+
+- The Telegram session file (`telegram.session`) holds the account's authorization key and is **not encrypted at rest**. File permissions protect it from other local users, but not from malware running as you or from someone who reads the disk directly. A design for encrypting it is in the [threat model](Docs/THREAT_MODEL.md#known-limitations).
+- TDENC2 encryption has not had an independent audit. Telegram can still see file sizes, times and destinations.
+- Files uploaded before encryption became the default stay unencrypted.
+- The fork has only been tested on Linux. macOS, Windows, Android, Google TV, the installers and a real Telegram sign-in have not been checked.
+- Sponsor placements still load third-party ad content, and the optional supporter purchase still uses PayPal. Both are unchanged while the owner decides.
+
 ## Languages
 
 Telegram Drive supports a **System** language preference and these 24 selectable locales:
@@ -258,6 +290,9 @@ Do not expose these ports to a LAN or the internet. See the [REST API endpoint r
 | [Changelog](CHANGELOG.md) | Release notes, compatibility information, and upgrade history |
 | [Privacy Policy](PRIVACY.md) | Local data, Telegram data flow, crash reporting, sharing, and the absence of ads and payments |
 | [Security Policy](SECURITY.md) | Private vulnerability reporting, redaction guidance, and responsible testing boundaries |
+| [Threat model](Docs/THREAT_MODEL.md) | Assets, adversaries, controls with code references, and known limitations |
+| [Cryptography overview](Docs/CRYPTO.md) | Primitives, parameters and the tests behind each encryption claim |
+| [Contributing](CONTRIBUTING.md) | Branches, checks, commit and pull-request expectations |
 | [Folder Sync guide](SYNC_GUIDE.md) | Sync safety model, limits, conflict resolution, and integration behavior |
 | [WebDAV guide](WEBDAV_GUIDE.md) | Setup instructions for macOS, Windows, and Linux clients |
 | [REST API reference](REST_API_Documentation.md) | Authentication, endpoints, request examples, and error responses |
