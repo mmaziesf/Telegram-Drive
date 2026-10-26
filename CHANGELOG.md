@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+### Telegram API disclosure
+
+- State on the sign-in screen, on the first step of the first-run introduction and in About (desktop and Android) that this unofficial app uses the Telegram API and is not affiliated with, endorsed by or sponsored by Telegram. The text is translated into all 24 locales.
+- Browser journeys check the notice on the sign-in screen, in the first-run introduction and in desktop About.
+- The locale ceilings rise by the measured 4053 bytes (319 bytes in the largest catalog) and the desktop route ceiling by 94 bytes.
+
 ### Accurate product claims
 
 - Remove "open-source" from the in-app tagline and QR sign-in text in all 24 locales and from the GitHub Pages site (`Docs/Telegram-Drive.html`). The upstream code has no license, so the project is source-available at most.
