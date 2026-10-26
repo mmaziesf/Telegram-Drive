@@ -1,3 +1,11 @@
+## [Unreleased]
+
+### Unofficial client naming
+
+- Show the app as "Unofficial Telegram Drive" in the window title, installer metadata, Linux desktop entry and every translated `common.app_title`, and state in the README that this is an independent third-party client that is not affiliated with, endorsed by or sponsored by Telegram FZ-LLC, as the [Telegram API Terms of Service](https://core.telegram.org/api/terms) require.
+- The bundle identifier is unchanged, so existing sessions, vaults, settings and keychain entries keep working. Linux `.deb` and macOS bundle artifact names change; the Arch packaging script accepts both the new and the legacy `.deb` name.
+- The locale budget grows by the exact 290 bytes the new title adds (11 bytes in the largest catalog).
+
 ## [4.1.2] - 2026-10-14
 
 ### Desktop video streaming metadata
