@@ -1,6 +1,6 @@
 {
   "common": {
-    "app_title": "Telegram Drive",
+    "app_title": "Unofficial Telegram Drive",
     "logout": "ログアウト",
     "signout_remote_unconfirmed": "このデバイスではサインアウトしましたが、Telegram はセッションの終了を確認しませんでした。Telegram → 設定 → デバイス を開き、そこでセッションを終了してください。",
     "search_placeholder": "ファイルを検索...",

@@ -1,6 +1,6 @@
 {
   "common": {
-    "app_title": "Telegram Drive",
+    "app_title": "Unofficial Telegram Drive",
     "logout": "Mag-log Out",
     "signout_remote_unconfirmed": "Naka-sign out ka na sa device na ito, ngunit hindi kinumpirma ng Telegram na natapos na ang session. Buksan ang Telegram → Settings → Devices at tapusin ito roon.",
     "search_placeholder": "Maghanap ng mga file...",

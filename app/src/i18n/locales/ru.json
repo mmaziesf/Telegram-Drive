@@ -1,6 +1,6 @@
 {
   "common": {
-    "app_title": "Telegram Drive",
+    "app_title": "Unofficial Telegram Drive",
     "logout": "Выйти",
     "signout_remote_unconfirmed": "Вы вышли на этом устройстве, но Telegram не подтвердил завершение сеанса. Откройте Telegram → Настройки → Устройства и завершите его там.",
     "search_placeholder": "Поиск файлов...",

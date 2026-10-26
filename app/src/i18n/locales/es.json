@@ -1,6 +1,6 @@
 {
   "common": {
-    "app_title": "Telegram Drive",
+    "app_title": "Unofficial Telegram Drive",
     "logout": "Cerrar sesión",
     "signout_remote_unconfirmed": "Se cerró la sesión en este dispositivo, pero Telegram no confirmó que la sesión haya finalizado. Abre Telegram → Ajustes → Dispositivos y ciérrala allí.",
     "search_placeholder": "Buscar archivos...",

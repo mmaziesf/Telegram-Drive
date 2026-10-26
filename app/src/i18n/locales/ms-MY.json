@@ -1,6 +1,6 @@
 {
   "common": {
-    "app_title": "Telegram Drive",
+    "app_title": "Unofficial Telegram Drive",
     "logout": "Log Keluar",
     "signout_remote_unconfirmed": "Anda telah log keluar pada peranti ini, tetapi Telegram tidak mengesahkan bahawa sesi telah ditamatkan. Buka Telegram → Tetapan → Peranti dan tamatkan sesi di sana.",
     "search_placeholder": "Cari fail...",

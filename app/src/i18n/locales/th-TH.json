@@ -1,6 +1,6 @@
 {
   "common": {
-    "app_title": "Telegram Drive",
+    "app_title": "Unofficial Telegram Drive",
     "logout": "ออกจากระบบ",
     "signout_remote_unconfirmed": "ออกจากระบบบนอุปกรณ์นี้แล้ว แต่ Telegram ไม่ได้ยืนยันว่าเซสชันสิ้นสุดแล้ว เปิด Telegram → การตั้งค่า → อุปกรณ์ แล้วสิ้นสุดเซสชันที่นั่น",
     "search_placeholder": "ค้นหาไฟล์...",

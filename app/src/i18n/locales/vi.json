@@ -1,6 +1,6 @@
 {
   "common": {
-    "app_title": "Telegram Drive",
+    "app_title": "Unofficial Telegram Drive",
     "logout": "Đăng xuất",
     "signout_remote_unconfirmed": "Đã đăng xuất trên thiết bị này, nhưng Telegram chưa xác nhận phiên đã kết thúc. Hãy mở Telegram → Cài đặt → Thiết bị và kết thúc phiên tại đó.",
     "search_placeholder": "Tìm kiếm tệp...",

@@ -1,6 +1,6 @@
 {
   "common": {
-    "app_title": "Telegram Drive",
+    "app_title": "Unofficial Telegram Drive",
     "logout": "Keluar",
     "signout_remote_unconfirmed": "Anda telah keluar di perangkat ini, tetapi Telegram tidak mengonfirmasi bahwa sesi telah diakhiri. Buka Telegram → Pengaturan → Perangkat dan akhiri sesi di sana.",
     "search_placeholder": "Cari berkas...",

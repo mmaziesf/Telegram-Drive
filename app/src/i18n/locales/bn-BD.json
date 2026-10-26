@@ -1,6 +1,6 @@
 {
   "common": {
-    "app_title": "Telegram Drive",
+    "app_title": "Unofficial Telegram Drive",
     "logout": "লগ আউট করুন",
     "signout_remote_unconfirmed": "এই ডিভাইস থেকে সাইন আউট হয়েছে, কিন্তু Telegram সেশন শেষ হওয়ার বিষয়টি নিশ্চিত করেনি। Telegram → সেটিংস → ডিভাইস খুলে সেখানে সেশনটি শেষ করুন।",
     "search_placeholder": "ফাইলগুলি অনুসন্ধান করুন...",
