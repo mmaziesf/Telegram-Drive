@@ -474,7 +474,7 @@ select:is(.app-select, .settings-select):focus-visible {
   text-wrap: balance;
 }
 
-/* Calm onboarding canvas shared by authentication and sponsored gateway. */
+/* Calm onboarding canvas for authentication. */
 .auth-gradient {
   background:
     radial-gradient(90% 70% at 50% -10%, color-mix(in srgb, var(--color-app-accent) 14%, transparent), transparent 68%),
@@ -629,7 +629,7 @@ select:is(.app-select, .settings-select):focus-visible {
   background: var(--color-app-hover);
 }
 
-.sponsored-label {
+.pill-label {
   display: inline-flex;
   align-items: center;
   min-height: 1.25rem;
@@ -1198,16 +1198,6 @@ select:is(.app-select, .settings-select):focus-visible {
 
 .tv-primary-nav button {
   min-width: 9rem;
-}
-
-.tv-sponsor-placement {
-  bottom: 8rem !important;
-  left: 2rem !important;
-  right: 2rem !important;
-}
-
-.tv-sponsor-placement #adsterra-banner-container {
-  border-radius: 0.75rem;
 }
 
 @media (prefers-reduced-motion: reduce) {
