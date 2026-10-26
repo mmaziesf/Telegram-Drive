@@ -1,3 +1,11 @@
+## [Unreleased]
+
+### Dependency security
+
+- Update tokio, rustls-webpki, webpki-roots, quinn-proto, actix-http (with zstd) and clipboard-win to releases that fix their published RUSTSEC advisories.
+- Move the archive viewer and extractor to `zip` 9. Entry names that `zip` 9 cannot decode are refused with an error that names the entry index.
+- `zip` 4 remains only inside `tauri-plugin-updater` (2.14 still requires `zip` ^4). It only unpacks minisign-verified update archives, so RUSTSEC-2026-0367, -0368 and -0369 are recorded as reviewed exceptions in `deny.toml` and the advisory baseline, to be removed when the updater moves to `zip` 9.
+
 ## [4.1.2] - 2026-10-14
 
 ### Desktop video streaming metadata
