@@ -229,6 +229,8 @@ Read the complete [Privacy Policy](PRIVACY.md), [WebDAV guide](WEBDAV_GUIDE.md),
 
 This fork has a security, compliance and quality review, with fixes made by Grok Bot, an AI agent working for the fork owner. Each change is a separate pull request. Each row names the evidence for its claim. A change is in effect only after its pull request is merged.
 
+The fork owner reviews each pull request and decides whether to merge it; Grok Bot does not merge its own changes. Grok Bot worked from the source code and test fixtures only. No Telegram account was signed in and no Telegram user data was used for this work, including for training AI models (Telegram API Terms of Service, section 1.5). The original application was written by its upstream author; see [caamer20/Telegram-Drive](https://github.com/caamer20/Telegram-Drive) for the project history.
+
 | Change | Pull request | Evidence |
 | --- | --- | --- |
 | New uploads are encrypted by default (vault mode). Sync never falls back to plaintext. Opting out shows a warning. | [#1](https://github.com/mmaziesf/Telegram-Drive/pull/1) | `app/tests/e2e/encryption-default.spec.ts` (5 tests) |
