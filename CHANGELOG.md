@@ -1,3 +1,11 @@
+## [Unreleased]
+
+### Encrypted uploads by default
+
+- New uploads now default to vault encryption with protected metadata. After the drive tour, a first-run dialog creates or unlocks the vault. Choosing plaintext uploads requires an explicit confirmation of what Telegram can read.
+- Existing installs keep their saved upload mode. The settings screen and the per-upload protection dialog describe plaintext uploads as readable by Telegram.
+- The setup dialog is lazy-loaded only when it is shown. The desktop route ceiling rises by 500 bytes for the setup check, and the locale budget rises by the exact size of the 15 new strings.
+
 ## [4.1.2] - 2026-10-14
 
 ### Desktop video streaming metadata
