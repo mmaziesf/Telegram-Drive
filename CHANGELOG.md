@@ -1,5 +1,13 @@
 ## [Unreleased]
 
+### Telegram session encrypted at rest
+
+- `telegram.session` is now sealed with XChaCha20-Poly1305. The 256-bit key is kept in the operating system's credential store (Secret Service on Linux, Keychain on macOS, Credential Manager on Windows). Header fields are authenticated, so a modified file is rejected instead of loaded.
+- When no credential store is reachable, the app asks for a passphrase (at least 12 characters) and derives the key with Argon2id. The passphrase stays in memory only.
+- A plaintext session from an earlier release is imported, sealed and its old file overwritten before removal. Overwriting is best effort on SSDs and copy-on-write file systems.
+- A "forgot passphrase" option deletes only the local session; the device stays listed in Telegram's active sessions until it is ended from another device.
+- Android sessions are unchanged in this release.
+
 ### Telegram session file protection
 
 - On Unix, `telegram.session` and its SQLite sidecars are now created owner-only (`0600`) inside an owner-only account directory (`0700`). The files are opened without following symlinks.
