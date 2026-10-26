@@ -1133,6 +1133,8 @@ impl Driver {
             | "database"
             | "seed_account"
             | "rewrite_session_owner"
+            | "session_store_journeys"
+            | "session_store_journey"
             | "open_account_session"
             | "account_validation_status"
             | "capture_account"
@@ -1561,6 +1563,17 @@ impl Driver {
                     .map_err(error)?;
                 session.cache_peer(&PeerInfo::User {id:owner,auth:None,bot:Some(false),is_self:Some(true)});
                 Ok(json!({"written": session.flush()}))
+            }
+            "session_store_journeys" => Ok(json!(crate::session_store::journeys::JOURNEYS
+                .iter()
+                .map(|(name, _)| *name)
+                .collect::<Vec<_>>())),
+            "session_store_journey" => {
+                // Each journey gets a fresh directory inside the fixture.
+                let name = text(&request, "name")?;
+                let directory = child(&self.root, &format!("session-journey-{name}"))?;
+                crate::session_store::journeys::run(name, &directory)?;
+                Ok(json!({"passed": name}))
             }
             "open_account_session" => {
                 // Open the saved session exactly as a starting runner does.

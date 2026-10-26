@@ -706,5 +706,5 @@ pub(crate) fn use_directory_key_store(directory: PathBuf) {
     keys::install_key_store(Arc::new(keys::DirectoryKeyStore(directory)));
 }
 
-#[cfg(test)]
-pub(crate) mod tests;
+#[cfg(feature = "native-e2e")]
+pub(crate) mod journeys;

@@ -89,13 +89,13 @@ impl KeyStore for OsKeychain {
     }
 }
 
-/// A key store that keeps one file per key in a directory. Only test builds
-/// use it, so native end-to-end runs work on CI machines without a desktop
+/// A key store that keeps one file per key in a directory. Only native
+/// end-to-end builds use it, so native end-to-end runs work on CI machines without a desktop
 /// credential store and keep their keys across driver restarts.
-#[cfg(any(test, feature = "native-e2e"))]
+#[cfg(feature = "native-e2e")]
 pub(crate) struct DirectoryKeyStore(pub std::path::PathBuf);
 
-#[cfg(any(test, feature = "native-e2e"))]
+#[cfg(feature = "native-e2e")]
 impl KeyStore for DirectoryKeyStore {
     fn store(&self, name: &str, key: &SecretKey) -> Result<(), KeyStoreUnavailable> {
         let fail = |error: std::io::Error| KeyStoreUnavailable(error.to_string());
@@ -120,25 +120,25 @@ impl KeyStore for DirectoryKeyStore {
     }
 }
 
-/// A credential store that is never reachable, for tests of the passphrase path.
-#[cfg(test)]
+/// A credential store that is never reachable, for journeys of the passphrase path.
+#[cfg(feature = "native-e2e")]
 pub(crate) struct NoKeyStore;
 
-#[cfg(test)]
+#[cfg(feature = "native-e2e")]
 impl KeyStore for NoKeyStore {
     fn store(&self, _: &str, _: &SecretKey) -> Result<(), KeyStoreUnavailable> {
         Err(KeyStoreUnavailable(
-            "no credential store in this test".into(),
+            "no credential store in this journey".into(),
         ))
     }
     fn load(&self, _: &str) -> Result<Option<SecretKey>, KeyStoreUnavailable> {
         Err(KeyStoreUnavailable(
-            "no credential store in this test".into(),
+            "no credential store in this journey".into(),
         ))
     }
     fn delete(&self, _: &str) -> Result<(), KeyStoreUnavailable> {
         Err(KeyStoreUnavailable(
-            "no credential store in this test".into(),
+            "no credential store in this journey".into(),
         ))
     }
 }
@@ -333,86 +333,4 @@ impl KeyCache {
 /// healthy answer; an error means it cannot be reached.
 pub(crate) fn keychain_reachable(store: Option<&dyn KeyStore>) -> bool {
     store.is_some_and(|store| store.load("availability-probe").is_ok())
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn keychain_keys_are_random_cached_and_reloaded() {
-        let directory = super::super::tests::TestDir::new();
-        let store = DirectoryKeyStore(directory.path().join("keys"));
-        let cache = KeyCache::default();
-        let (header, key) = cache.new_key(Some(&store)).expect("new key");
-        assert_eq!(header.source, KeySource::Keychain);
-        let (_, other) = cache.new_key(Some(&store)).expect("second key");
-        assert_ne!(key.expose(), other.expose());
-
-        let fresh = KeyCache::default();
-        assert_eq!(
-            fresh
-                .key_for(&header, Some(&store))
-                .expect("reload")
-                .expose(),
-            key.expose()
-        );
-        store.delete(&header.key_name()).expect("delete");
-        assert_eq!(
-            cache
-                .key_for(&header, Some(&store))
-                .expect("cached")
-                .expose(),
-            key.expose()
-        );
-        assert_eq!(
-            KeyCache::default().key_for(&header, Some(&store)).err(),
-            Some(KeyError::KeyMissing)
-        );
-    }
-
-    #[test]
-    fn without_a_keychain_the_passphrase_is_required() {
-        let cache = KeyCache::default();
-        assert_eq!(
-            cache.new_key(Some(&NoKeyStore)).err(),
-            Some(KeyError::PassphraseRequired)
-        );
-        cache.set_passphrase(Zeroizing::new("correct horse battery".into()));
-        let (header, key) = cache.new_key(Some(&NoKeyStore)).expect("passphrase key");
-        assert!(matches!(header.source, KeySource::Passphrase(_)));
-
-        // The same passphrase derives the same key in a later process.
-        let later = KeyCache::default();
-        assert_eq!(
-            later.key_for(&header, None).err(),
-            Some(KeyError::PassphraseRequired)
-        );
-        later.set_passphrase(Zeroizing::new("correct horse battery".into()));
-        assert_eq!(
-            later.key_for(&header, None).expect("derive").expose(),
-            key.expose()
-        );
-
-        let wrong = KeyCache::default();
-        wrong.set_passphrase(Zeroizing::new("another passphrase".into()));
-        assert_ne!(
-            wrong.key_for(&header, None).expect("derive").expose(),
-            key.expose()
-        );
-    }
-
-    #[test]
-    fn unreachable_keychain_is_reported_for_keychain_sessions() {
-        let header = Header {
-            key_id: [1; 16],
-            source: KeySource::Keychain,
-        };
-        assert!(matches!(
-            KeyCache::default().key_for(&header, Some(&NoKeyStore)),
-            Err(KeyError::KeychainUnavailable(_))
-        ));
-        assert!(!keychain_reachable(Some(&NoKeyStore)));
-        assert!(!keychain_reachable(None));
-    }
 }

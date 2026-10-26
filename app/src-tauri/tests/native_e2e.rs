@@ -300,6 +300,52 @@ fn telegram_session_files_are_owner_only_and_older_installs_are_tightened() {
     assert_eq!(std::fs::read(&outside).unwrap(), b"not a session");
 }
 
+/// Every behavior of the encrypted session store: the sealed format and its
+/// tamper checks, keychain and passphrase keys, plaintext migration, torn
+/// writes and sign-out. The journeys run inside the native driver.
+#[test]
+fn session_store_journeys_cover_sealing_keys_migration_and_recovery() {
+    const EXPECTED: [&str; 23] = [
+        "sealed_round_trip_hides_plaintext",
+        "every_write_uses_a_fresh_nonce",
+        "wrong_key_is_rejected",
+        "any_modified_byte_is_rejected",
+        "truncated_files_are_rejected",
+        "contents_are_classified_without_a_key",
+        "self_identity_survives_a_peer_refresh",
+        "out_of_range_peers_are_ignored",
+        "update_state_follows_memory_session",
+        "snapshots_round_trip_and_reject_ambiguity",
+        "keychain_keys_are_random_cached_and_reloaded",
+        "passphrase_keys_are_derived_on_demand",
+        "unreachable_keychain_is_reported",
+        "new_session_is_sealed_and_reopens",
+        "deferred_changes_are_written_on_drop",
+        "passphrase_is_chosen_then_required",
+        "plaintext_session_is_migrated_and_erased",
+        "interrupted_migration_completes_or_rolls_back",
+        "torn_write_is_recovered_from_the_journal",
+        "modified_session_is_rejected",
+        "missing_or_unreachable_keys_are_distinct",
+        "signed_out_session_stops_writing",
+        "destroy_removes_every_copy_and_the_key",
+    ];
+    let fixture = Fixture::new();
+    let mut app = Backend::start(&fixture.0);
+    assert_eq!(
+        app.ok(json!({"command":"session_store_journeys"})),
+        json!(EXPECTED)
+    );
+    for name in EXPECTED {
+        assert_eq!(
+            app.ok(json!({"command":"session_store_journey","name":name}))["passed"],
+            name
+        );
+    }
+    app.failure(json!({"command":"session_store_journey","name":"no_such_journey"}));
+    app.stop();
+}
+
 #[test]
 fn account_isolation_survives_restart_and_account_switch() {
     let fixture = Fixture::new();
