@@ -250,6 +250,9 @@ Design notes: [threat model](Docs/THREAT_MODEL.md) and [cryptography overview](D
 - TDENC2 encryption has not had an independent audit. Telegram can still see file sizes, times and destinations.
 - Files uploaded before encryption became the default stay unencrypted.
 - The fork has only been tested on Linux. macOS, Windows, Android, Google TV, the installers and a real Telegram sign-in have not been checked.
+- The app's own `npm audit` is not a CI gate, as upstream. Enabling it reports six advisories reached through `vite` and `source-map-js` (build tooling) that need a `vite` update.
+- The Android Kotlin sources are not in this repository, so `app/scripts/check-android-jni-contract.cjs` fails and Android builds cannot be reproduced from it.
+- Translations added or changed by this fork were not reviewed by native speakers.
 
 ## Languages
 
