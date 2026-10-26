@@ -1597,5 +1597,26 @@
     "this_device": "envoyée par cet appareil",
     "other_device": "envoyée par un autre appareil",
     "none": "Aucune sauvegarde chiffrée des paramètres dans les 1,000 derniers Messages enregistrés."
+  },
+  "session_lock": {
+    "title_enter": "Déverrouiller votre session Telegram",
+    "title_setup": "Protéger votre session Telegram",
+    "detail_enter": "Aucun magasin d'identifiants système n'était disponible : votre session Telegram enregistrée est donc chiffrée avec une phrase secrète. Saisissez-la pour continuer.",
+    "detail_setup": "Aucun magasin d'identifiants système n'est disponible : votre session Telegram sera donc chiffrée avec une phrase secrète d'au moins {{min}} caractères. Elle ne peut pas être récupérée si vous l'oubliez.",
+    "passphrase": "Phrase secrète",
+    "confirm": "Confirmer la phrase secrète",
+    "mismatch": "Les phrases secrètes ne correspondent pas.",
+    "too_short": "Utilisez au moins {{min}} caractères.",
+    "incorrect": "La phrase secrète est incorrecte.",
+    "failed": "Impossible de déverrouiller la session. Réessayez.",
+    "submit_enter": "Déverrouiller",
+    "submit_setup": "Protéger la session",
+    "working": "Déverrouillage…",
+    "keychain_title": "Magasin d'identifiants indisponible",
+    "keychain_detail": "Votre session Telegram est chiffrée avec une clé conservée dans le magasin d'identifiants du système, inaccessible pour le moment. Déverrouillez votre trousseau ou gestionnaire d'identifiants, puis réessayez.",
+    "retry": "Réessayer",
+    "forgot": "Phrase secrète oubliée ?",
+    "remove_detail": "La session enregistrée sera supprimée de cet appareil et vous devrez vous reconnecter. Cet appareil restera listé dans les sessions actives de Telegram jusqu'à ce que vous y mettiez fin depuis un autre appareil.",
+    "remove_confirm": "Supprimer la session"
   }
 }

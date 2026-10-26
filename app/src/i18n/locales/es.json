@@ -1597,5 +1597,26 @@
     "this_device": "subida por este dispositivo",
     "other_device": "subida por otro dispositivo",
     "none": "No se encontró una copia cifrada de ajustes en los últimos 1,000 Mensajes guardados."
+  },
+  "session_lock": {
+    "title_enter": "Desbloquea tu sesión de Telegram",
+    "title_setup": "Protege tu sesión de Telegram",
+    "detail_enter": "No había ningún almacén de credenciales del sistema disponible, así que tu sesión de Telegram guardada está cifrada con una frase de contraseña. Introdúcela para continuar.",
+    "detail_setup": "No hay ningún almacén de credenciales del sistema disponible, así que tu sesión de Telegram se cifrará con una frase de contraseña de al menos {{min}} caracteres. No se puede recuperar si la olvidas.",
+    "passphrase": "Frase de contraseña",
+    "confirm": "Confirmar frase de contraseña",
+    "mismatch": "Las frases de contraseña no coinciden.",
+    "too_short": "Usa al menos {{min}} caracteres.",
+    "incorrect": "La frase de contraseña es incorrecta.",
+    "failed": "No se pudo desbloquear la sesión. Inténtalo de nuevo.",
+    "submit_enter": "Desbloquear",
+    "submit_setup": "Proteger sesión",
+    "working": "Desbloqueando…",
+    "keychain_title": "Almacén de credenciales no disponible",
+    "keychain_detail": "Tu sesión de Telegram está cifrada con una clave guardada en el almacén de credenciales del sistema, al que no se puede acceder ahora. Desbloquea tu llavero o administrador de credenciales e inténtalo de nuevo.",
+    "retry": "Reintentar",
+    "forgot": "¿Olvidaste tu frase de contraseña?",
+    "remove_detail": "La sesión guardada se eliminará de este dispositivo y tendrás que volver a iniciar sesión. Este dispositivo seguirá apareciendo en las sesiones activas de Telegram hasta que la cierres desde otro dispositivo.",
+    "remove_confirm": "Eliminar sesión"
   }
 }

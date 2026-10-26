@@ -1590,5 +1590,26 @@
     "this_device": "diunggah oleh perangkat ini",
     "other_device": "diunggah oleh perangkat lain",
     "none": "Tidak ditemukan cadangan pengaturan terenkripsi dalam 1,000 Pesan Tersimpan terbaru."
+  },
+  "session_lock": {
+    "title_enter": "Buka kunci sesi Telegram Anda",
+    "title_setup": "Lindungi sesi Telegram Anda",
+    "detail_enter": "Penyimpanan kredensial sistem tidak tersedia, jadi sesi Telegram tersimpan Anda dienkripsi dengan frasa sandi. Masukkan untuk melanjutkan.",
+    "detail_setup": "Penyimpanan kredensial sistem tidak tersedia, jadi sesi Telegram Anda akan dienkripsi dengan frasa sandi minimal {{min}} karakter. Frasa sandi tidak dapat dipulihkan jika Anda lupa.",
+    "passphrase": "Frasa sandi",
+    "confirm": "Konfirmasi frasa sandi",
+    "mismatch": "Frasa sandi tidak cocok.",
+    "too_short": "Gunakan minimal {{min}} karakter.",
+    "incorrect": "Frasa sandi salah.",
+    "failed": "Sesi tidak dapat dibuka. Coba lagi.",
+    "submit_enter": "Buka kunci",
+    "submit_setup": "Lindungi sesi",
+    "working": "Membuka kunci…",
+    "keychain_title": "Penyimpanan kredensial tidak tersedia",
+    "keychain_detail": "Sesi Telegram Anda dienkripsi dengan kunci yang disimpan di penyimpanan kredensial sistem, yang saat ini tidak dapat dijangkau. Buka kunci keyring atau pengelola kredensial Anda, lalu coba lagi.",
+    "retry": "Coba lagi",
+    "forgot": "Lupa frasa sandi?",
+    "remove_detail": "Sesi tersimpan akan dihapus dari perangkat ini dan Anda perlu masuk lagi. Perangkat ini tetap tercantum di sesi aktif Telegram sampai Anda mengakhirinya dari perangkat lain.",
+    "remove_confirm": "Hapus sesi"
   }
 }

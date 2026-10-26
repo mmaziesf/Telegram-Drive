@@ -1590,5 +1590,26 @@
     "this_device": "được tải lên bởi thiết bị này",
     "other_device": "được tải lên bởi thiết bị khác",
     "none": "Không tìm thấy bản sao lưu cài đặt mã hóa trong 1,000 Tin nhắn đã lưu gần nhất."
+  },
+  "session_lock": {
+    "title_enter": "Mở khóa phiên Telegram của bạn",
+    "title_setup": "Bảo vệ phiên Telegram của bạn",
+    "detail_enter": "Không có kho thông tin xác thực của hệ thống, vì vậy phiên Telegram đã lưu của bạn được mã hóa bằng cụm mật khẩu. Hãy nhập cụm mật khẩu để tiếp tục.",
+    "detail_setup": "Không có kho thông tin xác thực của hệ thống, vì vậy phiên Telegram của bạn sẽ được mã hóa bằng cụm mật khẩu có ít nhất {{min}} ký tự. Nếu quên, bạn không thể khôi phục.",
+    "passphrase": "Cụm mật khẩu",
+    "confirm": "Xác nhận cụm mật khẩu",
+    "mismatch": "Các cụm mật khẩu không khớp.",
+    "too_short": "Hãy dùng ít nhất {{min}} ký tự.",
+    "incorrect": "Cụm mật khẩu không đúng.",
+    "failed": "Không thể mở khóa phiên. Hãy thử lại.",
+    "submit_enter": "Mở khóa",
+    "submit_setup": "Bảo vệ phiên",
+    "working": "Đang mở khóa…",
+    "keychain_title": "Kho thông tin xác thực không khả dụng",
+    "keychain_detail": "Phiên Telegram của bạn được mã hóa bằng khóa lưu trong kho thông tin xác thực của hệ thống, hiện không truy cập được. Hãy mở khóa keyring hoặc trình quản lý thông tin xác thực rồi thử lại.",
+    "retry": "Thử lại",
+    "forgot": "Quên cụm mật khẩu?",
+    "remove_detail": "Phiên đã lưu sẽ bị xóa khỏi thiết bị này và bạn cần đăng nhập lại. Thiết bị này vẫn xuất hiện trong các phiên đang hoạt động của Telegram cho đến khi bạn kết thúc nó từ thiết bị khác.",
+    "remove_confirm": "Xóa phiên"
   }
 }

@@ -1597,5 +1597,26 @@
     "this_device": "caricato da questo dispositivo",
     "other_device": "caricato da un altro dispositivo",
     "none": "Nessun backup cifrato delle impostazioni negli ultimi 1,000 Messaggi salvati."
+  },
+  "session_lock": {
+    "title_enter": "Sblocca la sessione di Telegram",
+    "title_setup": "Proteggi la sessione di Telegram",
+    "detail_enter": "Non era disponibile alcun archivio di credenziali di sistema, quindi la sessione di Telegram salvata è cifrata con una passphrase. Inseriscila per continuare.",
+    "detail_setup": "Non è disponibile alcun archivio di credenziali di sistema, quindi la sessione di Telegram verrà cifrata con una passphrase di almeno {{min}} caratteri. Non può essere recuperata se la dimentichi.",
+    "passphrase": "Passphrase",
+    "confirm": "Conferma passphrase",
+    "mismatch": "Le passphrase non coincidono.",
+    "too_short": "Usa almeno {{min}} caratteri.",
+    "incorrect": "La passphrase non è corretta.",
+    "failed": "Impossibile sbloccare la sessione. Riprova.",
+    "submit_enter": "Sblocca",
+    "submit_setup": "Proteggi sessione",
+    "working": "Sblocco in corso…",
+    "keychain_title": "Archivio di credenziali non disponibile",
+    "keychain_detail": "La sessione di Telegram è cifrata con una chiave conservata nell'archivio di credenziali di sistema, che al momento non è raggiungibile. Sblocca il portachiavi o il gestore credenziali e riprova.",
+    "retry": "Riprova",
+    "forgot": "Hai dimenticato la passphrase?",
+    "remove_detail": "La sessione salvata verrà eliminata da questo dispositivo e dovrai accedere di nuovo. Questo dispositivo resterà nelle sessioni attive di Telegram finché non la chiudi da un altro dispositivo.",
+    "remove_confirm": "Elimina sessione"
   }
 }

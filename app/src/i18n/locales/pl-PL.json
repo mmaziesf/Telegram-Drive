@@ -1604,5 +1604,26 @@
     "this_device": "wysłana przez to urządzenie",
     "other_device": "wysłana przez inne urządzenie",
     "none": "Nie znaleziono zaszyfrowanej kopii ustawień w ostatnich 1,000 Zapisanych wiadomościach."
+  },
+  "session_lock": {
+    "title_enter": "Odblokuj sesję Telegrama",
+    "title_setup": "Chroń sesję Telegrama",
+    "detail_enter": "Systemowy magazyn poświadczeń był niedostępny, więc zapisana sesja Telegrama jest zaszyfrowana hasłem. Wpisz je, aby kontynuować.",
+    "detail_setup": "Systemowy magazyn poświadczeń jest niedostępny, więc sesja Telegrama zostanie zaszyfrowana hasłem o długości co najmniej {{min}} znaków. Nie da się go odzyskać, jeśli je zapomnisz.",
+    "passphrase": "Hasło",
+    "confirm": "Potwierdź hasło",
+    "mismatch": "Hasła nie są zgodne.",
+    "too_short": "Użyj co najmniej {{min}} znaków.",
+    "incorrect": "Hasło jest nieprawidłowe.",
+    "failed": "Nie udało się odblokować sesji. Spróbuj ponownie.",
+    "submit_enter": "Odblokuj",
+    "submit_setup": "Chroń sesję",
+    "working": "Odblokowywanie…",
+    "keychain_title": "Magazyn poświadczeń niedostępny",
+    "keychain_detail": "Sesja Telegrama jest zaszyfrowana kluczem przechowywanym w systemowym magazynie poświadczeń, który jest teraz nieosiągalny. Odblokuj pęk kluczy lub menedżera poświadczeń i spróbuj ponownie.",
+    "retry": "Spróbuj ponownie",
+    "forgot": "Nie pamiętasz hasła?",
+    "remove_detail": "Zapisana sesja zostanie usunięta z tego urządzenia i trzeba będzie zalogować się ponownie. To urządzenie pozostanie na liście aktywnych sesji Telegrama, dopóki nie zakończysz jej na innym urządzeniu.",
+    "remove_confirm": "Usuń sesję"
   }
 }

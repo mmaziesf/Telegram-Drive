@@ -1590,5 +1590,26 @@
     "this_device": "由此设备上传",
     "other_device": "由另一台设备上传",
     "none": "最近 1,000 条收藏夹消息中未找到加密设置备份。"
+  },
+  "session_lock": {
+    "title_enter": "解锁你的 Telegram 会话",
+    "title_setup": "保护你的 Telegram 会话",
+    "detail_enter": "系统凭据存储不可用，因此你保存的 Telegram 会话已使用密码短语加密。请输入密码短语以继续。",
+    "detail_setup": "系统凭据存储不可用，因此你的 Telegram 会话将使用至少 {{min}} 个字符的密码短语加密。忘记后无法找回。",
+    "passphrase": "密码短语",
+    "confirm": "确认密码短语",
+    "mismatch": "两次输入的密码短语不一致。",
+    "too_short": "请至少使用 {{min}} 个字符。",
+    "incorrect": "密码短语不正确。",
+    "failed": "无法解锁会话，请重试。",
+    "submit_enter": "解锁",
+    "submit_setup": "保护会话",
+    "working": "正在解锁…",
+    "keychain_title": "系统凭据存储不可用",
+    "keychain_detail": "你的 Telegram 会话使用保存在系统凭据存储中的密钥加密，但目前无法访问该存储。请解锁钥匙串或凭据管理器后重试。",
+    "retry": "重试",
+    "forgot": "忘记密码短语？",
+    "remove_detail": "保存的会话将从此设备删除，你需要重新登录。在你从其他设备结束之前，此设备仍会显示在 Telegram 的活动会话中。",
+    "remove_confirm": "删除会话"
   }
 }

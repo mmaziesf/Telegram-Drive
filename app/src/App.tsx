@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, useEffect, useCallback, Suspense } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { load } from "@tauri-apps/plugin-store";
 import { AppProviders } from "./components/shared/AppProviders";
@@ -42,8 +42,10 @@ import { ensureLanguageResource } from "./i18n";
 import { publishNativeLanguage } from "./services/nativeLanguage";
 import { useSupporter } from "./context/SupporterContext";
 import { shouldShowSponsorContent } from "./services/supporterVisibility";
+import { lockFromSessionError, readSessionLock, type SessionLock } from "./services/sessionStorage";
+import { SessionUnlock } from "./components/shared/SessionUnlock";
 
-type AuthStatus = "loading" | "authenticated" | "unauthenticated" | "sponsor-check" | "ad-gateway";
+type AuthStatus = "loading" | "session-locked" | "authenticated" | "unauthenticated" | "sponsor-check" | "ad-gateway";
 
 const AD_GATEWAY_PASSED_KEY = "ad_gateway_passed";
 
@@ -56,6 +58,7 @@ interface StartupProgress {
 
 function AppContent() {
   const [authStatus, setAuthStatus] = useState<AuthStatus>("loading");
+  const [sessionLock, setSessionLock] = useState<SessionLock | null>(null);
   const [startupProgress, setStartupProgress] = useState<StartupProgress>({
     stage: "initial",
     percent: 8,
@@ -134,12 +137,20 @@ function AppContent() {
   // On mount: check for a saved session and auto-restore it.
   // This is the SINGLE source of truth for the initial connection.
   // useTelegramConnection (inside Dashboard) no longer calls cmd_connect on mount.
-  useEffect(() => {
+  const restoreSession = useCallback(() => {
     const checkSession = async () => {
       try {
         setStartupProgress({ stage: "local", percent: 18 });
         await invoke("cmd_get_startup_health");
         setStartupProgress({ stage: "session", percent: 38 });
+        // An encrypted session whose passphrase is not yet known (or must be
+        // chosen) cannot open, so ask for it before connecting or signing in.
+        const lock = await readSessionLock();
+        if (lock) {
+          setSessionLock(lock);
+          setAuthStatus("session-locked");
+          return;
+        }
         const store = await load("config.json");
         const savedId = await store.get<string>("api_id");
         const legacyApiHash = await store.get<string>("api_hash");
@@ -181,6 +192,13 @@ function AppContent() {
           setAuthStatus("unauthenticated");
         }
       } catch (err) {
+        // The saved session is intact but waiting on the user; keep it.
+        const lock = lockFromSessionError(err);
+        if (lock) {
+          setSessionLock(lock);
+          setAuthStatus("session-locked");
+          return;
+        }
         console.warn("Session restore failed, showing login:", err);
         // Session file is corrupt or revoked — clean up and show login
         try {
@@ -194,8 +212,11 @@ function AppContent() {
       }
     };
 
-    checkSession();
+    setAuthStatus("loading");
+    void checkSession();
   }, []);
+
+  useEffect(restoreSession, [restoreSession]);
 
   // Resolve supporter access before deciding whether the one-time sponsor
   // gateway is eligible. This prevents any sponsor surface from flashing
@@ -297,6 +318,9 @@ function AppContent() {
       )}
       {whatsNew && <Suspense fallback={null}><WhatsNewDialog details={whatsNew} onClose={() => setWhatsNew(null)} /></Suspense>}
       {isLoaded && <CrashReportingConsent />}
+      {authStatus === "session-locked" && sessionLock && (
+        <SessionUnlock lock={sessionLock} onResolved={restoreSession} />
+      )}
       {authStatus === "ad-gateway" && (
         <Suspense fallback={<div className="h-screen bg-telegram-bg" />}>
           <AdGateway onContinue={() => setAuthStatus("authenticated")} />

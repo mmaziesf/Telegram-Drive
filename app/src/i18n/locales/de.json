@@ -1590,5 +1590,26 @@
     "this_device": "von diesem Gerät hochgeladen",
     "other_device": "von einem anderen Gerät hochgeladen",
     "none": "Keine verschlüsselte Einstellungssicherung in den neuesten 1,000 Gespeicherten Nachrichten gefunden."
+  },
+  "session_lock": {
+    "title_enter": "Telegram-Sitzung entsperren",
+    "title_setup": "Telegram-Sitzung schützen",
+    "detail_enter": "Es war kein Anmeldedatenspeicher des Systems verfügbar, daher ist deine gespeicherte Telegram-Sitzung mit einer Passphrase verschlüsselt. Gib sie ein, um fortzufahren.",
+    "detail_setup": "Es ist kein Anmeldedatenspeicher des Systems verfügbar, daher wird deine Telegram-Sitzung mit einer Passphrase aus mindestens {{min}} Zeichen verschlüsselt. Sie kann nicht wiederhergestellt werden, wenn du sie vergisst.",
+    "passphrase": "Passphrase",
+    "confirm": "Passphrase bestätigen",
+    "mismatch": "Die Passphrasen stimmen nicht überein.",
+    "too_short": "Verwende mindestens {{min}} Zeichen.",
+    "incorrect": "Die Passphrase ist falsch.",
+    "failed": "Die Sitzung konnte nicht entsperrt werden. Versuche es erneut.",
+    "submit_enter": "Entsperren",
+    "submit_setup": "Sitzung schützen",
+    "working": "Wird entsperrt…",
+    "keychain_title": "Anmeldedatenspeicher nicht verfügbar",
+    "keychain_detail": "Deine Telegram-Sitzung ist mit einem Schlüssel aus dem Anmeldedatenspeicher des Systems verschlüsselt, der gerade nicht erreichbar ist. Entsperre deinen Schlüsselbund bzw. die Anmeldeinformationsverwaltung und versuche es erneut.",
+    "retry": "Erneut versuchen",
+    "forgot": "Passphrase vergessen?",
+    "remove_detail": "Die gespeicherte Sitzung wird von diesem Gerät gelöscht und du musst dich erneut anmelden. Dieses Gerät bleibt in den aktiven Telegram-Sitzungen aufgeführt, bis du es auf einem anderen Gerät beendest.",
+    "remove_confirm": "Sitzung löschen"
   }
 }

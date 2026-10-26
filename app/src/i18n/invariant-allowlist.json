@@ -73,11 +73,18 @@
       "settings.tab_proxy",
       "settings.base_mode",
       "settings.encryption_mode_standard",
-      "notifications.files_count_one"
+      "notifications.files_count_one",
+      "session_lock.passphrase"
     ],
     "vi": [
       "common.proxy",
       "settings.tab_proxy"
+    ],
+    "de": [
+      "session_lock.passphrase"
+    ],
+    "fil-PH": [
+      "session_lock.passphrase"
     ]
   }
 }

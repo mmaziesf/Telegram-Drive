@@ -1590,5 +1590,26 @@
     "this_device": "dimuat naik oleh peranti ini",
     "other_device": "dimuat naik oleh peranti lain",
     "none": "Tiada sandaran tetapan disulitkan dalam 1,000 Mesej Tersimpan terkini."
+  },
+  "session_lock": {
+    "title_enter": "Buka kunci sesi Telegram anda",
+    "title_setup": "Lindungi sesi Telegram anda",
+    "detail_enter": "Storan kelayakan sistem tidak tersedia, jadi sesi Telegram anda yang disimpan disulitkan dengan frasa laluan. Masukkannya untuk meneruskan.",
+    "detail_setup": "Storan kelayakan sistem tidak tersedia, jadi sesi Telegram anda akan disulitkan dengan frasa laluan sekurang-kurangnya {{min}} aksara. Ia tidak boleh dipulihkan jika anda terlupa.",
+    "passphrase": "Frasa laluan",
+    "confirm": "Sahkan frasa laluan",
+    "mismatch": "Frasa laluan tidak sepadan.",
+    "too_short": "Gunakan sekurang-kurangnya {{min}} aksara.",
+    "incorrect": "Frasa laluan tidak betul.",
+    "failed": "Sesi tidak dapat dibuka kunci. Cuba lagi.",
+    "submit_enter": "Buka kunci",
+    "submit_setup": "Lindungi sesi",
+    "working": "Membuka kunci…",
+    "keychain_title": "Storan kelayakan tidak tersedia",
+    "keychain_detail": "Sesi Telegram anda disulitkan dengan kunci yang disimpan dalam storan kelayakan sistem, yang tidak dapat dicapai sekarang. Buka kunci keyring atau pengurus kelayakan anda, kemudian cuba lagi.",
+    "retry": "Cuba lagi",
+    "forgot": "Terlupa frasa laluan?",
+    "remove_detail": "Sesi yang disimpan akan dipadam daripada peranti ini dan anda perlu log masuk semula. Peranti ini kekal disenaraikan dalam sesi aktif Telegram sehingga anda menamatkannya daripada peranti lain.",
+    "remove_confirm": "Padam sesi"
   }
 }

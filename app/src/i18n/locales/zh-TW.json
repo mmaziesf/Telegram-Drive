@@ -1590,5 +1590,26 @@
     "this_device": "由此裝置上傳",
     "other_device": "由另一台裝置上傳",
     "none": "最近 1,000 則已儲存的訊息中未找到加密設定備份。"
+  },
+  "session_lock": {
+    "title_enter": "解鎖你的 Telegram 工作階段",
+    "title_setup": "保護你的 Telegram 工作階段",
+    "detail_enter": "系統憑證儲存區無法使用，因此你儲存的 Telegram 工作階段已使用密碼片語加密。請輸入密碼片語以繼續。",
+    "detail_setup": "系統憑證儲存區無法使用，因此你的 Telegram 工作階段將使用至少 {{min}} 個字元的密碼片語加密。忘記後無法復原。",
+    "passphrase": "密碼片語",
+    "confirm": "確認密碼片語",
+    "mismatch": "兩次輸入的密碼片語不一致。",
+    "too_short": "請至少使用 {{min}} 個字元。",
+    "incorrect": "密碼片語不正確。",
+    "failed": "無法解鎖工作階段，請再試一次。",
+    "submit_enter": "解鎖",
+    "submit_setup": "保護工作階段",
+    "working": "正在解鎖…",
+    "keychain_title": "系統憑證儲存區無法使用",
+    "keychain_detail": "你的 Telegram 工作階段使用儲存在系統憑證儲存區中的金鑰加密，但目前無法存取該儲存區。請解鎖鑰匙圈或認證管理員後再試一次。",
+    "retry": "再試一次",
+    "forgot": "忘記密碼片語？",
+    "remove_detail": "儲存的工作階段將從此裝置刪除，你需要重新登入。在你從其他裝置結束之前，此裝置仍會列在 Telegram 的使用中工作階段。",
+    "remove_confirm": "刪除工作階段"
   }
 }

@@ -1590,5 +1590,26 @@
     "this_device": "bu cihaz tarafından yüklendi",
     "other_device": "başka bir cihaz tarafından yüklendi",
     "none": "Son 1,000 Kayıtlı Mesaj içinde şifreli ayar yedeği bulunamadı."
+  },
+  "session_lock": {
+    "title_enter": "Telegram oturumunun kilidini aç",
+    "title_setup": "Telegram oturumunu koru",
+    "detail_enter": "Sistem kimlik bilgisi deposu kullanılamadığından kayıtlı Telegram oturumun bir parola ifadesiyle şifrelendi. Devam etmek için gir.",
+    "detail_setup": "Sistem kimlik bilgisi deposu kullanılamıyor, bu yüzden Telegram oturumun en az {{min}} karakterli bir parola ifadesiyle şifrelenecek. Unutursan kurtarılamaz.",
+    "passphrase": "Parola ifadesi",
+    "confirm": "Parola ifadesini doğrula",
+    "mismatch": "Parola ifadeleri eşleşmiyor.",
+    "too_short": "En az {{min}} karakter kullan.",
+    "incorrect": "Parola ifadesi yanlış.",
+    "failed": "Oturumun kilidi açılamadı. Tekrar dene.",
+    "submit_enter": "Kilidi aç",
+    "submit_setup": "Oturumu koru",
+    "working": "Kilit açılıyor…",
+    "keychain_title": "Kimlik bilgisi deposu kullanılamıyor",
+    "keychain_detail": "Telegram oturumun, şu anda erişilemeyen sistem kimlik bilgisi deposunda tutulan bir anahtarla şifreli. Anahtar zincirinin veya kimlik bilgisi yöneticisinin kilidini açıp tekrar dene.",
+    "retry": "Tekrar dene",
+    "forgot": "Parola ifadeni mi unuttun?",
+    "remove_detail": "Kayıtlı oturum bu cihazdan silinecek ve yeniden giriş yapman gerekecek. Bu cihaz, başka bir cihazdan sonlandırana kadar Telegram'ın etkin oturumlarında listelenmeye devam eder.",
+    "remove_confirm": "Oturumu sil"
   }
 }
