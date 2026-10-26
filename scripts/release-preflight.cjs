@@ -37,7 +37,9 @@ async function main() {
   const heading = read('CHANGELOG.md').match(/^## \[([^\]]+)\]/m)?.[1];
   if (heading !== version && !(options.unreleased && heading === 'Unreleased')) throw new Error(`First changelog heading must be ${version}; use --allow-unreleased only for local readiness`);
   const links = [...read('README.md').matchAll(/releases\/download\/v([^/]+)\//g)].map(match => match[1]);
-  if (!links.length || links.some(value => value !== version)) throw new Error('README desktop download links disagree with application version');
+  // This fork publishes no releases, so its README may carry no download links;
+  // any link that is present must still name the current version.
+  if (links.some(value => value !== version)) throw new Error('README desktop download links disagree with application version');
   for (const name of ['.cargo/config.toml', 'app/package-lock.json', 'app/src-tauri/Cargo.lock', 'app/src-tauri/build.rs', 'app/src-tauri/build/search-support.rs', 'app/src-tauri/tauri.windows.release.conf.json']) {
     if (!fs.statSync(path.join(root, name)).isFile()) throw new Error(`Missing release build input ${name}`);
   }
