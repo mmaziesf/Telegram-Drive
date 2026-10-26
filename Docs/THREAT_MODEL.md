@@ -1,6 +1,6 @@
 # Threat model
 
-This page covers the desktop app in this fork (Tauri 2 with a Rust backend and a React front end) and the supporter service it talks to. It lists what the app protects, who it protects it from, what is in place and where each control lives. It also lists what is not covered.
+This page covers the desktop app in this fork (Tauri 2 with a Rust backend and a React front end). It lists what the app protects, who it protects it from, what is in place and where each control lives. It also lists what is not covered.
 
 "PR #N" means a pull request in [mmaziesf/Telegram-Drive](https://github.com/mmaziesf/Telegram-Drive/pulls). A control marked with a PR is in place only once that PR is merged.
 
@@ -24,7 +24,7 @@ This page covers the desktop app in this fork (Tauri 2 with a Rust backend and a
 | Another local user on the same machine | Copies the session file | Session directory 0700, session database and SQLite sidecars 0600, symlinks never followed; older installs tightened when the session is next opened | `session_protection.rs`; native test `telegram_session_files_are_owner_only_and_older_installs_are_tightened` | PR #2 (Unix-like systems only) |
 | Malware running as the same user | Copies the session or reads unlocked keys | **Not mitigated.** No desktop app can fully defend against code running with the user's privileges. Encrypting the session at rest would raise the cost; see Known limitations | none | Open (MIL-37) |
 | Web pages in a local browser | Use the loopback REST/WebDAV/streaming server | Servers are off by default and bind to `127.0.0.1` only; CORS allows only the app's origins, the development-server port and the `null` origin (see Known limitations); the REST key is stored as a hash and shown once | `server.rs` (listener bind), `local_cors.rs` | In the base |
-| Third-party ad network | Runs content inside the app's sponsor surface; sees IP address and timing | Sponsor content is isolated from credentials; the app no longer claims "no third-party servers" | `server.rs` (`AD_DOH_URL`); `PRIVACY.md` | Disclosure in PR #7. Whether to keep the ad network is the owner's decision |
+| Third-party ad network or payment provider | Runs remote content inside the app; sees IP address and timing | Removed: no ad routes, no DoH fallback or spoofed User-Agent, no supporter or payment service, WebView `frame-src 'none'`; a CI guard rejects ad, payment and donation hosts | `native_e2e.rs` (ad routes return 404); `check-app-security.cjs`; `check-no-ads.cjs` | PR #10 |
 | Update or distribution channel | Pushes a malicious build | No auto-updater; no published binaries; manual-only release workflow | `tauri.conf.json`, `.github/workflows/release.yml` | PR #9 |
 | Vulnerable dependency | Known CVE or RUSTSEC advisory in a shipped crate or npm package | Advisories fixed by version bumps; `cargo deny`, `cargo audit`, npm audit and Dependabot in CI | `deny.toml`, `.cargo/audit.toml`, `.github/workflows/ci.yml` | PR #4, PR #6 |
 | Secret committed to the repository | Leaks credentials | gitleaks scans the full history in CI; each allowlisted finding has a reason | `.gitleaksignore`, `ci.yml` | PR #6 |
@@ -35,7 +35,7 @@ This page covers the desktop app in this fork (Tauri 2 with a Rust backend and a
 
 1. **App ↔ Telegram.** MTProto via `grammers`, using the user's own `api_id` and `api_hash`. The fork ships no credentials.
 2. **App ↔ loopback clients.** REST, WebDAV, streaming and share links on `127.0.0.1`.
-3. **App ↔ third parties.** The ad network, Cloudflare DNS-over-HTTPS for one ad host, the optional supporter service and PayPal, and opt-in crash reporting ([PRIVACY.md](../PRIVACY.md)).
+3. **App ↔ third parties.** Opt-in crash reporting and the services the user enables, such as remote URL uploads ([PRIVACY.md](../PRIVACY.md)). There is no ad network or payment provider (PR #10).
 4. **Source ↔ build.** Users build from source. CI checks the pull request, not the machine that builds the app.
 
 ## Known limitations
@@ -53,5 +53,4 @@ This page covers the desktop app in this fork (Tauri 2 with a Rust backend and a
 - **Files uploaded in standard mode** before vault became the default stay unencrypted. There is no in-place migration.
 - **The local servers accept `Origin: null`** (`local_cors.rs` `is_allowed_origin`). Sandboxed iframes and `file:` pages on any site send that origin. Requests still need the REST key or a capability token, but the allowance should be reviewed and narrowed if the app does not need it.
 - **Platforms not verified by this fork**: the existing workflows build macOS, Windows and Linux. Installers, Android and Google TV builds, and a real Telegram sign-in were not exercised by hand.
-- **Ad network and supporter/PayPal flow**: these are unchanged pending the owner's decision. Options are recorded in the review notes.
 - **Licensing**: the original project publishes no license. This fork cannot grant one for the original code (see the README).

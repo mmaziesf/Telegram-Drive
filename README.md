@@ -240,6 +240,7 @@ This fork has a security, compliance and quality review, with fixes made by Grok
 | Inaccurate "open source", "E2EE" and "no third-party servers" claims are removed. | [#7](https://github.com/mmaziesf/Telegram-Drive/pull/7) | `rg -i 'open[- ]source\|E2EE\|third-party servers'` finds no product claims |
 | The app discloses its use of the Telegram API and credits the original project. | [#8](https://github.com/mmaziesf/Telegram-Drive/pull/8) | `app/tests/e2e/telegram-api-disclosure.spec.ts` |
 | The fork uses its own app identifier, has no auto-updater, releases only manually and does not publish to the original project's pages. | [#9](https://github.com/mmaziesf/Telegram-Drive/pull/9) | `tauri.conf.json`; `cargo tree` has no `tauri-plugin-updater`; `release.yml` triggers only on `workflow_dispatch` |
+| The ad network, its DNS-over-HTTPS fallback and spoofed User-Agent, the $5 supporter licence, its payment service and the donation links are removed. Every feature was already free. | [#10](https://github.com/mmaziesf/Telegram-Drive/pull/10) | `native_e2e.rs` asserts the ad routes return 404; `frame-src 'none'` enforced by `check-app-security.cjs`; `scripts/check-no-ads.cjs` runs on every PR; `release-small-defects.spec.ts` |
 
 Design notes: [threat model](Docs/THREAT_MODEL.md) and [cryptography overview](Docs/CRYPTO.md). The review covers this fork only. It is not an independent audit.
 
@@ -249,7 +250,6 @@ Design notes: [threat model](Docs/THREAT_MODEL.md) and [cryptography overview](D
 - TDENC2 encryption has not had an independent audit. Telegram can still see file sizes, times and destinations.
 - Files uploaded before encryption became the default stay unencrypted.
 - The fork has only been tested on Linux. macOS, Windows, Android, Google TV, the installers and a real Telegram sign-in have not been checked.
-- Sponsor placements still load third-party ad content, and the optional supporter purchase still uses PayPal. Both are unchanged while the owner decides.
 
 ## Languages
 
