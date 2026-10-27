@@ -14,6 +14,7 @@
 - Remove the related strings from all 24 locales and lower the literal budget to the measured 291 findings.
 - `PRIVACY.md`, `SECURITY.md`, `AGENTS.md`, `TESTING.md` and the README say the app shows no ads and takes no payments. Historical upstream records keep their text and carry a banner.
 - Add `node scripts/check-no-ads.cjs`, which fails when a tracked file names an ad network, a payment or donation provider, the DoH fallback or a spoofed Chrome User-Agent. It runs on every pull request in its own workflow and in release preflight, and the assurance suite checks that it catches each kind of reference. Browser journeys assert that sign-in, the workspace and settings show no donation, purchase or sponsor content and no iframe.
+- Dependabot no longer watches `supporter-service/`, and `.gitignore` drops its entries.
 - Release preflight no longer checks a supporter service and accepts a README without download links.
 - Kept: the Android Kotlin entry points `get/put/deleteSupporterSecret` keep their names because they are the JNI contract for the API-hash store and the Android sources are not in this repository.
 
@@ -21,6 +22,7 @@
 
 - Remove the built-in updater: the Tauri updater and process plugins, their capabilities, the upstream update signing public key, the update banner, the "What's new" dialog and the "Check for updates" control in About. This build never contacts the upstream release feed. `node scripts/check-app-security.cjs` now fails if an `updater:` or `process:` permission, an updater plugin config or updater artifacts come back.
 - Change the bundle identifier from `com.cameronamer.telegramdrive` to `io.github.mmaziesf.unofficialtelegramdrive`, including keychain service names, the Linux desktop entry, Android class names referenced from Rust, packaging scripts, workflows and the docs that name it. This is a separate app: it does not read the sessions, vaults, settings or keychain entries of an upstream install.
+- Removing the updater also removes `zip` 4 from the dependency tree. The RUSTSEC-2026-0367, -0368 and -0369 exceptions for it are deleted from `deny.toml` and the Rust advisory baseline, so cargo-deny fails if any of them returns.
 - Publish nothing automatically. `release.yml` runs only on a manual dispatch and no longer signs updater artifacts, writes an updater manifest or refreshes the upstream product page. The GitHub Pages workflow that deployed the upstream product site is removed. `node scripts/check-workflow-pins.cjs` now fails on a `push:` trigger in `release.yml` or any `actions/deploy-pages` step.
 - Point the README, About, Help and Privacy links at this fork, replace the download section with build-from-source instructions and credit the original project and author in About (desktop and Android) in all 24 locales. A browser journey checks both links in desktop About.
 - `SECURITY.md` asks for private reports through GitHub private vulnerability reporting on this fork and states that there are no releases or auto-updater.
@@ -45,6 +47,31 @@
 - Show the app as "Unofficial Telegram Drive" in the window title, installer metadata, Linux desktop entry and every translated `common.app_title`, and state in the README that this is an independent third-party client that is not affiliated with, endorsed by or sponsored by Telegram FZ-LLC, as the [Telegram API Terms of Service](https://core.telegram.org/api/terms) require.
 - The bundle identifier is unchanged, so existing sessions, vaults, settings and keychain entries keep working. Linux `.deb` and macOS bundle artifact names change; the Arch packaging script accepts both the new and the legacy `.deb` name.
 - The locale budget grows by the exact 290 bytes the new title adds (11 bytes in the largest catalog).
+
+### The full-history secret scan passes again after the #6 squash merge
+
+- Squash-merging #6 put an earlier wording of a `.gitleaksignore` comment into a new commit (21645df). The full-history gitleaks scan reported it as a generic API key. The comment is reworded, and `.gitleaksignore` records that fingerprint along with its reason.
+
+### Continuous integration
+
+- Add a CI workflow for pull requests and pushes to `main`. It runs ESLint with zero warnings, `tsc --noEmit`, the locale checks, the production build with its bundle budget, the Playwright journeys, `cargo fmt --check`, Clippy with `-D warnings`, the native Rust integration tests, `cargo deny`, `cargo audit` and a gitleaks scan of the full history.
+- Add CodeQL analysis for GitHub Actions, JavaScript/TypeScript and Rust on pull requests, `main` and a weekly schedule.
+- Add Dependabot updates for Cargo, both npm projects and GitHub Actions.
+- Workflows use read-only tokens by default, pin every action to a commit SHA and do not persist checkout credentials. Only the CodeQL job can write security events.
+- Fix the frontend lint findings, including 22 conditional hook calls in the sign-in screen. Two rules stay off with an inline reason: `no-explicit-any` (141 uses) and `react-hooks/exhaustive-deps` (43 uses).
+- `cargo audit` ignores the same advisories as `deny.toml`, with the same reasons. `.gitleaksignore` lists each known false positive with its reason.
+- Fix the TV keyboard journey in `accessibility.spec.ts`. After Escape releases the native select, the test now presses ArrowLeft to reach the number field beside it. It used to press ArrowDown, and spatial navigation picks the element below by on-screen geometry. With some installed fonts, such as Inter, that element is a button instead of the number field, so the test failed on those machines but passed on the CI runner.
+
+### Dependency security
+
+- Update tokio, rustls-webpki, webpki-roots, webpki-root-certs, quinn-proto, actix-http (with zstd) and clipboard-win to releases that fix their published RUSTSEC advisories.
+- Move the archive viewer and extractor to `zip` 9. Entry names that `zip` 9 cannot decode are refused with an error that names the entry index.
+- `zip` 4 remains only inside `tauri-plugin-updater` (2.14 still requires `zip` ^4). It only unpacks minisign-verified update archives, so RUSTSEC-2026-0367, -0368 and -0369 are recorded as reviewed exceptions in `deny.toml` and the advisory baseline, to be removed when the updater moves to `zip` 9.
+- Raise the supporter service's pinned `undici` override (used only by the `miniflare` test harness) from 7.29.1 to 7.30.1, fixing GHSA-4qv8-2p9j-2685, GHSA-f72v-6w45-q472 and GHSA-xjj6-f33q-929c.
+
+### Clearing the legacy preview cache no longer skips a file being hashed
+
+- Clearing previews while a cancelled legacy preview was still being hashed could leave that file on disk and still report success. The hashing worker now ends its claim on the file before it releases the cache category, so the waiting clear removes it.
 
 ### Pull requests skip macOS runners and cancel superseded runs
 

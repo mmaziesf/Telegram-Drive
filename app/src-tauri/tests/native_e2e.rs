@@ -3148,7 +3148,11 @@ fn zip_preview_and_extraction_use_private_files_verify_crc_limits_and_cleanup_ca
         let mut zip =
             zip::ZipArchive::new(std::fs::File::open(fixture.path("document.zip")).unwrap())
                 .unwrap();
-        let offset = zip.by_index(0).unwrap().data_start() as usize;
+        let offset =
+            zip.by_index(0)
+                .unwrap()
+                .data_start()
+                .expect("stored ZIP fixture entry has a known data offset") as usize;
         offset
     };
     damaged[data_offset + 100] ^= 1;
