@@ -1,5 +1,17 @@
 ## [Unreleased]
 
+
+
+### Continuous integration
+
+- Add a CI workflow for pull requests and pushes to `main`. It runs ESLint with zero warnings, `tsc --noEmit`, the locale checks, the production build with its bundle budget, the Playwright journeys, `cargo fmt --check`, Clippy with `-D warnings`, the native Rust integration tests, `cargo deny`, `cargo audit` and a gitleaks scan of the full history.
+- Add CodeQL analysis for GitHub Actions, JavaScript/TypeScript and Rust on pull requests, `main` and a weekly schedule.
+- Add Dependabot updates for Cargo, both npm projects and GitHub Actions.
+- Workflows use read-only tokens by default, pin every action to a commit SHA and do not persist checkout credentials. Only the CodeQL job can write security events.
+- Fix the frontend lint findings, including 22 conditional hook calls in the sign-in screen. Two rules stay off with an inline reason: `no-explicit-any` (141 uses) and `react-hooks/exhaustive-deps` (43 uses).
+- `cargo audit` ignores the same advisories as `deny.toml`, with the same reasons. `.gitleaksignore` lists each known false positive with its reason.
+- Fix the TV keyboard journey in `accessibility.spec.ts`. After Escape releases the native select, the test now presses ArrowLeft to reach the number field beside it. It used to press ArrowDown, which correctly moves to the list below, so the test failed on every run.
+
 ### Dependency security
 
 - Update tokio, rustls-webpki, webpki-roots, webpki-root-certs, quinn-proto, actix-http (with zstd) and clipboard-win to releases that fix their published RUSTSEC advisories.
@@ -7,6 +19,15 @@
 - `zip` 4 remains only inside `tauri-plugin-updater` (2.14 still requires `zip` ^4). It only unpacks minisign-verified update archives, so RUSTSEC-2026-0367, -0368 and -0369 are recorded as reviewed exceptions in `deny.toml` and the advisory baseline, to be removed when the updater moves to `zip` 9.
 - Raise the supporter service's pinned `undici` override (used only by the `miniflare` test harness) from 7.29.1 to 7.30.1, fixing GHSA-4qv8-2p9j-2685, GHSA-f72v-6w45-q472 and GHSA-xjj6-f33q-929c.
 - Reset the design gallery's scroll container before its full-page snapshots. A click could leave it scrolled by a few pixels, which made the visual check on this pull request fail intermittently; 75 of 75 repeated runs now pass.
+
+
+### Clearing the legacy preview cache no longer skips a file being hashed
+
+- Clearing previews while a cancelled legacy preview was still being hashed could leave that file on disk and still report success. The hashing worker now ends its claim on the file before it releases the cache category, so the waiting clear removes it.
+
+### Pull requests skip macOS runners and cancel superseded runs
+
+Pull requests now build Windows and Linux. Both macOS targets still run on every push to `main`, nightly and on manual dispatch. A new push to a pull request cancels that pull request's runs that are still going; runs on `main` are never cancelled. `scripts/check-workflow-pins.cjs` enforces both rules on every pull request that changes a workflow.
 
 ### Telegram session file protection
 

@@ -149,7 +149,8 @@ export function MediaPlayer({ file, onClose, onNext, onPrev, currentIndex, total
                 e.preventDefault();
                 const media = containerRef.current?.querySelector('video, audio') as HTMLMediaElement | null;
                 if (media) {
-                    media.paused ? media.play().catch(() => {}) : media.pause();
+                    if (media.paused) void media.play().catch(() => {});
+                    else media.pause();
                 }
             }
         };
