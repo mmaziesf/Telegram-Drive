@@ -25,6 +25,11 @@ for line in sys.stdin:
     if key in ("EMPTY_ENVELOPE", "SMALL_ENVELOPE"):
         open("corpus/envelope_header/" + key.lower(), "wb").write(bytes.fromhex(value.strip()))
 '
+# cargo-fuzz enables debug assertions for the fuzzed crates but not for build
+# scripts and proc macros. Tauri's generated context then lacks the
+# debug-only `ResolvedCommand.referenced_by` field (error E0063), so turn them
+# on for build dependencies too.
+export CARGO_PROFILE_RELEASE_BUILD_OVERRIDE_DEBUG_ASSERTIONS=true
 cargo +nightly fuzz run envelope_header -- -max_total_time=600
 cargo +nightly fuzz run envelope_decrypt -- -max_total_time=600
 ```

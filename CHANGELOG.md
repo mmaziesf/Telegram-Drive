@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+### Fuzz build note
+
+- `app/src-tauri/fuzz/README.md` now sets `CARGO_PROFILE_RELEASE_BUILD_OVERRIDE_DEBUG_ASSERTIONS=true` before `cargo fuzz run`. cargo-fuzz turns on debug assertions only for the fuzzed crates, so Tauri's build-time code generator omitted the debug-only `ResolvedCommand.referenced_by` field, and a clean build of the fuzz targets failed with E0063. With the variable set, the build passed on main 393aceb.
+
 ### Settings sync buffers wiped after use
 
 - `commands/settings_sync.rs` now wraps the plaintext settings encoded before encryption and the settings decrypted from a backup in `Zeroizing`, so both buffers are overwritten when dropped. This is backed by code review only: no test can observe freed memory.
