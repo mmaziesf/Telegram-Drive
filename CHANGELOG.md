@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+### Settings sync buffers wiped after use
+
+- `commands/settings_sync.rs` now wraps the plaintext settings encoded before encryption and the settings decrypted from a backup in `Zeroizing`, so both buffers are overwritten when dropped. This is backed by code review only: no test can observe freed memory.
+
 ### TDENC2 fuzz targets
 
 - Add `app/src-tauri/fuzz`, a cargo-fuzz research harness outside the app build, CI and release, with its own workspace and lockfile. `envelope_header` feeds arbitrary bytes to the header parser, metadata verification and decrypter setup; `envelope_decrypt` feeds forged ciphertext, in input-chosen fragments, behind a valid header and aborts if any of it authenticates. Local 10-minute smoke runs found no crash: `envelope_header` ran 112,243,538 inputs (seeded with the known-answer envelopes, which raised its coverage from 111 to 416 edges) and `envelope_decrypt` ran 10,765,974. The 24-hour run is still pending. TESTING.md, Docs/CRYPTO.md, Docs/TDENC2_FORMAT.md and Docs/RELEASE_ACCEPTANCE.md describe the harness and its status.
