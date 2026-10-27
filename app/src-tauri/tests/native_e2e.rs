@@ -1333,8 +1333,8 @@ fn the_log_file_is_redacted_bounded_and_named_in_the_startup_failure_report() {
     ));
     // A WebDAV capability path and an HLS segment URL with a stream token
     // shaped like the per-run one (16 random bytes as hex).
-    let dav_token = "4f1c9e0b7a2d6e8f3c5b1a9d7e0f2c4b6a8d0e2f4c6b8a0d2e4f6c8b0a2d4e6f";
-    let stream_token = "9a3f0c7e1b5d2f8a6c4e0b9d7f1a3c5e";
+    let dav_token = "4f1c".repeat(16);
+    let stream_token = "9a3f".repeat(8);
     app.ok(json!({
         "command":"log_emit",
         "level":"error",
@@ -1355,8 +1355,8 @@ fn the_log_file_is_redacted_bounded_and_named_in_the_startup_failure_report() {
         "credential=77",
         "deadbeefcafe",
         "0123456789abcdef0123456789abcdef0123",
-        dav_token,
-        stream_token,
+        dav_token.as_str(),
+        stream_token.as_str(),
         home.as_str(),
         "Holiday Photos",
     ] {
