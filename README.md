@@ -229,7 +229,7 @@ Read the complete [Privacy Policy](PRIVACY.md), [WebDAV guide](WEBDAV_GUIDE.md),
 
 This fork has a security, compliance and quality review, with fixes made by Grok Bot, an AI agent working for the fork owner. Each change is a separate pull request. Each row names the evidence for its claim. A change is in effect only after its pull request is merged.
 
-The fork owner reviews each pull request and decides whether to merge it; Grok Bot does not merge its own changes. Grok Bot worked from the source code and test fixtures only. No Telegram account was signed in and no Telegram user data was used for this work, including for training AI models (Telegram API Terms of Service, section 1.5). The original application was written by its upstream author; see [caamer20/Telegram-Drive](https://github.com/caamer20/Telegram-Drive) for the project history.
+The fork owner decides what is merged. Grok Bot merges a pull request only with the owner's explicit approval. While GitHub Actions was blocked on this fork, the owner approved merging the documentation, compliance, test and CI pull requests after a full local Linux run of the CI checks; each of those pull requests has a "Local verification (GitHub Actions blocked)" comment listing the commands and results. The security code pull requests (#1, #4, #12, #13) wait for GitHub CI. Grok Bot worked from the source code and test fixtures only. No Telegram account was signed in and no Telegram user data was used for this work, including for training AI models (Telegram API Terms of Service, section 1.5). The original application was written by its upstream author; see [caamer20/Telegram-Drive](https://github.com/caamer20/Telegram-Drive) for the project history.
 
 | Change | Pull request | Evidence |
 | --- | --- | --- |
@@ -242,17 +242,23 @@ The fork owner reviews each pull request and decides whether to merge it; Grok B
 | Inaccurate "open source", "E2EE" and "no third-party servers" claims are removed. | [#7](https://github.com/mmaziesf/Telegram-Drive/pull/7) | `rg -i 'open[- ]source\|E2EE\|third-party servers'` finds no product claims |
 | The app discloses its use of the Telegram API and credits the original project. | [#8](https://github.com/mmaziesf/Telegram-Drive/pull/8) | `app/tests/e2e/telegram-api-disclosure.spec.ts` |
 | The fork uses its own app identifier, has no auto-updater, releases only manually and does not publish to the original project's pages. | [#9](https://github.com/mmaziesf/Telegram-Drive/pull/9) | `tauri.conf.json`; `cargo tree` has no `tauri-plugin-updater`; `release.yml` triggers only on `workflow_dispatch` |
+| `telegram.session` is encrypted at rest (XChaCha20-Poly1305). The key is kept in the OS credential store, or derived from a passphrase with Argon2id when no store is available. Existing plaintext sessions are migrated. | [#12](https://github.com/mmaziesf/Telegram-Drive/pull/12) | 23 journeys in `session_store/journeys.rs`, run by `session_store_journeys_cover_sealing_keys_migration_and_recovery` in `native_e2e.rs`; `app/tests/e2e/session-unlock.spec.ts` (5 tests) |
+| The app's npm advisories (`vite`, `source-map-js`) are fixed and the app's `npm audit` is a CI gate. | [#13](https://github.com/mmaziesf/Telegram-Drive/pull/13) | `node scripts/check-npm-audit.cjs app` exits 1 on the old lockfile and 0 on the new one; `dependency-assurance.yml` matrix includes `app` |
+| A drop-order race that let a preview cache clear skip a file being hashed is fixed. | [#14](https://github.com/mmaziesf/Telegram-Drive/pull/14) | `workspace/assets.rs` lease tuple order; reproduced and fixed with a temporary delay (no permanent regression test) |
+| Pull requests build on Linux and Windows; macOS builds run on `main`, nightly and on demand. Superseded pull request runs are cancelled. | [#15](https://github.com/mmaziesf/Telegram-Drive/pull/15) | `desktop-sync-ci.yml` matrix; `scripts/check-workflow-pins.cjs` rejects any other matrix or a missing concurrency rule |
 | The ad network, its DNS-over-HTTPS fallback and spoofed User-Agent, the $5 supporter licence, its payment service and the donation links are removed. Every feature was already free. | [#10](https://github.com/mmaziesf/Telegram-Drive/pull/10) | `native_e2e.rs` asserts the ad routes return 404; `frame-src 'none'` enforced by `check-app-security.cjs`; `scripts/check-no-ads.cjs` runs on every PR; `release-small-defects.spec.ts` |
 
 Design notes: [threat model](Docs/THREAT_MODEL.md) and [cryptography overview](Docs/CRYPTO.md). The review covers this fork only. It is not an independent audit.
 
 ## Known limitations
 
-- The Telegram session file (`telegram.session`) holds the account's authorization key and is **not encrypted at rest**. File permissions protect it from other local users, but not from malware running as you or from someone who reads the disk directly. A design for encrypting it is in the [threat model](Docs/THREAT_MODEL.md#known-limitations).
+- Until [#12](https://github.com/mmaziesf/Telegram-Drive/pull/12) is merged, the Telegram session file (`telegram.session`) is **not encrypted at rest**. File permissions protect it from other local users, but not from malware running as you or from someone who reads the disk directly. Limits that remain after #12 are listed in the [threat model](Docs/THREAT_MODEL.md#known-limitations); Android sessions stay plaintext.
 - TDENC2 encryption has not had an independent audit. Telegram can still see file sizes, times and destinations.
 - Files uploaded before encryption became the default stay unencrypted.
 - The fork has only been tested on Linux. macOS, Windows, Android, Google TV, the installers and a real Telegram sign-in have not been checked.
-- The app's own `npm audit` is not a CI gate, as upstream. Enabling it reports six advisories reached through `vite` and `source-map-js` (build tooling) that need a `vite` update.
+- Until [#13](https://github.com/mmaziesf/Telegram-Drive/pull/13) is merged, the app's own `npm audit` is not a CI gate and reports six advisories in build tooling (`vite`, `source-map-js`).
+- Pull requests are not built on macOS. macOS problems are found by the build on `main` or the nightly run, after merging.
+- Pull requests merged on local verification while GitHub Actions was blocked were checked on Linux only; Windows and macOS were not checked for them until GitHub CI ran on `main`.
 - The Android Kotlin sources are not in this repository, so `app/scripts/check-android-jni-contract.cjs` fails and Android builds cannot be reproduced from it.
 - Translations added or changed by this fork were not reviewed by native speakers.
 

@@ -22,11 +22,11 @@ This page covers the desktop app in this fork (Tauri 2 with a Rust backend and a
 | Telegram or anyone with access to the account's cloud data | Reads uploaded files | Client-side TDENC2 encryption before upload | `crypto/envelope/`; tests in `tests/crypto_envelope.rs` | In the base; tests in PR #5 |
 | Same | Plaintext uploads by default | Vault mode is the default for new uploads; sync pauses with `VAULT_LOCKED` instead of uploading plaintext | `EncryptionSettings::default`; `tests/e2e/encryption-default.spec.ts` | PR #1 |
 | Another local user on the same machine | Copies the session file | Session directory 0700, session database and SQLite sidecars 0600, symlinks never followed; older installs tightened when the session is next opened | `session_protection.rs`; native test `telegram_session_files_are_owner_only_and_older_installs_are_tightened` | PR #2 (Unix-like systems only) |
-| Malware running as the same user | Copies the session or reads unlocked keys | **Not mitigated.** No desktop app can fully defend against code running with the user's privileges. Encrypting the session at rest would raise the cost; see Known limitations | none | Open (MIL-37) |
+| Malware running as the same user | Copies the session or reads unlocked keys | Partly mitigated. No desktop app can fully defend against code running with the user's privileges. The session file is sealed with XChaCha20-Poly1305 under a key in the OS credential store (or an Argon2id passphrase key), so a copied file alone is not enough; malware that can query the credential store or read process memory still gets the session | `session_store/`; journeys in `session_store/journeys.rs`; `session-unlock.spec.ts` | PR #12 (MIL-37); open until merged |
 | Web pages in a local browser | Use the loopback REST/WebDAV/streaming server | Servers are off by default and bind to `127.0.0.1` only; CORS allows only the app's origins, the development-server port and the `null` origin (see Known limitations); the REST key is stored as a hash and shown once | `server.rs` (listener bind), `local_cors.rs` | In the base |
 | Third-party ad network or payment provider | Runs remote content inside the app; sees IP address and timing | Removed: no ad routes, no DoH fallback or spoofed User-Agent, no supporter or payment service, WebView `frame-src 'none'`; a CI guard rejects ad, payment and donation hosts | `native_e2e.rs` (ad routes return 404); `check-app-security.cjs`; `check-no-ads.cjs` | PR #10 |
 | Update or distribution channel | Pushes a malicious build | No auto-updater; no published binaries; manual-only release workflow | `tauri.conf.json`, `.github/workflows/release.yml` | PR #9 |
-| Vulnerable dependency | Known CVE or RUSTSEC advisory in a shipped crate or npm package | Advisories fixed by version bumps; `cargo deny`, `cargo audit`, npm audit and Dependabot in CI | `deny.toml`, `.cargo/audit.toml`, `.github/workflows/ci.yml` | PR #4, PR #6 |
+| Vulnerable dependency | Known CVE or RUSTSEC advisory in a shipped crate or npm package | Advisories fixed by version bumps; `cargo deny`, `cargo audit`, npm audit for the app and Dependabot in CI | `deny.toml`, `.cargo/audit.toml`, `.github/workflows/ci.yml`, `dependency-assurance.yml` (`node-assurance` matrix) | PR #4, PR #6, PR #13 |
 | Secret committed to the repository | Leaks credentials | gitleaks scans the full history in CI; each allowlisted finding has a reason | `.gitleaksignore`, `ci.yml` | PR #6 |
 | Malicious pull request or workflow | Abuses CI tokens | Read-only `GITHUB_TOKEN` by default, actions pinned to commit SHAs, no persisted checkout credentials | `.github/workflows/*.yml`, `scripts/check-workflow-pins.cjs` | PR #6 |
 | Crafted encrypted file | Weakens the KDF or exhausts memory | Argon2id parameters and sizes are validated against fixed bounds on parse | `crypto/policy.rs` `validate_argon2_params` | In the base |
@@ -40,13 +40,14 @@ This page covers the desktop app in this fork (Tauri 2 with a Rust backend and a
 
 ## Known limitations
 
-- **The Telegram session is not encrypted at rest.** Owner-only file permissions (PR #2) stop other local users, but not malware running as the user, a backup tool, or someone who reads the disk directly. The planned design:
-  - a session store that implements the `grammers` `Session` trait over an encrypted file;
-  - a random key held in the OS credential manager (the `keyring` crate the app already uses);
-  - atomic, debounced writes;
-  - a one-time migration from the SQLite file, followed by secure removal of it.
-
-  This also needs an explicit account ID, because account isolation currently relies on the session file's on-disk identity (`external_files.rs`). It is tracked in MIL-37 and not yet done.
+- **The Telegram session is not encrypted at rest until PR #12 is merged.** Owner-only file permissions (PR #2) stop other local users, but not malware running as the user, a backup tool, or someone who reads the disk directly. PR #12 seals the session and migrates plaintext files. After it, these limits remain:
+  - Android sessions are unchanged and still plaintext.
+  - Erasing the old plaintext file is best effort. On SSDs, copy-on-write file systems and in backups, old blocks may survive.
+  - Intermediate `serde_json` buffers of the session snapshot are not zeroized.
+  - If a write tears before the 77-byte header is complete, a keychain key may be left orphaned.
+  - When the credential store is unavailable, the app offers only Retry.
+  - Resetting a forgotten passphrase deletes the local session but does not revoke the authorization on Telegram's servers; end it from another device.
+  - The macOS Keychain and Windows Credential Manager backends compile but have not been tested on those systems.
 - **Windows and other non-Unix platforms** rely on the per-user profile ACL for the session. The app sets no extra ACL.
 - **No independent audit** of TDENC2 or the vault.
 - **Metadata is visible to Telegram**: size, time, account and destination, even for encrypted files.

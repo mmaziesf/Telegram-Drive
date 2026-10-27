@@ -37,6 +37,12 @@ cargo deny check
 
 CI runs the same checks plus `cargo audit`, gitleaks and CodeQL. Fix a failure at its cause. If a lint rule, advisory or secret-scan finding has to be allowed, put the reason next to the exception (`deny.toml`, `.cargo/audit.toml`, `.gitleaksignore` or an inline lint comment).
 
+## Which runners check a pull request
+
+- Pull requests run the desktop build on Linux and Windows only. macOS (Apple silicon and Intel) runs on every push to `main`, nightly, and on demand with `gh workflow run desktop-sync-ci.yml --ref BRANCH`. Run it on demand when a change touches macOS-specific code.
+- A newer push to a pull request cancels its older runs. Runs on `main` are never cancelled.
+- `scripts/check-workflow-pins.cjs` enforces both rules. [TESTING.md](TESTING.md) has the details.
+
 ## Code expectations
 
 - Rust: no `unwrap`, `expect` or `panic!` on paths reachable from user input or the network; return errors instead. Never log secrets, session data, file names or paths.
