@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+### Share links refuse out-of-range metadata
+
+- `cmd_create_share` now checks the WebView-supplied file name, size and expiry before it contacts Telegram. Expiry must be 1 to 8,760 hours (one year). It is computed with checked arithmetic, so a huge value can no longer wrap the stored expiry in release builds or panic in debug builds. Zero or negative hours, which created links that were already expired, are refused too. File names must have 1 to 255 characters and no control characters, and the size cannot be negative.
+- A native E2E journey covers the accepted range and each refused case (RT-09 in the red-team report).
+
 ### External links and WebView scripts narrowed
 
 - The shell `open` scope, which Rust enforces, now allows only HTTPS links to this fork's and the upstream GitHub repository, `telegram.org`, `core.telegram.org`, `my.telegram.org`, `ffmpeg.org` and `fragment.com` (including subdomains). It used to allow any `http`, `https` or `mailto` URL, so script injected into the WebView could send data to any site by opening a link.

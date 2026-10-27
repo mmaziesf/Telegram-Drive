@@ -1139,6 +1139,7 @@ impl Driver {
             | "open_account_session"
             | "account_validation_status"
             | "advance_share_unlock_clock"
+            | "share_metadata_check"
             | "capture_account"
             | "validate_account"
             | "save_collection"
@@ -1519,6 +1520,15 @@ impl Driver {
                     Ok(json!({"version": query.read::<i64,_>(0).map_err(error)?}))
                 })
                 .await
+            }
+            "share_metadata_check" => {
+                let checked = crate::commands::sharing::validate_share_metadata(
+                    request["fileName"].as_str().ok_or("fileName is required")?,
+                    request["fileSize"].as_i64().ok_or("fileSize is required")?,
+                    request["expiryHours"].as_i64(),
+                    request["createdAt"].as_i64().ok_or("createdAt is required")?,
+                )?;
+                Ok(json!({"expiresAt": checked}))
             }
             "advance_share_unlock_clock" => {
                 let seconds = request["seconds"]

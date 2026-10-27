@@ -9799,3 +9799,36 @@ fn video_upload_unused_prepared_preview_admission_is_released_when_main_upload_i
         app.stop();
     }
 }
+
+#[test]
+fn share_creation_rejects_unbounded_metadata_before_contacting_telegram() {
+    let fixture = Fixture::new();
+    let mut app = Backend::start(&fixture.0);
+    let check = |expiry: Value, name: &str, size: i64| json!({"command":"share_metadata_check","fileName":name,"fileSize":size,"expiryHours":expiry,"createdAt":1_000});
+    let accepted = app.ok(check(json!(168), "report.pdf", 10));
+    assert_eq!(accepted["expiresAt"], 1_000 + 168 * 3600);
+    assert_eq!(
+        app.ok(check(Value::Null, "report.pdf", 0))["expiresAt"],
+        Value::Null
+    );
+    // Overflowing hours previously wrapped (release) or panicked (debug) in
+    // `created_at + hours * 3600`; non-positive hours produced dead links.
+    for hours in [i64::MAX, 24 * 365 + 1, 0, -1] {
+        assert!(
+            app.failure(check(json!(hours), "report.pdf", 10))
+                .contains("Share expiry"),
+            "hours={hours}"
+        );
+    }
+    assert!(app
+        .failure(check(json!(1), &"n".repeat(256), 10))
+        .contains("file names"));
+    assert!(app
+        .failure(check(json!(1), "line\r\nbreak.pdf", 10))
+        .contains("file names"));
+    assert!(app.failure(check(json!(1), "", 10)).contains("file names"));
+    assert!(app
+        .failure(check(json!(1), "report.pdf", -1))
+        .contains("negative"));
+    app.stop();
+}
