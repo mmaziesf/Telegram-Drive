@@ -1,10 +1,19 @@
 ## [Unreleased]
 
+### Accurate product claims
+
+- Remove "open-source" from the in-app tagline and QR sign-in text in all 24 locales and from the GitHub Pages site (`Docs/Telegram-Drive.html`). The upstream code has no license, so the project is source-available at most.
+- Replace the sign-in note "never sent to any third-party servers. All data goes directly between you and Telegram" in all 24 locales. It now says that the API ID, API hash and Telegram session are stored on the device and sent only to Telegram, and that some features contact other services such as ads and supporter licenses.
+- Show "No limit" instead of "Unlimited" for a zero bandwidth, archive or stream-quality cap in English, so the label cannot be read as a storage claim.
+- Note in the README that sponsor placements load third-party ad content and that one ad host is resolved through Cloudflare DNS-over-HTTPS.
+
 ### Unofficial client naming
 
 - Show the app as "Unofficial Telegram Drive" in the window title, installer metadata, Linux desktop entry and every translated `common.app_title`, and state in the README that this is an independent third-party client that is not affiliated with, endorsed by or sponsored by Telegram FZ-LLC, as the [Telegram API Terms of Service](https://core.telegram.org/api/terms) require.
 - The bundle identifier is unchanged, so existing sessions, vaults, settings and keychain entries keep working. Linux `.deb` and macOS bundle artifact names change; the Arch packaging script accepts both the new and the legacy `.deb` name.
 - The locale budget grows by the exact 290 bytes the new title adds (11 bytes in the largest catalog).
+
+
 
 ### The full-history secret scan passes again after the #6 squash merge
 
