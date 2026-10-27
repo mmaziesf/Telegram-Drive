@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+### Product TypeScript is free of `any`
+
+- Removed the remaining `any` casts in product code: mp4box internals in `useAdaptiveStreaming.ts` now use mp4box's own `ISOFile` typings, `MoveToFolderModal` uses `TelegramFolder`, and `TouchFileList` reuses the typed `resolvePublicFolderUsername` helper. ESLint now rejects `no-explicit-any` under `src/` (except `MobileDashboard.tsx`, still pending its own cleanup).
+
 ### Poisoned locks no longer crash network and upload commands
 
 - `vpn_optimizer` and the upload-cancellation registry in `commands/fs.rs` recover a poisoned lock with `PoisonError::into_inner` instead of panicking (one site ran inside `Drop`, where a panic during unwind aborts the app). Both modules now `deny(clippy::unwrap_used, clippy::expect_used)` outside tests so new unwraps fail CI.
