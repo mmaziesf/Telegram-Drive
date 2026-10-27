@@ -6,6 +6,10 @@
 - The bundle identifier is unchanged, so existing sessions, vaults, settings and keychain entries keep working. Linux `.deb` and macOS bundle artifact names change; the Arch packaging script accepts both the new and the legacy `.deb` name.
 - The locale budget grows by the exact 290 bytes the new title adds (11 bytes in the largest catalog).
 
+### The full-history secret scan passes again after the #6 squash merge
+
+- Squash-merging #6 put an earlier wording of a `.gitleaksignore` comment into a new commit (21645df). The full-history gitleaks scan reported it as a generic API key. The comment is reworded, and `.gitleaksignore` records that fingerprint along with its reason.
+
 ### Continuous integration
 
 - Add a CI workflow for pull requests and pushes to `main`. It runs ESLint with zero warnings, `tsc --noEmit`, the locale checks, the production build with its bundle budget, the Playwright journeys, `cargo fmt --check`, Clippy with `-D warnings`, the native Rust integration tests, `cargo deny`, `cargo audit` and a gitleaks scan of the full history.
@@ -14,7 +18,7 @@
 - Workflows use read-only tokens by default, pin every action to a commit SHA and do not persist checkout credentials. Only the CodeQL job can write security events.
 - Fix the frontend lint findings, including 22 conditional hook calls in the sign-in screen. Two rules stay off with an inline reason: `no-explicit-any` (141 uses) and `react-hooks/exhaustive-deps` (43 uses).
 - `cargo audit` ignores the same advisories as `deny.toml`, with the same reasons. `.gitleaksignore` lists each known false positive with its reason.
-- Fix the TV keyboard journey in `accessibility.spec.ts`. After Escape releases the native select, the test now presses ArrowLeft to reach the number field beside it. It used to press ArrowDown, which correctly moves to the list below, so the test failed on every run.
+- Fix the TV keyboard journey in `accessibility.spec.ts`. After Escape releases the native select, the test now presses ArrowLeft to reach the number field beside it. It used to press ArrowDown, and spatial navigation picks the element below by on-screen geometry. With some installed fonts, such as Inter, that element is a button instead of the number field, so the test failed on those machines but passed on the CI runner.
 
 ### Dependency security
 
