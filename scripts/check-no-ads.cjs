@@ -30,9 +30,6 @@ const ALLOWED = new Map([
   ['scripts/check-no-ads.cjs', 'defines the forbidden patterns'],
   // Release history is append-only; earlier entries describe removed code.
   ['CHANGELOG.md', 'append-only release history'],
-  // A dated record of the upstream 4.1.0 candidate's test evidence; editing
-  // it would falsify what was run. It carries a historical-record banner.
-  ['Docs/RELEASE_READINESS_4.1.0.md', 'historical upstream test evidence'],
   // gitleaks fingerprints name the file of each reviewed historic finding,
   // including removed ad components; changing them would break the history scan.
   ['.gitleaksignore', 'fingerprints of reviewed historic gitleaks findings'],

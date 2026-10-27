@@ -36,7 +36,56 @@ permissions:
   contents: read
 
 jobs:
+  # The package contract is checked against a Debian package built from this
+  # commit, never against a binary downloaded from another project's releases.
+  build-deb:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@4360b52568e2003a75bf9bc1d59f33a8e3fc893c # stable
+        with:
+          toolchain: 1.92.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - name: Install Linux desktop dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libssl-dev libdbus-1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev
+      - id: version
+        name: Read the application version
+        run: echo "version=$(jq -r .version app/src-tauri/tauri.conf.json)" >> "$GITHUB_OUTPUT"
+      - name: Build the Debian package
+        working-directory: app
+        run: |
+          npm ci
+          npm run tauri -- build --ci --no-sign --bundles deb
+      # Tauri names the package after the product name, with spaces; releases
+      # publish it with dots, which is the name the PKGBUILD renderer expects.
+      - name: Stage the package under its release file name
+        env:
+          PKG_VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          mkdir -p fixture
+          cp "app/src-tauri/target/release/bundle/deb/Unofficial Telegram Drive_${PKG_VERSION}_amd64.deb" "fixture/Unofficial.Telegram.Drive_${PKG_VERSION}_amd64.deb"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: arch-fixture-deb
+          path: fixture/Unofficial.Telegram.Drive_${{ steps.version.outputs.version }}_amd64.deb
+          if-no-files-found: error
+          retention-days: 1
+
   package-contract:
+    needs: build-deb
+    env:
+      PKG_VERSION: ${{ needs.build-deb.outputs.version }}
     runs-on: ubuntu-22.04
     timeout-minutes: 35
     container:
@@ -66,19 +115,16 @@ jobs:
             xorg-server-xvfb \
             xorg-xauth
 
-      - name: Download and verify the immutable packaging fixture
-        run: |
-          set -euo pipefail
-          mkdir -p fixture
-          curl --fail --location --retry 3 \
-            'https://github.com/caamer20/Telegram-Drive/releases/download/v3.7.0/Telegram.Drive_3.7.0_amd64.deb' \
-            --output fixture/Telegram.Drive_3.7.0_amd64.deb
-          echo 'd229a414025650d44211521ca350298d67c7d8136001f8300636bb3ea2ecc35f  fixture/Telegram.Drive_3.7.0_amd64.deb' | sha256sum -c -
+      - name: Download the Debian package built from this commit
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: arch-fixture-deb
+          path: fixture
 
       - name: Build and inspect the fixture package as an unprivileged user
         run: |
           set -euo pipefail
-          bash scripts/render-arch-pkgbuild.sh fixture/Telegram.Drive_3.7.0_amd64.deb 3.7.0 arch-package
+          bash scripts/render-arch-pkgbuild.sh "fixture/Unofficial.Telegram.Drive_${PKG_VERSION}_amd64.deb" "${PKG_VERSION}" arch-package
           useradd --create-home --shell /bin/bash arch-builder
           chown -R arch-builder:arch-builder arch-package
           runuser -u arch-builder -- bash -c 'cd "$1" && makepkg --printsrcinfo > .SRCINFO && makepkg --cleanbuild --clean --noconfirm' _ "$PWD/arch-package"
@@ -90,7 +136,7 @@ jobs:
             exit 1
           fi
           pacman -U --noconfirm "${package_path}"
-          bash scripts/verify-arch-package.sh "${package_path}" 3.7.0
+          bash scripts/verify-arch-package.sh "${package_path}" "${PKG_VERSION}"
 
       - name: Verify the native package starts and produces a runtime SBOM
         run: |
@@ -107,4 +153,4 @@ jobs:
             cat arch-package/startup-smoke.log
             exit 1
           fi
-          bash scripts/generate-arch-runtime-sbom.sh 3.7.0 arch-package/telegram-drive-arch-runtime-sbom.cdx.json
+          bash scripts/generate-arch-runtime-sbom.sh "${PKG_VERSION}" arch-package/telegram-drive-arch-runtime-sbom.cdx.json
