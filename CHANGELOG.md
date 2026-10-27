@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+### Crypto known-answer tests
+
+- Add `tests/crypto_kat.rs`: three TDENC2 envelopes (empty, 100 bytes with metadata, two chunks) must match, byte for byte, the output of the new `scripts/generate-tdenc2-kat.py`, an independent Python encoder; HKDF-SHA-256 is checked against RFC 5869 test case 3; and decryption must reject a body whose length differs from the declared size and an edited declared size. CI runs it with the envelope suite, and TESTING.md and Docs/CRYPTO.md list it.
+
 ### Crypto test coverage
 
 - Add `tests/crypto_envelope.rs`, an in-memory suite that exercises the public envelope, key-slot and recovery-bundle API. It covers round-trips under random sizes, metadata and download fragmentation; rejection of every flipped bit, truncation, trailing bytes, reordered, dropped or cross-file records, and wrong keys; key-slot binding of the file identity, slot ID, kind and salt; nonce and file-identity uniqueness; and byte-identical resumed uploads. Property cases use `proptest` (a dev-dependency only).
