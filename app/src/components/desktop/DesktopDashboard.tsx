@@ -37,6 +37,7 @@ import { RenameFileModal } from './dashboard/RenameFileModal';
 import { RemoteUploadModal } from './dashboard/RemoteUploadModal';
 import { KeyboardShortcutsDialog } from './dashboard/KeyboardShortcutsDialog';
 import { DriveConceptTour } from './dashboard/DriveConceptTour';
+import { open as openExternalUrl } from '@tauri-apps/plugin-shell';
 import { LazyFeatureBoundary } from '../shared/LazyFeatureBoundary';
 import { SyncDashboard } from './sync/SyncDashboard';
 import { Files, Link, Copy, Check, X, Loader2, Share2 } from 'lucide-react';
@@ -1017,6 +1018,7 @@ export function Dashboard({ onLogout }: { onLogout: () => void }) {
                 <DriveConceptTour
                     onFinish={() => updateSetting('driveTourSeen', true)}
                     onOpenHelp={() => { updateSetting('driveTourSeen', true); setShowHelp(true); }}
+                    onOpenLink={url => void openExternalUrl(url)}
                 />
             )}
 

@@ -70,6 +70,15 @@ Telegram requires third-party clients to use an application API ID and API hash.
 > [!WARNING]
 > Treat the API hash, Telegram login codes, session data, encryption credentials, REST keys, and WebDAV links as secrets. Do not paste them into issues, logs, screenshots, or support messages.
 
+### Protect your Telegram account
+
+The app's first-run introduction shows this warning too.
+
+- Telegram puts every account that signs in through an unofficial client under observation, and bans accounts that use the API for flooding or spam ([Telegram API Terms of Service](https://core.telegram.org/api/terms)). Uploading or downloading a very large number of files quickly can look like that to Telegram.
+- Telegram gives no storage guarantee or SLA. Files you keep only in Telegram can be lost with the account.
+- Telegram deletes accounts that stay offline longer than the self-destruct period set in **Settings → Privacy and Security** ([how account self-destruction works](https://telegram.org/faq#q-how-does-account-self-destruction-work)). Set it to the longest option and sign in regularly.
+- Keep your own backups of anything important.
+
 ## How it works
 
 Telegram Drive uses Telegram's MTProto API for authentication and file operations:
