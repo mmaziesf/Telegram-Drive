@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+### Removed unreachable frontend code
+
+- Deleted `src/services/localMediaServer.ts` (orphaned since the ad network was removed), `src/utils/drag.ts` (`createDragGhost`, never imported), the unused `withTimeout` helper and `TRANSCODE_CACHE_TIMEOUT_MS` constant, and three unused re-exports (`isZipFile`, `isRarFile`, `isSevenZFile`) from the `utils` barrel.
+
 ### Product TypeScript is free of `any`
 
 - Removed the remaining `any` casts in product code: mp4box internals in `useAdaptiveStreaming.ts` now use mp4box's own `ISOFile` typings, `MoveToFolderModal` uses `TelegramFolder`, and `TouchFileList` reuses the typed `resolvePublicFolderUsername` helper. ESLint now rejects `no-explicit-any` under `src/` (except `MobileDashboard.tsx`, still pending its own cleanup).
