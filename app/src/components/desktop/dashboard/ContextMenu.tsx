@@ -148,7 +148,7 @@ export function ContextMenu({ x, y, file, onClose, onDownload, onDelete, onPrevi
                             try {
                                 await navigator.clipboard.writeText(url);
                                 toast.success(t('notifications.telegram_link_copied'));
-                            } catch (e) {
+                            } catch {
                                 toast.error(t('notifications.copy_link_failed'));
                             }
                             onClose();
