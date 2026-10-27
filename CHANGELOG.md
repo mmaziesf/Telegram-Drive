@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+### Local servers check the Host header; dev origin is debug-only
+
+- The streaming/share server, the REST API server and the WebDAV server now refuse with 421 any request whose `Host` is not `127.0.0.1:<port>` or `localhost:<port>` for the port they are bound to. They already bound loopback only, but a web page could point a domain it controls at 127.0.0.1 (DNS rebinding) and then talk to them as its own origin. The check runs before CORS, the API key check and routing. A native journey covers all three servers with a rebound name, a lookalike, the wrong port and a bare name.
+- The Vite dev-server origins (`http://localhost:1420`, `http://127.0.0.1:1420`) are trusted by CORS only in debug builds. `Origin: null` is still accepted: WebKit on macOS and Linux sends it for media fetches from `tauri://`, and v1.8.2 added it to fix playback there. Private routes still need the stream token or API key.
+
 ### Stream token checked in constant time; derived keys wiped
 
 - The streaming server's `/stream`, `/hls` and `/fmp4` routes compared the session stream token with `==` and `!=`, which stop at the first differing byte. They now go through one check that hashes both values with SHA-256 and compares the digests with `constant_time_eq_32`. A native journey checks that near-miss tokens (one byte off, a prefix, an extension, empty) get 403 on every route. The API key and WebDAV token checks were already constant-time.

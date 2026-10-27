@@ -1441,6 +1441,9 @@ pub fn serve(
     let auth = web::Data::new(auth);
     Ok(actix_web::HttpServer::new(move || {
         actix_web::App::new()
+            .wrap(actix_web::middleware::from_fn(
+                crate::local_cors::require_loopback_host,
+            ))
             .app_data(handler.clone())
             .app_data(auth.clone())
             .service(web::resource("/{tail:.*}").to(webdav_handler))

@@ -978,6 +978,9 @@ pub(crate) fn start_server_with_listener(
 
         let app = App::new()
             .wrap(cors)
+            .wrap(actix_web::middleware::from_fn(
+                crate::local_cors::require_loopback_host,
+            ))
             .app_data(bandwidth_data.clone())
             .app_data(network_data.clone())
             .app_data(state_data.clone())
