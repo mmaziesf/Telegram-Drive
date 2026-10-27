@@ -275,6 +275,9 @@ Design notes: [threat model](Docs/THREAT_MODEL.md) and [cryptography overview](D
 
 ## Languages
 
+> [!WARNING]
+> **Machine-translated, unreviewed.** None of the 23 non-English locales has been reviewed by a native speaker, and the text this fork added in those languages was drafted by machine, including the Telegram account risk notice and the security, encryption and recovery messages. English is the reference text: if a translation is unclear, especially in a warning, switch the language to English in Settings before you act on it. Please report wrong or misleading translations in GitHub Issues. Review status is tracked in [Docs/LOCALIZATION_REVIEW.md](Docs/LOCALIZATION_REVIEW.md).
+
 Telegram Drive supports a **System** language preference and these 24 selectable locales:
 
 | | | | |
