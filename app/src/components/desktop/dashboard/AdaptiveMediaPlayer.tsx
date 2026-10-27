@@ -924,7 +924,8 @@ export function AdaptiveMediaPlayer({
                 e.preventDefault();
                 const video = getActiveVideo();
                 if (video) {
-                    video.paused ? video.play().catch(() => {}) : video.pause();
+                    if (video.paused) void video.play().catch(() => {});
+                    else video.pause();
                 }
             }
         };
@@ -1191,7 +1192,9 @@ export function AdaptiveMediaPlayer({
                                 <button
                                     onClick={() => {
                                         const video = getActiveVideo();
-                                        if (video) video.paused ? video.play().catch(() => {}) : video.pause();
+                                        if (!video) return;
+                                        if (video.paused) void video.play().catch(() => {});
+                                        else video.pause();
                                     }}
                                     className="viewer-control text-white/80"
                                     title={i18n.t('viewer.play_pause_shortcut')}
