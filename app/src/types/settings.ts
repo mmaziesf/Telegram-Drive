@@ -17,6 +17,10 @@ export interface Settings {
   viewMode: 'grid' | 'list';
   fileSortField: 'name' | 'size' | 'date';
   fileSortDirection: 'asc' | 'desc';
+  /**
+   * Retained only so encrypted settings bundles from other installs still
+   * validate; this build has no updater and never reads the value.
+   */
   autoUpdate: boolean;
   maxConcurrentUploads: number;
   maxConcurrentDownloads: number;

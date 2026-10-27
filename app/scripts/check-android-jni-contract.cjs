@@ -21,7 +21,7 @@ const r8SeedsPath = r8SeedsFlag === -1
 
 const classes = [
   {
-    className: 'com.cameronamer.telegramdrive.MainActivity',
+    className: 'io.github.mmaziesf.unofficialtelegramdrive.MainActivity',
     rustCallSymbol: 'main_class',
     rustFiles: [
       'src-tauri/src/lib.rs',
@@ -31,7 +31,7 @@ const classes = [
       'src-tauri/src/android_security.rs',
       'src-tauri/src/android_updates.rs',
     ],
-    kotlinFile: 'app/src/main/java/com/cameronamer/telegramdrive/MainActivity.kt',
+    kotlinFile: 'app/src/main/java/io/github/mmaziesf/unofficialtelegramdrive/MainActivity.kt',
     methods: [
       {
         name: 'authenticateForSensitiveAction',
@@ -168,10 +168,10 @@ const classes = [
     ],
   },
   {
-    className: 'com.cameronamer.telegramdrive.UploadForegroundService',
+    className: 'io.github.mmaziesf.unofficialtelegramdrive.UploadForegroundService',
     rustCallSymbol: 'j_class',
     rustFiles: ['src-tauri/src/upload_service.rs'],
-    kotlinFile: 'app/src/main/java/com/cameronamer/telegramdrive/UploadForegroundService.kt',
+    kotlinFile: 'app/src/main/java/io/github/mmaziesf/unofficialtelegramdrive/UploadForegroundService.kt',
     methods: [
       {
         name: 'startService',
@@ -280,9 +280,9 @@ const overrideFiles = [
   'app/build.gradle.kts',
   'app/proguard-rules.pro',
   'app/src/main/AndroidManifest.xml',
-  'app/src/main/java/com/cameronamer/telegramdrive/MainActivity.kt',
-  'app/src/main/java/com/cameronamer/telegramdrive/UploadForegroundService.kt',
-  'app/src/main/java/com/cameronamer/telegramdrive/MediaPlayerActivity.kt',
+  'app/src/main/java/io/github/mmaziesf/unofficialtelegramdrive/MainActivity.kt',
+  'app/src/main/java/io/github/mmaziesf/unofficialtelegramdrive/UploadForegroundService.kt',
+  'app/src/main/java/io/github/mmaziesf/unofficialtelegramdrive/MediaPlayerActivity.kt',
 ];
 
 if (requireGenerated) {

@@ -14,7 +14,7 @@ if (mode === 'descendant') {
 } else {
   const root = process.env.TELEGRAM_DRIVE_STARTUP_SMOKE_ROOT;
   const token = process.env.TELEGRAM_DRIVE_STARTUP_SMOKE_TOKEN;
-  const identifier = `com.cameronamer.telegramdrive.smoke.${/^\d/.test(token) ? 'r' : ''}${token}`;
+  const identifier = `io.github.mmaziesf.unofficialtelegramdrive.smoke.${/^\d/.test(token) ? 'r' : ''}${token}`;
   fs.writeFileSync(evidence, JSON.stringify({ root, token, identifier,
     USERPROFILE: process.env.USERPROFILE, APPDATA: process.env.APPDATA, LOCALAPPDATA: process.env.LOCALAPPDATA }));
   if (mode === 'orphan') {

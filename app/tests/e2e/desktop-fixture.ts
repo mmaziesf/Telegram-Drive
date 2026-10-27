@@ -10,8 +10,6 @@ export async function desktopFixture(page: Page, options: {
   holdStartupHealth?: boolean;
   holdSupporter?: boolean;
   supporterState?: 'active' | 'needs_refresh' | 'expired' | 'inactive';
-  update?: boolean;
-  packageManaged?: boolean;
   signedOut?: boolean;
   gatewaySeen?: boolean;
   /** Loopback port reported by the native startup check; defaults to the preferred port. */
@@ -72,8 +70,8 @@ export async function desktopFixture(page: Page, options: {
       owner: '101', accountFailures: options.accountFailures ?? 0, holdFiles: options.holdFiles ?? false,
       holdSupporter: options.holdSupporter ?? false, supporterState: options.supporterState ?? 'active',
       supporterRefreshFails: options.supporterState === 'needs_refresh',
-      logoutFails: false, remoteSignOutUnconfirmed: false, saveFails: false, installFails: true, incompleteDownload: false,
-      update: options.update ?? false, stores, calls: (savedTransfers?.calls ?? []) as { command: string; args: any }[],
+      logoutFails: false, remoteSignOutUnconfirmed: false, saveFails: false,
+      stores, calls: (savedTransfers?.calls ?? []) as { command: string; args: any }[],
       sync: { settings: { enabled: false, debounceMs: 2000, encryption: 'inherit', scanner: 'full' } as Record<string, unknown>, pairs: [] as any[] },
       holdThumbnails: options.holdThumbnails ?? false, thumbnailVersion: 0,
       releaseThumbnails: () => { state.holdThumbnails = false; releaseThumbnails?.(); },
@@ -244,15 +242,6 @@ export async function desktopFixture(page: Page, options: {
           if (command === 'cmd_get_api_settings') return { enabled: options.networkEnabled ?? false, running: options.networkEnabled ?? false, port: 14201,key_set:true,last_error:null };
           if (command === 'cmd_get_webdav_settings') return { enabled: options.networkEnabled ?? false, running: options.networkEnabled ?? false, port: 14202,supported:true,token_set:true,write_enabled:true,last_error:null };
           if (command === 'cmd_get_offline_cache_status') return { files: [], total_bytes: 0, max_bytes: 1_000_000_000 };
-          if (command === 'cmd_get_installation_info') return { managedByPackageManager: options.packageManaged ?? false, packageManager: options.packageManaged ? 'pacman' : null };
-          if (command === 'plugin:updater|check') return state.update ? { rid: 100, currentVersion: '3.9.0', version: '3.9.6', body: 'Reliability update' } : null;
-          if (command === 'plugin:updater|download') {
-            args.onEvent.onmessage({ event: 'Started', data: { contentLength: 4 } });
-            args.onEvent.onmessage({ event: 'Progress', data: { chunkLength: state.incompleteDownload ? 2 : 4 } });
-            args.onEvent.onmessage({ event: 'Finished' });
-            return 101;
-          }
-          if (command === 'plugin:updater|install') { if (state.installFails) throw new Error('Disk unavailable'); return; }
           return null;
           } finally {
             if (options.persistTransfersAcrossReload) sessionStorage.setItem('desktop-e2e-native-transfers', JSON.stringify({ jobs: state.jobs, calls: state.calls }));

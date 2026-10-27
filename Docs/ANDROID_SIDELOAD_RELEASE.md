@@ -4,7 +4,7 @@ Telegram Drive is distributed as a signed sideloaded Android application, not th
 
 ## Fixed application identity
 
-- Package name: `com.cameronamer.telegramdrive`
+- Package name: `io.github.mmaziesf.unofficialtelegramdrive`
 - Minimum Android version: Android 7.0 / API 24
 - Target SDK: API 36
 - Release keystore: `${XDG_CONFIG_HOME:-$HOME/.config}/telegram-drive/signing/telegram-drive-release.keystore`
@@ -72,9 +72,9 @@ Useful test commands:
 ```bash
 bash scripts/run-android-emulator-tests.sh phone
 bash scripts/run-android-emulator-tests.sh google-tv
-bash scripts/test-android-resilience.sh com.cameronamer.telegramdrive process-death
-bash scripts/test-android-resilience.sh com.cameronamer.telegramdrive low-battery
-bash scripts/test-android-resilience.sh com.cameronamer.telegramdrive doze
+bash scripts/test-android-resilience.sh io.github.mmaziesf.unofficialtelegramdrive process-death
+bash scripts/test-android-resilience.sh io.github.mmaziesf.unofficialtelegramdrive low-battery
+bash scripts/test-android-resilience.sh io.github.mmaziesf.unofficialtelegramdrive doze
 bash scripts/verify-android-upgrade.sh previous.apk current.apk
 ```
 

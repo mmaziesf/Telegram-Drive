@@ -8,7 +8,7 @@
 use keyring::Entry;
 
 #[cfg(not(target_os = "android"))]
-const KEYRING_SERVICE: &str = "com.cameronamer.telegramdrive.telegram-api";
+const KEYRING_SERVICE: &str = "io.github.mmaziesf.unofficialtelegramdrive.telegram-api";
 const API_HASH_ACCOUNT: &str = "api-hash-v1";
 
 #[cfg(not(target_os = "android"))]

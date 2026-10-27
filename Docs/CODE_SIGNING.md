@@ -2,7 +2,7 @@
 
 The release workflow signs and notarizes desktop builds when signing credentials are present in the repository settings. When they are absent, the workflow prints a warning and produces the same unsigned builds as before. A platform with only some of its values set fails the release instead of publishing a build that is signed but not notarized.
 
-Signing changes only the code signature. The bundle identifier `com.cameronamer.telegramdrive`, the updater key, the supporter credential service and account names, the entitlement token format, and the supporter service are not affected.
+Signing changes only the code signature. The bundle identifier `io.github.mmaziesf.unofficialtelegramdrive`, the supporter credential service and account names, the entitlement token format, and the supporter service are not affected.
 
 ## macOS: Developer ID and notarization
 

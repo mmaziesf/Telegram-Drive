@@ -13,7 +13,7 @@ use std::{
 use tauri::{AppHandle, Manager};
 
 #[cfg(not(target_os = "android"))]
-const KEYRING_SERVICE: &str = "com.cameronamer.telegramdrive.supporter";
+const KEYRING_SERVICE: &str = "io.github.mmaziesf.unofficialtelegramdrive.supporter";
 const DEVICE_KEY_ACCOUNT: &str = "device-signing-key-v1";
 const RECOVERY_CODE_ACCOUNT: &str = "recovery-code-v1";
 const CHECKOUT_SECRET_ACCOUNT: &str = "checkout-claim-secret-v1";

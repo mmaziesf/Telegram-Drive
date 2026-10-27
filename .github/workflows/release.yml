@@ -1,9 +1,10 @@
 name: "Release"
 
+# This fork publishes no release binaries. The pipeline stays available for a
+# deliberate manual run once the fork has its own signing identities; a tag
+# push alone must not publish anything.
 on:
-  push:
-    tags:
-      - 'v*'  # Trigger on version tags like v1.0.0, v1.0.1
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -140,7 +141,7 @@ jobs:
 
           ## Verify artifacts
           Compare the downloaded artifact with SHA256SUMS.txt, then run:
-          `gh attestation verify ./ARTIFACT --repo caamer20/Telegram-Drive`
+          `gh attestation verify ./ARTIFACT --repo ${{ github.repository }}`
           Inspect the verified producer workflow and tag/ref before installing.
           Source and Arch runtime SBOMs and Sigstore bundles accompany this release.
           NOTES
@@ -242,20 +243,6 @@ jobs:
         shell: pwsh
         run: ./app/scripts/prepare-windows-runtime.ps1
 
-      - name: Prepare Tauri signing key
-        shell: node {0}
-        env:
-          KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-        run: |
-          const fs = require('fs');
-          const key = process.env.KEY.trim();
-          // Tauri expects TAURI_SIGNING_PRIVATE_KEY to be base64-encoded.
-          // If the secret is raw key text, base64-encode it; otherwise pass through.
-          const b64 = key.startsWith('untrusted comment:')
-            ? Buffer.from(key).toString('base64')
-            : key;
-          fs.appendFileSync(process.env.GITHUB_ENV, `TAURI_SIGNING_PRIVATE_KEY=${b64}\n`);
-
       # Platform code signing is applied only when its credentials exist in the
       # repository. Without them the build is exactly what earlier releases
       # shipped. A partly configured platform fails here instead of publishing
@@ -333,15 +320,12 @@ jobs:
         uses: tauri-apps/tauri-action@84b9d35b5fc46c1e45415bdb6144030364f7ebc5 # v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           releaseId: ${{ needs.create-release.outputs.release_id }}
           tagName: ${{ github.ref_name }}
           releaseDraft: true
           prerelease: ${{ needs.create-release.outputs.prerelease == 'true' }}
           projectPath: ./app
-          includeUpdaterJson: true
           args: ${{ matrix.args }} ${{ env.SIGNING_ARGS }}
 
       # A signing step that silently did nothing must not reach users.
@@ -352,7 +336,7 @@ jobs:
           bundle="app/src-tauri/target/${{ matrix.target }}/release/bundle"
           application="${bundle}/macos/Unofficial Telegram Drive.app"
           codesign --verify --deep --strict --verbose=2 "${application}"
-          codesign --display --verbose=2 "${application}" 2>&1 | grep -F 'Identifier=com.cameronamer.telegramdrive'
+          codesign --display --verbose=2 "${application}" 2>&1 | grep -F 'Identifier=io.github.mmaziesf.unofficialtelegramdrive'
           xcrun stapler validate "${application}"
           spctl --assess --type execute --verbose=2 "${application}"
 
@@ -477,7 +461,7 @@ jobs:
         run: |
           set -euo pipefail
           package_path="$(find arch-package -maxdepth 1 -type f -name 'telegram-drive-bin-*.pkg.tar.zst' -print -quit)"
-          seed_directory='/home/arch-builder/.local/share/com.cameronamer.telegramdrive'
+          seed_directory='/home/arch-builder/.local/share/io.github.mmaziesf.unofficialtelegramdrive'
           install -d -o arch-builder -g arch-builder "${seed_directory}"
           runuser -u arch-builder -- sh -c 'printf preserved > "$1/arch-package-preservation-test"' _ "${seed_directory}"
           pacman -U --noconfirm "${package_path}"
@@ -612,25 +596,3 @@ jobs:
           script: |
             const { publish } = require('./scripts/release-draft.cjs');
             await publish(github, context, process.env.release_id, context.ref.replace('refs/tags/', ''));
-
-  refresh-product-page:
-    name: Refresh product page after stable publication
-    needs: publish-release
-    if: ${{ !contains(github.ref_name, '-') }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    permissions:
-      actions: write
-    steps:
-      # GITHUB_TOKEN publication does not emit a new release-triggered run.
-      # Dispatch main explicitly so Pages keeps its branch protection and
-      # mirrors the newly published stable desktop updater manifest.
-      - name: Request main-branch Pages deployment
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
-        with:
-          script: |
-            await github.rest.actions.createWorkflowDispatch({
-              ...context.repo,
-              workflow_id: 'pages.yml',
-              ref: 'main',
-            });

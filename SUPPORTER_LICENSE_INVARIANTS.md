@@ -16,7 +16,7 @@ This document records the user-facing and technical contract that future mainten
 1. A successfully verified PayPal capture must match the configured merchant, checkout claim, `5.00` amount, and `USD` currency before an entitlement is issued.
 2. Entitlements remain cryptographically signed and bound to the device key. The private signing key stays in Worker secrets; released applications contain only the matching public key and HTTPS service origin.
 3. `active` and `needs_refresh`/offline-grace states keep `ad_free: true`. Sponsor content must remain hidden while entitlement state is loading so startup cannot flash an advertisement at a licensed user.
-4. Normal updates reuse the stable secure credential service `com.cameronamer.telegramdrive.supporter`, stable credential account identifiers, local entitlement state, and compatible signed-token format.
+4. Normal updates reuse the stable secure credential service `io.github.mmaziesf.unofficialtelegramdrive.supporter`, stable credential account identifiers, local entitlement state, and compatible signed-token format.
 5. Existing entitlements and recovery codes remain usable across releases. Changes to signing keys, token claims, storage identifiers, terms handling, D1 schema, or device-key derivation require an explicit backward-compatible migration.
 6. An expired verification token is a refresh/recovery condition, not a reason to offer an existing purchaser another checkout. A saved recovery code or known prior entitlement must suppress repurchase prompts.
 7. The D1/R2 backup system is independent disaster-recovery infrastructure. Backup success or failure must never gate checkout, token issuance, refresh, recovery, local ad suppression, Worker deployment, or application startup.

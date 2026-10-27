@@ -23,6 +23,7 @@ const ARGON2_ITERATIONS: u32 = 3;
 const ARGON2_PARALLELISM: u32 = 1;
 
 const BOOLEAN_KEYS: &[&str] = &[
+    // Accepted for compatibility with existing bundles; this build has no updater.
     "autoUpdate",
     "zipFolders",
     "videoFilenameCaption",

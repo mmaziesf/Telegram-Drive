@@ -22,9 +22,6 @@ ignore = [
   { id = "RUSTSEC-2026-0253", reason = "Transitive dav-server cache uses non-panicking key types and does not wrap key destruction in catch_unwind; major upgrade is tracked separately." },
   { id = "RUSTSEC-2026-0194", reason = "Transitive Tauri plist build/config parser receives repository-controlled application metadata, not uploaded or remote XML." },
   { id = "RUSTSEC-2026-0195", reason = "Transitive Tauri plist build/config parser receives repository-controlled application metadata, not uploaded or remote XML." },
-  { id = "RUSTSEC-2026-0367", reason = "Only zip@4 remains, pinned by tauri-plugin-updater (latest 2.14 still requires zip ^4). The updater unpacks its own minisign-verified update archive, and the app's own archive code is on zip 9. Remove once the updater moves to zip >= 9." },
-  { id = "RUSTSEC-2026-0368", reason = "Only zip@4 remains, pinned by tauri-plugin-updater (see RUSTSEC-2026-0367). Signed update archives only; the app's archive extraction is on zip 9." },
-  { id = "RUSTSEC-2026-0369", reason = "Only zip@4 remains, pinned by tauri-plugin-updater (see RUSTSEC-2026-0367). Signed update archives only; the app's archive extraction is on zip 9." },
 ]
 
 [licenses]
