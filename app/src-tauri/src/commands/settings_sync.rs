@@ -40,6 +40,8 @@ const BOOLEAN_KEYS: &[&str] = &[
 ];
 
 const NUMBER_RANGES: &[(&str, i64, i64)] = &[
+    // Older versions allowed up to 32 uploads; such a synced value is still
+    // accepted, and the app and the transfer engine clamp it to 4 when applied.
     ("maxConcurrentUploads", 1, 32),
     ("maxConcurrentDownloads", 1, 32),
     ("timeoutMultiplier", 1, 20),
