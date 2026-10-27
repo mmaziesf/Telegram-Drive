@@ -1,5 +1,7 @@
 # Desktop 4.1.0 release readiness
 
+> **Historical record.** This document records upstream work before this fork removed the advertising network, the supporter licence and its payment service (see the CHANGELOG). References to them below describe that earlier code, not the fork's current behaviour.
+
 Prepared 2026-10-13 from published desktop 4.0.0 source `81aa3a70d177ef4759bd54d5aa86f67a7827fa66`. The owner authorized a full stable desktop release, followed by a separate Android 4.1.0 APK compiled locally. This report records exercised boundaries; it does not turn unrun manual acceptance into passes.
 
 ## Scope and compatibility

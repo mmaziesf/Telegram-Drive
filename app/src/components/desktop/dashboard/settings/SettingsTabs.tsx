@@ -1,9 +1,9 @@
 import {useTranslation} from 'react-i18next';
 import { TelegramApiNotice } from '../../../shared/TelegramApiNotice';
 import { ProjectAttribution } from '../../../shared/ProjectAttribution';
-import { lazy, useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { motion } from 'framer-motion';
-import { Bug, Cloud, Database, Globe, HardDrive, Megaphone, Shield, Zap, Clipboard, Loader2, RefreshCw, Upload, Download } from 'lucide-react';
+import { Bug, Cloud, Database, Globe, HardDrive, Shield, Zap, Clipboard, Loader2, RefreshCw, Upload, Download } from 'lucide-react';
 import { open } from '@tauri-apps/plugin-shell';
 import { toast } from 'sonner';
 import type { TFunction } from 'i18next';
@@ -18,9 +18,7 @@ import {
   type SettingsSyncStatus,
 } from '../../../../services/settingsSync';
 import i18n from '../../../../i18n';
-import { LazyFeatureBoundary } from '../../../shared/LazyFeatureBoundary';
 
-const SupporterSettingsSection = lazy(() => import('./SupporterSettingsSection').then(module => ({ default: module.SupporterSettingsSection })));
 
 const tabMotion = {
   initial: { opacity: 0 },
@@ -196,7 +194,7 @@ export function PrivacySettingsTab({ crashReportingEnabled, onCrashReportingChan
     <motion.section key="privacy" {...tabMotion} className="space-y-4">
       <div className="flex items-start gap-3 rounded-lg border border-app-accent/20 bg-app-accent/5 p-4">
         <Bug className="mt-0.5 h-5 w-5 shrink-0 text-app-accent" />
-        <div><h3 className="text-sm font-semibold text-app-text">Crash-only reporting</h3><p className="mt-1 text-xs leading-5 text-app-text-secondary">Optional reports help diagnose unexpected app crashes. Normal usage, analytics, advertising activity, and file operations are never reported.</p></div>
+        <div><h3 className="text-sm font-semibold text-app-text">Crash-only reporting</h3><p className="mt-1 text-xs leading-5 text-app-text-secondary">Optional reports help diagnose unexpected app crashes. Normal usage, analytics, and file operations are never reported.</p></div>
       </div>
       <div className="flex items-center justify-between rounded-lg bg-app-hover/50 p-4">
         <div className="max-w-[75%]"><p className="text-sm font-medium text-app-text">Send anonymous crash reports</p><p className="mt-1 text-xs leading-5 text-app-text-secondary">Never sends file names, paths, contents, Telegram messages, credentials, or personal identifiers. Turning this off also clears reports waiting to be sent.</p></div>
@@ -208,7 +206,6 @@ export function PrivacySettingsTab({ crashReportingEnabled, onCrashReportingChan
           {([
             [t('privacy_destinations.device_title'), t('privacy_destinations.device_body'), Database],
             ['Telegram', t('privacy_destinations.telegram_body'), Cloud],
-            [t('privacy_destinations.sponsors_title'), t('privacy_destinations.sponsors_body'), Megaphone],
             [t('privacy_destinations.crash_title'), t('privacy_destinations.crash_body'), Bug],
           ] as const).map(([title, description, Icon]) => (
             <div key={title} className="rounded-lg border border-app-border-subtle bg-app-surface-sunken/25 p-3"><Icon className="h-4 w-4 text-app-accent" aria-hidden="true" /><strong className="mt-2 block text-xs text-app-text">{title}</strong><p className="mt-1 text-xs leading-5 text-app-text-secondary">{description}</p></div>
@@ -219,10 +216,6 @@ export function PrivacySettingsTab({ crashReportingEnabled, onCrashReportingChan
       <SettingsSyncSection settings={settings} onSettingsChange={onSettingsChange} onEnabledChange={onSettingsSyncEnabledChange} />
     </motion.section>
   );
-}
-
-export function LicenseSettingsTab() {
-  return <motion.section key="license" {...tabMotion}><LazyFeatureBoundary><SupporterSettingsSection /></LazyFeatureBoundary></motion.section>;
 }
 
 interface AdvancedSettingsTabProps {

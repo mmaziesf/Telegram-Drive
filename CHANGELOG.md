@@ -1,5 +1,18 @@
 ## [Unreleased]
 
+### No ads, payments or donations
+
+- Remove the advertising network. The loopback media server no longer serves `/ad-banner` or `/ad-script` (`app/src-tauri/tests/native_e2e.rs` asserts both return 404), no longer resolves the ad host through Cloudflare DNS-over-HTTPS and no longer sends a spoofed desktop-Chrome User-Agent. The WebView content policy now sets `frame-src 'none'`, enforced by `node scripts/check-app-security.cjs`.
+- Remove the $5 supporter licence: the PayPal checkout, the Cloudflare Worker that issued licences (`supporter-service/`), its CI and backup workflows, the in-app offer, settings section and mobile card, the Ed25519 token verifier and the supporter documents. Every feature was already free; the licence only hid ads, so no feature changes.
+- Remove the sign-in donate dialog with its Litecoin and Bitcoin addresses, and `.github/FUNDING.yml`.
+- Remove the related strings from all 24 locales and lower the literal budget to the measured 291 findings.
+- `PRIVACY.md`, `SECURITY.md`, `AGENTS.md`, `TESTING.md` and the README say the app shows no ads and takes no payments. Historical upstream records keep their text and carry a banner.
+- Add `node scripts/check-no-ads.cjs`, which fails when a tracked file names an ad network, a payment or donation provider, the DoH fallback or a spoofed Chrome User-Agent. It runs on every pull request in its own workflow and in release preflight, and the assurance suite checks that it catches each kind of reference. Browser journeys assert that sign-in, the workspace and settings show no donation, purchase or sponsor content and no iframe.
+- Dependabot no longer watches `supporter-service/`, and `.gitignore` drops its entries.
+- `check-no-ads.cjs` skips `.gitleaksignore`: its fingerprints must name the removed ad components that hold reviewed historic gitleaks findings.
+- Release preflight no longer checks a supporter service and accepts a README without download links.
+- Kept: the Android Kotlin entry points `get/put/deleteSupporterSecret` keep their names because they are the JNI contract for the API-hash store and the Android sources are not in this repository.
+
 ### Fork identity and no auto-update
 
 - Remove the built-in updater: the Tauri updater and process plugins, their capabilities, the upstream update signing public key, the update banner, the "What's new" dialog and the "Check for updates" control in About. This build never contacts the upstream release feed. `node scripts/check-app-security.cjs` now fails if an `updater:` or `process:` permission, an updater plugin config or updater artifacts come back.
@@ -11,7 +24,7 @@
 - Point the README, About, Help and Privacy links at this fork, replace the download section with build-from-source instructions and credit the original project and author in About (desktop and Android) in all 24 locales. A browser journey checks both links in desktop About.
 - `SECURITY.md` asks for private reports through GitHub private vulnerability reporting on this fork and states that there are no releases or auto-updater.
 - Bundle ceilings: initial JavaScript falls from 504923 to 378375 bytes because framer-motion no longer loads with the update banner; the desktop route rises from 302094 to 420791 bytes because the library now loads there; total JavaScript and locale data both fall. All changed ceilings are set to the measured sizes.
-- Not done: Android strings and Microsoft Store packaging cannot be renamed because neither the Android project nor a Store configuration is in this repository. Supporter and funding links still point to the upstream author until the monetization decision is made.
+- Not done: Android strings and Microsoft Store packaging cannot be renamed because neither the Android project nor a Store configuration is in this repository.
 
 ### Telegram API disclosure
 
