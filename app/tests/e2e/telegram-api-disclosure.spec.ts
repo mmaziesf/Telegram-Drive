@@ -42,3 +42,24 @@ test('About links to this fork and credits the original project', async ({ page 
     'https://github.com/caamer20/Telegram-Drive',
   ]);
 });
+
+test('the first-run introduction warns about Telegram account risks and links the terms and self-destruct FAQ', async ({ page }) => {
+  await desktopFixture(page, { settings: { driveTourSeen: false } });
+  await page.goto('/');
+  const tour = page.getByRole('dialog');
+  for (let step = 0; step < 3; step += 1) {
+    await tour.getByRole('button', { name: 'Next', exact: true }).click();
+  }
+  await expect(tour.getByRole('heading', { name: 'Protect your Telegram account', exact: true })).toBeVisible();
+  await expect(tour).toContainText('under observation');
+  await expect(tour).toContainText('no storage guarantee or SLA');
+  await expect(tour).toContainText('keep your own backups');
+  await tour.getByRole('button', { name: 'Telegram API Terms of Service', exact: true }).click();
+  await tour.getByRole('button', { name: 'How account self-destruction works', exact: true }).click();
+  await expect.poll(async () => (await nativeCalls(page, 'plugin:shell|open')).map(call => call.args.path)).toEqual([
+    'https://core.telegram.org/api/terms',
+    'https://telegram.org/faq#q-how-does-account-self-destruction-work',
+  ]);
+  await tour.getByRole('button', { name: 'Finish', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Protect your Telegram account', exact: true })).toHaveCount(0);
+});

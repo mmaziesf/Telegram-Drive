@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+### Telegram account risk notice
+
+- The first-run introduction has a fourth step, "Protect your Telegram account". It says that Telegram observes accounts using unofficial clients and bans flooding or spam, gives no storage guarantee, and deletes accounts offline longer than the self-destruct period, and it asks the user to set that period to the longest option and keep backups. It links the Telegram API Terms of Service and Telegram's self-destruction FAQ (opened in the system browser). The strings are in all 24 locales; the non-English ones are machine-drafted and unreviewed. The locale data grows by 16,562 bytes and stays under the existing budget. The README's first-time setup has the same notice. `telegram-api-disclosure.spec.ts` covers the step and both links.
+
 ### Crypto known-answer tests
 
 - Add `tests/crypto_kat.rs`: three TDENC2 envelopes (empty, 100 bytes with metadata, two chunks) must match, byte for byte, the output of the new `scripts/generate-tdenc2-kat.py`, an independent Python encoder; HKDF-SHA-256 is checked against RFC 5869 test case 3; and decryption must reject a body whose length differs from the declared size and an edited declared size. CI runs it with the envelope suite, and TESTING.md and Docs/CRYPTO.md list it.
