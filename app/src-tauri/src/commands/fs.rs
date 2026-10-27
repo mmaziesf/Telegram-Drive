@@ -1,3 +1,6 @@
+//! File, folder and transfer commands.
+#![cfg_attr(not(test), deny(clippy::unwrap_used, clippy::expect_used))]
+
 use crate::bandwidth::{BandwidthManager, BandwidthReservation};
 use crate::commands::download_destination::{
     publish_download_file, skip_existing_download, DownloadCollisionPolicy, DownloadOutcome,
@@ -1545,7 +1548,7 @@ impl UploadCancellation {
         } else {
             get_upload_cancellations()
                 .lock()
-                .unwrap()
+                .unwrap_or_else(std::sync::PoisonError::into_inner)
                 .insert(transfer_id.to_string(), sender);
             None
         };
@@ -1564,7 +1567,7 @@ impl Drop for UploadCancellation {
         if !self.transfer_id.is_empty() {
             get_upload_cancellations()
                 .lock()
-                .unwrap()
+                .unwrap_or_else(std::sync::PoisonError::into_inner)
                 .remove(&self.transfer_id);
         }
     }
@@ -2192,7 +2195,7 @@ pub async fn cmd_cancel_transfer(
         .insert(transfer_id.clone());
     if let Some(tx) = get_upload_cancellations()
         .lock()
-        .unwrap()
+        .unwrap_or_else(std::sync::PoisonError::into_inner)
         .remove(&transfer_id)
     {
         let _ = tx.send(());
@@ -6442,7 +6445,7 @@ async fn cmd_upload_from_url_owned(
     #[cfg(any(target_os = "android", target_os = "ios"))]
     get_upload_cancellations()
         .lock()
-        .unwrap()
+        .unwrap_or_else(std::sync::PoisonError::into_inner)
         .insert(transfer_id.clone(), cancel_tx);
 
     let client_clone = client.clone();
@@ -6464,7 +6467,10 @@ async fn cmd_upload_from_url_owned(
         tokio::select! {
             res = &mut upload_task => {
                 #[cfg(any(target_os = "android", target_os = "ios"))]
-                get_upload_cancellations().lock().unwrap().remove(&transfer_id);
+                get_upload_cancellations()
+                    .lock()
+                    .unwrap_or_else(std::sync::PoisonError::into_inner)
+                    .remove(&transfer_id);
                 match res {
                     Ok(Ok(file)) => file,
                     Ok(Err(e)) => {

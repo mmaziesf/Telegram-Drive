@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+### Poisoned locks no longer crash network and upload commands
+
+- `vpn_optimizer` and the upload-cancellation registry in `commands/fs.rs` recover a poisoned lock with `PoisonError::into_inner` instead of panicking (one site ran inside `Drop`, where a panic during unwind aborts the app). Both modules now `deny(clippy::unwrap_used, clippy::expect_used)` outside tests so new unwraps fail CI.
+
 ### Folder group names and colours are checked
 
 - Creating or editing a folder group now refuses an empty name, a name longer than 64 characters, or one with control characters. The colour must be a `#RRGGBB` hex value. It is used as a CSS colour in the sidebar, so values like `url(...)` or extra declarations are refused. The desktop name field is limited to 64 characters (RT-15).
