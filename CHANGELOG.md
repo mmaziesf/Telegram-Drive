@@ -1,5 +1,12 @@
 ## [Unreleased]
 
+### External links and WebView scripts narrowed
+
+- The shell `open` scope, which Rust enforces, now allows only HTTPS links to this fork's and the upstream GitHub repository, `telegram.org`, `core.telegram.org`, `my.telegram.org`, `ffmpeg.org` and `fragment.com` (including subdomains). It used to allow any `http`, `https` or `mailto` URL, so script injected into the WebView could send data to any site by opening a link.
+- Desktop no longer grants `opener:allow-open-url`, which it never used; it opens links through the shell scope. On Android the opener allows only five exact URLs: the fork repository, its privacy policy, the upstream repository, the Telegram API terms and the Telegram account self-destruction FAQ.
+- `script-src` no longer allows `blob:`. hls.js runs its worker under `worker-src 'self' blob:`, which is unchanged.
+- `check-app-security.cjs` tests the shell scope against every link constant in `projectLinks.ts` and a list of URLs it must refuse (http, other GitHub repositories, look-alike hosts, userinfo tricks, `mailto:`, `file:`). It also requires `script-src 'self'` only, no desktop opener URL permission, and exact Android opener URLs that sit inside the shell scope.
+
 ### No referrers from local servers or the WebView; token risk documented
 
 - Every response from the streaming/share, REST API and WebDAV servers, including the 421 refusals, now carries `Referrer-Policy: no-referrer`. The WebView's `index.html` sets `<meta name="referrer" content="no-referrer">`, and `check-app-security.cjs` requires it. Stream URLs carry the session stream token in their query string, so no page may pass them on as a referrer.

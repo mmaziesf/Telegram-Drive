@@ -9,7 +9,21 @@ for (const file of ['.cargo/config.toml', 'app/src-tauri/Cargo.toml', 'app/src-t
 }
 const json = file => JSON.parse(fs.readFileSync(path.join(root, file), 'utf8'));
 const config = json('src-tauri/tauri.conf.json');
-if (config.plugins?.shell?.open !== '(?:https?://[^\\s]+|mailto:[^\\s]+)') throw new Error('Shell URL scope must allow only HTTP, HTTPS and mailto.');
+// External links are fixed constants or Telegram's fragment.com login link, so the
+// Rust-enforced shell scope allows HTTPS on those hosts only. The plugin anchors it as ^...$.
+const shellScope = new RegExp(`^(?:${config.plugins?.shell?.open})$`);
+const links = fs.readFileSync(path.join(root, 'src/services/projectLinks.ts'), 'utf8');
+const linkConstants = [...links.matchAll(/'(https:\/\/[^']+)'/g)].map(([, url]) => url);
+if (linkConstants.length < 3) throw new Error('projectLinks.ts link constants were not found.');
+const mustOpen = [...linkConstants, 'https://github.com/mmaziesf/Telegram-Drive/issues',
+  'https://github.com/mmaziesf/Telegram-Drive/blob/main/PRIVACY.md', 'https://my.telegram.org',
+  'https://ffmpeg.org/download.html#build-windows', 'https://fragment.com/', 'https://oauth.fragment.com/x?y=1'];
+const mustRefuse = ['http://github.com/mmaziesf/Telegram-Drive', 'https://github.com/someone/else', 'https://github.com.evil.example/',
+  'https://telegram.org.evil.example/', 'https://evil.example/?next=https://telegram.org', 'https://fragment.com.evil.example/',
+  'https://evilfragment.com/', 'mailto:someone@example.com', 'file:///etc/passwd', 'tel:123', 'https://my.telegram.org@evil.example/'];
+const scopeErrors = mustOpen.filter(url => !shellScope.test(url)).map(url => `blocked: ${url}`)
+  .concat(mustRefuse.filter(url => shellScope.test(url)).map(url => `allowed: ${url}`));
+if (scopeErrors.length) throw new Error(`Shell URL scope is wrong: ${scopeErrors.join('; ')}`);
 const csp = config.app?.security?.csp;
 if (typeof csp !== 'string') throw new Error('A production WebView CSP is required.');
 const directives = new Map(csp.split(';').map(value => value.trim()).filter(Boolean).map(value => {
@@ -17,8 +31,8 @@ const directives = new Map(csp.split(';').map(value => value.trim()).filter(Bool
   return [name, sources];
 }));
 const scripts = directives.get('script-src') || [];
-if (!scripts.includes("'self'") || scripts.some(value => ["'unsafe-inline'", "'unsafe-eval'", '*'].includes(value))) {
-  throw new Error('WebView scripts must be self-hosted without inline/eval/wildcard execution.');
+if (scripts.length !== 1 || scripts[0] !== "'self'") {
+  throw new Error("WebView scripts must come from 'self' only (workers use worker-src).");
 }
 // Nothing in the app is framed; the removed sponsor iframe was the only user.
 for (const [name, expected] of [['object-src', "'none'"], ['frame-src', "'none'"], ['base-uri', "'self'"], ['form-action', "'self'"]]) {
@@ -52,12 +66,18 @@ for (const capability of [mobile, desktop]) {
 if (![mobile.identifier, desktop.identifier].every(value => config.app.security.capabilities.includes(value))) {
   throw new Error('The application must declare its platform-specific capabilities.');
 }
+// Desktop opens links through the shell scope above; only Android uses opener.openUrl,
+// and only for fixed project and Telegram policy pages.
+const openerUrls = capability => capability.permissions.filter(value => value?.identifier === 'opener:allow-open-url' || value === 'opener:allow-open-url');
+if (openerUrls(desktop).length) throw new Error('Desktop must not grant opener:allow-open-url; it opens links through the shell scope.');
+const mobileOpener = openerUrls(mobile);
+const mobileUrls = (mobileOpener[0]?.allow || []).map(value => value.url);
+if (mobileOpener.length !== 1 || !mobileUrls.length || mobileUrls.some(url => /[*?[]/.test(url) || !shellScope.test(url))) {
+  throw new Error('Android opener URLs must be an explicit list of exact HTTPS links inside the shell scope.');
+}
 for (const capability of [mobile, desktop]) {
-  const opener = capability.permissions.find(value => value?.identifier === 'opener:allow-open-url');
-  const schemes = (opener?.allow || []).map(value => value.url).sort();
-  if (JSON.stringify(schemes) !== JSON.stringify(['http://*', 'https://*', 'mailto:*'])
-      || capability.permissions.some(value => ['opener:default', 'opener:allow-default-urls', 'opener:allow-open-path'].includes(value))) {
-    throw new Error('Opener URLs must have explicit HTTP/HTTPS/mailto scopes without generic path permission.');
+  if (capability.permissions.some(value => ['opener:default', 'opener:allow-default-urls', 'opener:allow-open-path'].includes(value))) {
+    throw new Error('Opener must not grant default URL or generic path permissions.');
   }
 }
 if (!desktop.permissions.includes('opener:allow-reveal-item-in-dir')) throw new Error('Download reveal permission is required.');

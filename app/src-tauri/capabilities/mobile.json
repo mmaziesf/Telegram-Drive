@@ -20,13 +20,19 @@
       "identifier": "opener:allow-open-url",
       "allow": [
         {
-          "url": "https://*"
+          "url": "https://github.com/mmaziesf/Telegram-Drive"
         },
         {
-          "url": "http://*"
+          "url": "https://github.com/mmaziesf/Telegram-Drive/blob/main/PRIVACY.md"
         },
         {
-          "url": "mailto:*"
+          "url": "https://github.com/caamer20/Telegram-Drive"
+        },
+        {
+          "url": "https://core.telegram.org/api/terms"
+        },
+        {
+          "url": "https://telegram.org/faq#q-how-does-account-self-destruction-work"
         }
       ]
     }
