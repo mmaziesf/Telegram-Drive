@@ -1,0 +1,30 @@
+[package]
+name = "app-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+app_lib = { path = "..", package = "app" }
+libfuzzer-sys = "0.4"
+
+# Keep the fuzz crate out of the app's dependency graph and lockfile.
+[workspace]
+members = ["."]
+
+[[bin]]
+name = "envelope_header"
+path = "fuzz_targets/envelope_header.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "envelope_decrypt"
+path = "fuzz_targets/envelope_decrypt.rs"
+test = false
+doc = false
+bench = false
