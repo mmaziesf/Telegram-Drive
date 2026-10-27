@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+### Stream token checked in constant time; derived keys wiped
+
+- The streaming server's `/stream`, `/hls` and `/fmp4` routes compared the session stream token with `==` and `!=`, which stop at the first differing byte. They now go through one check that hashes both values with SHA-256 and compares the digests with `constant_time_eq_32`. A native journey checks that near-miss tokens (one byte off, a prefix, an extension, empty) get 403 on every route. The API key and WebDAV token checks were already constant-time.
+- The Argon2id output buffer in `derive_passphrase_key`, and the HKDF buffers in `derive_domain_key_32` and `derive_file_wrapping_key`, are now `Zeroizing`, so the stack copies are wiped on success and on error. The key itself stays in `SecretKey`, which already zeroizes on drop.
+
 ### Share-link unlocks are random and expire on the server
 
 - Entering a share password used to set a cookie equal to SHA-256 of the share token and the stored bcrypt hash. The value never changed, so anyone who copied it once, or who had the shares database, kept access, and the 30-minute lifetime existed only in the browser. Each unlock now gets 32 random bytes. The server keeps only a SHA-256 digest of it, together with the password hash it was issued under and a 30-minute expiry, and compares in constant time. Changing a share's password ends earlier unlocks. The store holds at most 8 unlocks per share and is capped at the same number of shares as the attempt limiter. Unlocks do not survive an app restart.
