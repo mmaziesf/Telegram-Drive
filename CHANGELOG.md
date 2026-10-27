@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+### Share-link unlocks are random and expire on the server
+
+- Entering a share password used to set a cookie equal to SHA-256 of the share token and the stored bcrypt hash. The value never changed, so anyone who copied it once, or who had the shares database, kept access, and the 30-minute lifetime existed only in the browser. Each unlock now gets 32 random bytes. The server keeps only a SHA-256 digest of it, together with the password hash it was issued under and a 30-minute expiry, and compares in constant time. Changing a share's password ends earlier unlocks. The store holds at most 8 unlocks per share and is capped at the same number of shares as the attempt limiter. Unlocks do not survive an app restart.
+
 ### WebView file-system permissions removed
 
 - The desktop and Android capabilities no longer grant the WebView `fs:allow-read`/`fs:allow-write` (desktop: whole app directory via `fs:scope-app-recursive`; Android: `$APPDATA/**` and `$APPCACHE/**`). The frontend never imports `@tauri-apps/plugin-fs`; all file access goes through Rust commands. Before this change, script injected into the WebView could have read or overwritten the Telegram session and settings files in the app data directory. `scripts/check-app-security.cjs` now fails if any `fs:` permission comes back.

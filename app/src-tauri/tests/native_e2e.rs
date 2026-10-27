@@ -700,6 +700,73 @@ async fn real_http_server_streams_owned_cache_and_revokes_it_after_account_switc
     assert!(cookie.contains("HttpOnly"));
     assert!(cookie.contains("SameSite=Strict"));
     assert!(cookie.contains("Path=/d/private"));
+    assert!(cookie.contains("Max-Age=1800"));
+    // Without a Telegram client an unlocked request gets past the password form
+    // and stops at 503, while a locked one gets the form (200).
+    let share_status = |cookie: String| {
+        let request = client
+            .get(format!("{url}/d/private"))
+            .header("Cookie", cookie);
+        async move { request.send().await.unwrap().status() }
+    };
+    let unlock = cookie.split(';').next().unwrap().to_string();
+    let value = unlock.strip_prefix("share_auth_private=").unwrap();
+    assert_eq!(value.len(), 64);
+    assert!(value.bytes().all(|byte| byte.is_ascii_hexdigit()));
+    assert_eq!(share_status(unlock.clone()).await, 503);
+    // The value earlier builds derived from the token and password hash alone
+    // is no longer a key, and neither is a guessed one of the same shape.
+    let derived = {
+        use sha2::Digest;
+        let digest = sha2::Sha256::digest(format!("private{password_hash}").as_bytes());
+        digest
+            .iter()
+            .map(|byte| format!("{byte:02x}"))
+            .collect::<String>()
+    };
+    assert_eq!(
+        share_status(format!("share_auth_private={derived}")).await,
+        200
+    );
+    assert_eq!(
+        share_status(format!("share_auth_private={}", "0".repeat(64))).await,
+        200
+    );
+    // Each unlock is random, and the 30-minute lifetime is enforced by the server.
+    let second = client
+        .post(format!("{url}/d/private/verify"))
+        .form(&[("password", "synthetic share password")])
+        .send()
+        .await
+        .unwrap();
+    let second = second.headers()["set-cookie"].to_str().unwrap();
+    let second = second.split(';').next().unwrap().to_string();
+    assert_ne!(second, unlock);
+    app.ok(json!({"command":"advance_share_unlock_clock","seconds":29 * 60}));
+    assert_eq!(share_status(unlock.clone()).await, 503);
+    app.ok(json!({"command":"advance_share_unlock_clock","seconds":2 * 60}));
+    assert_eq!(share_status(unlock).await, 200);
+    assert_eq!(share_status(second).await, 200);
+    // Changing the share password ends unlocks issued under the old one.
+    let third = client
+        .post(format!("{url}/d/private/verify"))
+        .form(&[("password", "synthetic share password")])
+        .send()
+        .await
+        .unwrap();
+    let third = third.headers()["set-cookie"].to_str().unwrap();
+    let third = third.split(';').next().unwrap().to_string();
+    assert_eq!(share_status(third.clone()).await, 503);
+    {
+        let db = sqlite::open(fixture.path("shares.db")).unwrap();
+        let changed = bcrypt::hash("a new share password", 4).unwrap();
+        let mut update = db
+            .prepare("UPDATE shared_links SET password_hash=? WHERE id='private'")
+            .unwrap();
+        update.bind((1, changed.as_str())).unwrap();
+        update.next().unwrap();
+    }
+    assert_eq!(share_status(third).await, 200);
     let missing = client.get(format!("{url}/d/missing")).send().await.unwrap();
     assert_eq!(missing.status(), 404);
     let token = "synthetic-e2e-stream-token";

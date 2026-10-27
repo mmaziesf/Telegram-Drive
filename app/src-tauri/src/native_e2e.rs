@@ -1138,6 +1138,7 @@ impl Driver {
             | "seed_account"
             | "open_account_session"
             | "account_validation_status"
+            | "advance_share_unlock_clock"
             | "capture_account"
             | "validate_account"
             | "save_collection"
@@ -1518,6 +1519,14 @@ impl Driver {
                     Ok(json!({"version": query.read::<i64,_>(0).map_err(error)?}))
                 })
                 .await
+            }
+            "advance_share_unlock_clock" => {
+                let seconds = request["seconds"]
+                    .as_i64()
+                    .filter(|value| *value > 0)
+                    .ok_or("Invalid clock advance")?;
+                crate::share_routes::advance_unlock_clock_for_e2e(seconds);
+                Ok(json!({}))
             }
             "account_validation_status" => {
                 let counts = crate::workspace::test_account_validation_counts();
