@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-package_name="${1:-com.cameronamer.telegramdrive}"
+package_name="${1:-io.github.mmaziesf.unofficialtelegramdrive}"
 scenario="${2:-process-death}"
 adb_bin="${ADB:-adb}"
 

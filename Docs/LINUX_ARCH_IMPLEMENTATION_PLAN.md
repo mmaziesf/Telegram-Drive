@@ -1,5 +1,7 @@
 # Linux and Arch compatibility implementation plan
 
+> **Historical record.** This document records upstream work before this fork removed the advertising network, the supporter licence and its payment service (see the CHANGELOG). References to them below describe that earlier code, not the fork's current behaviour.
+
 Status: implemented locally; CI and real-device acceptance remain required before a release is published.
 
 ## Assessment of the original plan

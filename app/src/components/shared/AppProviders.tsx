@@ -2,11 +2,9 @@ import { useState, type ReactNode } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ConfirmProvider } from '../../context/ConfirmContext';
 import { SettingsProvider } from '../../context/SettingsContext';
-import { SupporterProvider } from '../../context/SupporterContext';
 import { SyncProvider } from '../../context/SyncContext';
 import { ThemeProvider } from '../../context/ThemeContext';
 import { UploadChoiceProvider } from '../../context/UploadChoiceContext';
-import { UpdateProvider } from '../../context/UpdateContext';
 import { EncryptionProvider } from '../../hooks/useEncryption';
 import { ErrorBoundary } from './ErrorBoundary';
 
@@ -39,15 +37,13 @@ export function AppProviders({ children }: AppProvidersProps) {
         <QueryClientProvider client={queryClient}>
           <ConfirmProvider>
             <SettingsProvider>
-              <SupporterProvider>
-                <SyncProvider>
-                  <EncryptionProvider>
-                    <UploadChoiceProvider>
-                      <UpdateProvider>{children}</UpdateProvider>
-                    </UploadChoiceProvider>
-                  </EncryptionProvider>
-                </SyncProvider>
-              </SupporterProvider>
+              <SyncProvider>
+                <EncryptionProvider>
+                  <UploadChoiceProvider>
+                    {children}
+                  </UploadChoiceProvider>
+                </EncryptionProvider>
+              </SyncProvider>
             </SettingsProvider>
           </ConfirmProvider>
         </QueryClientProvider>

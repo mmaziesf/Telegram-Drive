@@ -41,7 +41,7 @@ async function main() {
   // Keep the normal suffix alpha-leading (124 random bits). Explicit numeric
   // nonces are escaped for D-Bus; the authentication token itself is unchanged.
   const token = options.token ?? ('a' + randomBytes(16).toString('hex').slice(1));
-  const identifier = `com.cameronamer.telegramdrive.smoke.${/^\d/.test(token) ? 'r' : ''}${token}`;
+  const identifier = `io.github.mmaziesf.unofficialtelegramdrive.smoke.${/^\d/.test(token) ? 'r' : ''}${token}`;
   fs.writeFileSync(path.join(root, '.packaged-startup-smoke'), `${token}\n`, { mode: 0o600 });
   const environment = { ...process.env, TELEGRAM_DRIVE_STARTUP_SMOKE_ROOT: root, TELEGRAM_DRIVE_STARTUP_SMOKE_TOKEN: token, TELEGRAM_DRIVE_SMOKE_DISPOSABLE_USER: '1',
     XDG_DATA_HOME: path.join(root, 'data'), XDG_CONFIG_HOME: path.join(root, 'config'), XDG_CACHE_HOME: path.join(root, 'cache'), TMPDIR: path.join(root, 'tmp'), TMP: path.join(root, 'tmp'), TEMP: path.join(root, 'tmp') };

@@ -1,5 +1,7 @@
 # Localization review required
 
+> **Historical record.** This document records upstream work before this fork removed the advertising network, the supporter licence and its payment service (see the CHANGELOG). References to them below describe that earlier code, not the fork's current behaviour.
+
 These translations and added plural forms require owner-arranged native-language review. Structural, interpolation, browser and layout checks do not establish linguistic quality. No entry below is approved by a native reviewer. The protected $5.00 USD one-time lifetime ad-free promise, three-device allowance, recovery, offline grace and no-subscription meaning must remain intact.
 
 ## Earlier P2 additions
@@ -228,7 +230,6 @@ The Google TV offer was the identified meaning regression. It now uses the new `
 | `app/src/components/desktop/DesktopDashboard.tsx` | `common.pinned`, `workspace.error_operation`, `settings.offline`, `files.share_link`, `settings.done` |
 | `app/src/components/desktop/dashboard/AdaptiveMediaPlayer.tsx` | `workspace.exit_fullscreen`, `playback.speed`, `settings.unlimited`, `settings.original`, `settings.clearing`, `workspace.fullscreen` |
 | `app/src/components/desktop/dashboard/CreateFolderDialog.tsx` | `common.create_folder` |
-| `app/src/components/desktop/dashboard/DesktopAdBanner.tsx` | `common.loading` |
 | `app/src/components/desktop/dashboard/DriveConceptTour.tsx` | `workspace.next` |
 | `app/src/components/desktop/dashboard/FileCard.tsx` | `files.preview`, `files.download`, `files.share`, `files.delete` |
 | `app/src/components/desktop/dashboard/MediaPlayer.tsx` | `workspace.exit_fullscreen`, `workspace.fullscreen` |
@@ -244,9 +245,7 @@ The Google TV offer was the identified meaning regression. It now uses the new `
 | `app/src/components/desktop/sync/SyncPlanPreview.tsx` | `activity.uploads`, `activity.downloads` |
 | `app/src/components/dev/DesignGallery.tsx` | `common.offline_files` |
 | `app/src/components/mobile/MobileDashboard.tsx` | `settings.failed_prefix`, `notifications.telegram_link_copied`, `notifications.copy_link_failed`, `common.app_title`, `playback.title`, `common.transfers`, `activity.pause`, `activity.resume`, `settings.clear`, `common.cancel`, `common.retry`, `supporter_license.title`, `supporter_license.mobile_description`, `common.diagnostics`, `common.offline_files`, `playback.speed_label`, `files.folder_name`, `common.create_folder`, `settings.proxy_status_connected`, `settings.offline`, `files.share_link`, `settings.done` |
-| `app/src/components/mobile/MobileSupporterCard.tsx` | `supporter_license.purchase_restored`, `supporter_license.mobile_title`, `supporter_license.mobile_description`, `supporter_license.checking`, `supporter_license.active`, `supporter_license.inactive`, `supporter_license.android_updates_preserved`, `supporter_offer.price_suffix`, `supporter_license.save_recovery`, `supporter_license.recovery_storage_android`, `supporter_license.waiting_payment`, `supporter_license.waiting_payment_android`, `supporter_license.purchase_info`, `supporter_license.purchase_policy_mobile`, `supporter_license.preparing_checkout`, `supporter_license.checkout_opened`, `supporter_license.purchase_action`, `supporter_license.check_payment`, `supporter_license.verification_refreshed`, `supporter_license.refresh_verification`, `supporter_license.terms_action`, `supporter_license.restore_heading_mobile`, `supporter_license.restore_description_mobile`, `supporter_license.recovery_code_label`, `supporter_license.restore_action_mobile`, `supporter_license.help_action` |
 | `app/src/components/mobile/TouchFileList.tsx` | `common.sync`, `files.items_selected`, `files.clear_selection`, `files.download`, `files.move`, `files.share`, `files.no_other_folders` |
-| `app/src/components/shared/AdsterraBanner.tsx` | `ads.sponsored` |
 | `app/src/components/shared/AuthWizard.tsx` | `common.switch_light`, `common.switch_dark`, `common.app_title` |
 | `app/src/components/shared/ConfirmationDialogs.tsx` | `settings.min_passphrase_length`, `settings.passphrases_no_match`, `settings.confirm_passphrase`, `common.cancel`, `common.confirm` |
 | `app/src/components/shared/EncryptionSettingsSection.tsx` | `settings.copy_bundle`, `settings.min_passphrase_length`, `settings.passphrases_no_match`, `settings.import_recovery_bundle`, `settings.import_recovery_confirmation`, `settings.import`, `settings.paste_bundle`, `settings.recovery_passphrase`, `settings.new_vault_passphrase`, `settings.confirm_passphrase`, `settings.vault_locked`, `settings.default_upload_protection`, `settings.protect_metadata`, `settings.auto_lock_vault`, `settings.lock_on_sleep`, `settings.temp_plaintext_policy` |

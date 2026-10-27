@@ -165,7 +165,7 @@ set -e
 if [[ "$TEST_STATUS" -ne 0 ]]; then
   "$ADB" -s "$SERIAL" logcat -d -v threadtime >"$DEVICE_LOG" 2>&1 || true
   echo "Android instrumentation failed. Fatal device log entries follow:" >&2
-  grep -E -i -A 30 -B 5 'FATAL EXCEPTION.*telegram|Process com\.cameronamer|Crash of app com\.cameronamer|lowmemorykiller: Kill .com\.cameronamer|am_crash.*cameronamer|SIGABRT.*telegram|UnsatisfiedLinkError.*telegram|ClassNotFoundException.*telegram' "$DEVICE_LOG" >&2 || true
+  grep -E -i -A 30 -B 5 'FATAL EXCEPTION.*telegram|Process io\.github\.mmaziesf|Crash of app io\.github\.mmaziesf|lowmemorykiller: Kill .io\.github\.mmaziesf|am_crash.*mmaziesf|SIGABRT.*telegram|UnsatisfiedLinkError.*telegram|ClassNotFoundException.*telegram' "$DEVICE_LOG" >&2 || true
   echo "Full device log: $DEVICE_LOG" >&2
   exit "$TEST_STATUS"
 fi
@@ -175,18 +175,18 @@ if [[ -n "$SIGNED_APK" ]]; then
     echo "Signed APK smoke-test artifact is missing: $SIGNED_APK" >&2
     exit 1
   fi
-  "$ADB" -s "$SERIAL" uninstall com.cameronamer.telegramdrive >/dev/null 2>&1 || true
+  "$ADB" -s "$SERIAL" uninstall io.github.mmaziesf.unofficialtelegramdrive >/dev/null 2>&1 || true
   adb_retry install "$SIGNED_APK"
   adb_retry logcat -c
   "$ADB" -s "$SERIAL" shell am start -W \
     -a android.intent.action.MAIN \
     -c android.intent.category.LEANBACK_LAUNCHER \
-    -n com.cameronamer.telegramdrive/.MainActivity >/dev/null
+    -n io.github.mmaziesf.unofficialtelegramdrive/.MainActivity >/dev/null
   sleep 8
-  if [[ -z "$($ADB -s "$SERIAL" shell pidof com.cameronamer.telegramdrive 2>/dev/null | tr -d '\r')" ]]; then
+  if [[ -z "$($ADB -s "$SERIAL" shell pidof io.github.mmaziesf.unofficialtelegramdrive 2>/dev/null | tr -d '\r')" ]]; then
     "$ADB" -s "$SERIAL" logcat -d -v threadtime >"$DEVICE_LOG" 2>&1 || true
     echo "The production-signed APK did not remain running after TV launch." >&2
-    grep -E -i -A 30 -B 5 'FATAL EXCEPTION.*telegram|Process com\.cameronamer|UnsatisfiedLinkError|ClassNotFoundException' "$DEVICE_LOG" >&2 || true
+    grep -E -i -A 30 -B 5 'FATAL EXCEPTION.*telegram|Process io\.github\.mmaziesf|UnsatisfiedLinkError|ClassNotFoundException' "$DEVICE_LOG" >&2 || true
     exit 1
   fi
   echo "Production-signed APK installed and launched through the Leanback entry point."
