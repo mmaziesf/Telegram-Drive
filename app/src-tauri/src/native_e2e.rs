@@ -1135,6 +1135,8 @@ impl Driver {
             | "rewrite_session_owner"
             | "session_store_journeys"
             | "session_store_journey"
+            | "session_revocation_journeys"
+            | "session_revocation_journey"
             | "open_account_session"
             | "account_validation_status"
             | "capture_account"
@@ -1569,6 +1571,17 @@ impl Driver {
                 let name = text(&request, "name")?;
                 let directory = child(&self.root, &format!("session-journey-{name}"))?;
                 crate::session_store::journeys::run(name, &directory)?;
+                Ok(json!({"passed": name}))
+            }
+            "session_revocation_journeys" => Ok(json!(crate::session_revocation::journeys::JOURNEYS
+                .iter()
+                .map(|(name, _)| *name)
+                .collect::<Vec<_>>())),
+            "session_revocation_journey" => {
+                let name = text(&request, "name")?;
+                let directory = child(&self.root, &format!("revocation-journey-{name}"))?;
+                std::fs::create_dir_all(&directory).map_err(error)?;
+                crate::session_revocation::journeys::run(name, &directory)?;
                 Ok(json!({"passed": name}))
             }
             "open_account_session" => {

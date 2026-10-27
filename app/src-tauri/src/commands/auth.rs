@@ -531,6 +531,14 @@ pub async fn cmd_logout(
         }
     }
     let session_path = app_data_dir.join("telegram.session");
+    // A session removed here without Telegram confirming the sign-out stays
+    // listed in the account; offer to end it after the next sign-in.
+    crate::session_revocation::after_sign_out(
+        &app_data_dir,
+        session_path.exists(),
+        remote_session_revoked,
+        chrono::Utc::now().timestamp(),
+    );
     // Erase every copy of the session and remove its key.
     #[cfg(not(any(target_os = "android", target_os = "ios")))]
     crate::session_store::destroy(&session_path);
@@ -551,6 +559,141 @@ pub async fn cmd_logout(
         signed_out: true,
         remote_session_revoked,
     })
+}
+
+/// How long a request about the account's active sessions may take.
+const ACTIVE_SESSIONS_TIMEOUT: Duration = Duration::from_secs(20);
+
+fn authorization_from(entry: tl::enums::Authorization) -> crate::session_revocation::Authorization {
+    let tl::enums::Authorization::Authorization(entry) = entry;
+    crate::session_revocation::Authorization {
+        hash: entry.hash,
+        current: entry.current,
+        api_id: entry.api_id,
+        device_model: entry.device_model,
+        platform: entry.platform,
+        system_version: entry.system_version,
+        app_name: entry.app_name,
+        app_version: entry.app_version,
+        date_created: i64::from(entry.date_created),
+        date_active: i64::from(entry.date_active),
+    }
+}
+
+/// The account's sessions that the pending marker allows ending, with the
+/// marker's directory and the signed-in client. `None` when nothing is
+/// pending or nobody is signed in.
+async fn stale_session_context(
+    app_handle: &tauri::AppHandle,
+    state: &TelegramState,
+) -> Result<
+    Option<(
+        PathBuf,
+        Client,
+        Vec<crate::session_revocation::StaleSession>,
+    )>,
+    String,
+> {
+    let app_data_dir = app_handle
+        .path()
+        .app_data_dir()
+        .map_err(|e| e.to_string())?;
+    let Some(since) = crate::session_revocation::pending(&app_data_dir) else {
+        return Ok(None);
+    };
+    let Some(client) = state.client.lock().await.clone() else {
+        return Ok(None);
+    };
+    let Some(api_id) = *state.api_id.lock().await else {
+        return Ok(None);
+    };
+    let tl::enums::account::Authorizations::Authorizations(list) = timeout(
+        ACTIVE_SESSIONS_TIMEOUT,
+        client.invoke(&tl::functions::account::GetAuthorizations {}),
+    )
+    .await
+    .map_err(|_| "Telegram did not list the active sessions in time".to_string())?
+    .map_err(|error| format!("Telegram did not list the active sessions: {error}"))?;
+    let authorizations: Vec<_> = list
+        .authorizations
+        .into_iter()
+        .map(authorization_from)
+        .collect();
+    let sessions = crate::session_revocation::stale_sessions(&authorizations, api_id, since);
+    Ok(Some((app_data_dir, client, sessions)))
+}
+
+/// Sessions an earlier sign-out left active, for the user to review. Nothing
+/// is ended here. When none remain, the pending marker is removed.
+#[tauri::command]
+pub async fn cmd_stale_sessions(
+    app_handle: tauri::AppHandle,
+    state: State<'_, TelegramState>,
+) -> Result<Vec<crate::session_revocation::StaleSession>, String> {
+    let Some((app_data_dir, _, sessions)) = stale_session_context(&app_handle, &state).await?
+    else {
+        return Ok(Vec::new());
+    };
+    if sessions.is_empty() {
+        crate::session_revocation::clear(&app_data_dir);
+    }
+    Ok(sessions)
+}
+
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct EndStaleSessionsOutcome {
+    pub ended: Vec<String>,
+    pub failed: Vec<String>,
+}
+
+/// Ends the sessions the user selected and confirmed. Every ID must still be
+/// offered by `cmd_stale_sessions`; otherwise nothing is ended.
+#[tauri::command]
+pub async fn cmd_end_stale_sessions(
+    app_handle: tauri::AppHandle,
+    state: State<'_, TelegramState>,
+    ids: Vec<String>,
+) -> Result<EndStaleSessionsOutcome, String> {
+    let Some((app_data_dir, client, sessions)) = stale_session_context(&app_handle, &state).await?
+    else {
+        return Err("No session is waiting to be ended".to_string());
+    };
+    let hashes = crate::session_revocation::confirmed_hashes(&sessions, &ids)?;
+    let mut outcome = EndStaleSessionsOutcome {
+        ended: Vec::new(),
+        failed: Vec::new(),
+    };
+    for hash in hashes {
+        let result = timeout(
+            ACTIVE_SESSIONS_TIMEOUT,
+            client.invoke(&tl::functions::account::ResetAuthorization { hash }),
+        )
+        .await;
+        match result {
+            Ok(Ok(true)) => outcome.ended.push(hash.to_string()),
+            _ => outcome.failed.push(hash.to_string()),
+        }
+    }
+    log::info!(
+        "Ended {} of the sessions left by an earlier sign-out; {} failed",
+        outcome.ended.len(),
+        outcome.failed.len()
+    );
+    if outcome.failed.is_empty() && outcome.ended.len() == sessions.len() {
+        crate::session_revocation::clear(&app_data_dir);
+    }
+    Ok(outcome)
+}
+
+/// Keeps every listed session and stops offering them.
+#[tauri::command]
+pub fn cmd_dismiss_stale_sessions(app_handle: tauri::AppHandle) -> Result<(), String> {
+    let app_data_dir = app_handle
+        .path()
+        .app_data_dir()
+        .map_err(|e| e.to_string())?;
+    crate::session_revocation::clear(&app_data_dir);
+    Ok(())
 }
 
 fn normalize_phone_number(input: &str) -> Result<String, String> {

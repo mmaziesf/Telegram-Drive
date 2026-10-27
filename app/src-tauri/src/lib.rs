@@ -109,6 +109,7 @@ pub mod mp4_utils;
 pub mod server;
 mod server_lifecycle;
 pub(crate) mod session_protection;
+pub(crate) mod session_revocation;
 #[cfg(not(any(target_os = "android", target_os = "ios")))]
 pub mod session_store;
 pub mod share_routes;
@@ -1403,6 +1404,9 @@ pub fn run() {
             commands::cmd_set_preview_cache_limit,
             commands::cmd_set_preview_pinned,
             commands::cmd_logout,
+            commands::cmd_stale_sessions,
+            commands::cmd_end_stale_sessions,
+            commands::cmd_dismiss_stale_sessions,
             commands::cmd_scan_folders,
             commands::cmd_search_global,
             commands::search::cmd_search_local,

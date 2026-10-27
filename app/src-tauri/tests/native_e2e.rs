@@ -300,6 +300,31 @@ fn telegram_session_files_are_owner_only_and_older_installs_are_tightened() {
     assert_eq!(std::fs::read(&outside).unwrap(), b"not a session");
 }
 
+/// Sessions a sign-out could not end: the pending marker, which sessions are
+/// offered after the next sign-in and which confirmations are accepted.
+#[test]
+fn session_revocation_journeys_offer_only_confirmable_older_sessions() {
+    const EXPECTED: [&str; 3] = [
+        "unrevoked_sign_out_leaves_a_marker",
+        "only_older_sessions_of_the_same_app_are_offered",
+        "only_offered_sessions_can_be_confirmed",
+    ];
+    let fixture = Fixture::new();
+    let mut app = Backend::start(&fixture.0);
+    assert_eq!(
+        app.ok(json!({"command":"session_revocation_journeys"})),
+        json!(EXPECTED)
+    );
+    for name in EXPECTED {
+        assert_eq!(
+            app.ok(json!({"command":"session_revocation_journey","name":name}))["passed"],
+            name
+        );
+    }
+    app.failure(json!({"command":"session_revocation_journey","name":"no_such_journey"}));
+    app.stop();
+}
+
 /// Every behavior of the encrypted session store: the sealed format and its
 /// tamper checks, keychain and passphrase keys, plaintext migration, torn
 /// writes and sign-out. The journeys run inside the native driver.
