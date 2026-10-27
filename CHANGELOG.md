@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+### Vulnerability disclosure skeleton
+
+- SECURITY.md now says only the latest `main` commit is supported, says GitHub private reporting is the only channel and that no PGP key is published, and has clearly marked owner-input placeholders for response times and safe-harbour wording. Until those are filled in, it says reports are handled best-effort and that no safe-harbour commitment has been made. `Docs/security.txt.template` is an unpublished RFC 9116 `security.txt` (Contact, Expires, Policy, Preferred-Languages, Canonical) for when the project has a website.
+
 ### Settings sync buffers wiped after use
 
 - `commands/settings_sync.rs` now wraps the plaintext settings encoded before encryption and the settings decrypted from a backup in `Zeroizing`, so both buffers are overwritten when dropped. This is backed by code review only: no test can observe freed memory.

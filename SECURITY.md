@@ -18,6 +18,28 @@ Include only the information needed to understand the report:
 
 Never send Telegram API credentials, login codes, session data, phone numbers, file contents, private filenames or paths, proxy passwords, REST API keys, WebDAV capability links, share-link passwords, vault/file passphrases, recovery bundles, signing keys, or other secrets.
 
+## Supported versions
+
+Only the latest commit on `main` is supported. The fork has no releases and no version branches, so security fixes land on `main` only.
+
+## Response times
+
+> **Owner input needed.** No response times have been committed yet. Until this section is filled in, reports are handled on a best-effort basis.
+
+<!-- OWNER INPUT: acknowledgement time (for example N business days), time to a first assessment, fix or mitigation target by severity, and the coordinated disclosure deadline (for example 90 days). Then tick the SLA criterion in MIL-57. -->
+
+## Encrypted reports
+
+GitHub private vulnerability reporting is the only channel. A draft advisory is visible only to the reporter and the repository maintainers. This fork publishes no PGP key.
+
+<!-- OWNER INPUT: if a PGP key is published, add its fingerprint and URL here and to the Encryption field in Docs/security.txt.template. -->
+
+## Safe harbour
+
+> **Owner input needed.** No safe-harbour commitment has been made yet. Until it is, follow the responsible testing rules below and report privately.
+
+<!-- OWNER INPUT: the maintainer's own safe-harbour wording (what good-faith research will not be pursued, and its limits). It is a legal commitment, so it is not drafted here. -->
+
 ## Responsible testing
 
 - Test only with accounts, devices, services, and data you own or have explicit permission to use.
@@ -36,3 +58,7 @@ See [TDENC2 format and review boundaries](Docs/TDENC2_FORMAT.md) and the [recove
 ## Releases
 
 This fork publishes no release binaries and ships no auto-updater. Build from source and review the commit you build. Binaries from any other source are not produced by this repository.
+
+## security.txt
+
+[`Docs/security.txt.template`](Docs/security.txt.template) is an RFC 9116 `security.txt` for when the project has a website. It is not published anywhere yet.

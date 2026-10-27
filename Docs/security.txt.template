@@ -1,0 +1,12 @@
+# security.txt for Unofficial Telegram Drive (mmaziesf/Telegram-Drive), RFC 9116.
+# NOT PUBLISHED: the project has no website yet. Before publishing:
+#   1. Replace every <OWNER INPUT: ...> value and delete this comment block.
+#   2. Serve it over HTTPS at https://<site>/.well-known/security.txt (text/plain).
+#   3. Set Expires to less than a year ahead, and renew it before then.
+#   4. Optionally sign it as an OpenPGP cleartext message with the key named in Encryption.
+Contact: https://github.com/mmaziesf/Telegram-Drive/security/advisories/new
+Expires: <OWNER INPUT: ISO 8601 date-time, for example 2027-10-01T00:00:00.000Z>
+Policy: https://github.com/mmaziesf/Telegram-Drive/blob/main/SECURITY.md
+Preferred-Languages: en
+Canonical: <OWNER INPUT: https://<site>/.well-known/security.txt>
+# Encryption: <OWNER INPUT: URL of the PGP key, only if one is published>
