@@ -1132,6 +1132,7 @@ impl Driver {
             | "database_mode"
             | "database"
             | "seed_account"
+            | "open_account_session"
             | "account_validation_status"
             | "capture_account"
             | "validate_account"
@@ -1542,6 +1543,14 @@ impl Driver {
                 })();
                 if prepared.is_err() {let _ = std::fs::remove_file(&staged);}
                 prepared?;
+                Ok(json!({"owner": crate::workspace::current_owner(&root)?}))
+            }
+            "open_account_session" => {
+                // Open the saved session exactly as a starting runner does.
+                let root=if let Some(root)=request["root"].as_str() {child(&self.root,root)?} else {self.root.clone()};
+                let session=crate::workspace::open_session(&root).map_err(error)?;
+                crate::workspace::register_session(&root,&session)?;
+                drop(session);
                 Ok(json!({"owner": crate::workspace::current_owner(&root)?}))
             }
             "capture_account" => {

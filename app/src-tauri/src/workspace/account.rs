@@ -51,6 +51,9 @@ pub(crate) fn open_session(root: &Path) -> sqlite::Result<Arc<SqliteSession>> {
         .lock()
         .unwrap_or_else(|error| error.into_inner());
     let generation = LIFECYCLE.generation.load(Ordering::SeqCst);
+    // Create or tighten the database before SQLite touches it, so neither it
+    // nor its sidecars are ever readable by other local users.
+    crate::session_protection::prepare_account_session_or_warn(root);
     let path = root.join("telegram.session");
     let before = session_file_identity(&path).ok();
     if let Some(session) = sessions.get(root).and_then(|registered| {
@@ -63,6 +66,7 @@ pub(crate) fn open_session(root: &Path) -> sqlite::Result<Arc<SqliteSession>> {
         return Ok(session);
     }
     let session = Arc::new(SqliteSession::open(&path)?);
+    crate::session_protection::restrict_session_files_or_warn(&path);
     let identity = session_file_identity(&path)
         .ok()
         .filter(|after| before.is_none_or(|before| before == *after));

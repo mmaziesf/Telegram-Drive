@@ -36,6 +36,7 @@ node scripts/check-test-policy.cjs
 node scripts/check-app-security.cjs
 node scripts/check-android-publication.cjs
 node scripts/check-baseline-expiry.cjs
+node scripts/check-workflow-pins.cjs
 npm run build:verify --prefix app
 npm run i18n:check --prefix app
 node scripts/check-no-ads.cjs
@@ -43,7 +44,13 @@ cargo fmt --manifest-path app/src-tauri/Cargo.toml --all -- --check
 cargo clippy --locked --manifest-path app/src-tauri/Cargo.toml --features native-e2e --lib --all-targets -- -D warnings
 ```
 
-The dependency-assurance workflow remains mandatory for desktop publication. Release verification requires browser, native, and service E2E suites before creating a release. CI also builds the normal application on Windows, Linux, and macOS. Unit-test line-coverage floors have been retired; a green E2E run must not be presented as 100% code or feature coverage.
+The dependency-assurance workflow remains mandatory for desktop publication. Release verification requires browser, native, and service E2E suites before creating a release. CI also builds the normal application on Windows, Linux, and macOS.
+
+### Which runners a change uses
+
+Pull requests build and run the native journeys on Windows and Linux only. macOS runners are scarce, so both macOS targets (Apple Silicon and Intel) run on every push to `main`, nightly at 10:17 UTC, and on manual dispatch. A change can therefore merge with a macOS failure that only shows up on `main`; fix it there first. To check macOS before merging, run the Desktop sync CI workflow by hand on your branch (`gh workflow run desktop-sync-ci.yml --ref BRANCH`).
+
+A new push to a pull request cancels that pull request's runs that are still going. Runs on `main` are never cancelled. `scripts/check-workflow-pins.cjs` enforces both rules and runs in the End-to-end and bundle assurance workflow. Unit-test line-coverage floors have been retired; a green E2E run must not be presented as 100% code or feature coverage.
 
 ## Device and external-service acceptance
 
