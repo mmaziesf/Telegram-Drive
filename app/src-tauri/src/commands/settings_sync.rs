@@ -177,11 +177,14 @@ fn encrypt_settings(
 ) -> Result<String, String> {
     validate_passphrase(passphrase)?;
     let settings = sanitize_settings(settings)?;
-    let payload = serde_json::to_vec(&SettingsPayload {
-        schema_version: 1,
-        settings,
-    })
-    .map_err(|error| format!("Unable to encode settings: {error}"))?;
+    // The plaintext settings are wiped from memory once they have been encrypted.
+    let payload = Zeroizing::new(
+        serde_json::to_vec(&SettingsPayload {
+            schema_version: 1,
+            settings,
+        })
+        .map_err(|error| format!("Unable to encode settings: {error}"))?,
+    );
     let mut salt = [0_u8; 16];
     let mut nonce = [0_u8; 24];
     getrandom::getrandom(&mut salt)
@@ -270,15 +273,18 @@ fn decrypt_settings(message: &str, passphrase: &str) -> Result<SettingsSyncDownl
     let cipher = XChaCha20Poly1305::new_from_slice(key.expose())
         .map_err(|_| "Unable to initialize settings decryption".to_string())?;
     let associated_data = aad(&envelope);
-    let plaintext = cipher
-        .decrypt(
-            XNonce::from_slice(&nonce),
-            Payload {
-                msg: &ciphertext,
-                aad: associated_data.as_bytes(),
-            },
-        )
-        .map_err(|_| "The sync passphrase is incorrect or the backup is damaged".to_string())?;
+    // The decrypted settings are wiped from memory once they have been parsed.
+    let plaintext = Zeroizing::new(
+        cipher
+            .decrypt(
+                XNonce::from_slice(&nonce),
+                Payload {
+                    msg: &ciphertext,
+                    aad: associated_data.as_bytes(),
+                },
+            )
+            .map_err(|_| "The sync passphrase is incorrect or the backup is damaged".to_string())?,
+    );
     let payload: SettingsPayload = serde_json::from_slice(&plaintext)
         .map_err(|_| "Decrypted settings payload is malformed".to_string())?;
     if payload.schema_version != 1 {
