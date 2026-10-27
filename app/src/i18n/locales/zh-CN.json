@@ -1,6 +1,6 @@
 {
   "common": {
-    "app_title": "Telegram Drive",
+    "app_title": "Unofficial Telegram Drive",
     "logout": "退出登录",
     "signout_remote_unconfirmed": "已在此设备上退出登录，但 Telegram 未确认会话已结束。请打开 Telegram → 设置 → 设备，在那里结束该会话。",
     "search_placeholder": "搜索文件...",

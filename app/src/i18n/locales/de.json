@@ -1,6 +1,6 @@
 {
   "common": {
-    "app_title": "Telegram Drive",
+    "app_title": "Unofficial Telegram Drive",
     "logout": "Abmelden",
     "signout_remote_unconfirmed": "Auf diesem Gerät abgemeldet, aber Telegram hat das Beenden der Sitzung nicht bestätigt. Öffne Telegram → Einstellungen → Geräte und beende sie dort.",
     "search_placeholder": "Dateien suchen...",

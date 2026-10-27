@@ -1,6 +1,6 @@
 {
   "common": {
-    "app_title": "Telegram Drive",
+    "app_title": "Unofficial Telegram Drive",
     "logout": "Çıkış Yap",
     "signout_remote_unconfirmed": "Bu cihazda oturum kapatıldı, ancak Telegram oturumun sonlandırıldığını doğrulamadı. Telegram → Ayarlar → Cihazlar bölümünü açıp oturumu oradan sonlandırın.",
     "search_placeholder": "Dosya ara...",

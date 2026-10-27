@@ -1,6 +1,6 @@
 {
   "common": {
-    "app_title": "Telegram Drive",
+    "app_title": "Unofficial Telegram Drive",
     "logout": "لاگ آؤٹ",
     "signout_remote_unconfirmed": "اس ڈیوائس سے سائن آؤٹ ہو گیا، لیکن ٹیلیگرام نے سیشن ختم ہونے کی تصدیق نہیں کی۔ ٹیلیگرام ← ترتیبات ← ڈیوائسز کھولیں اور اسے وہاں ختم کریں۔",
     "search_placeholder": "فائلیں تلاش کریں...",

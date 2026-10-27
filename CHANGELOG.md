@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+### Unofficial client naming
+
+- Show the app as "Unofficial Telegram Drive" in the window title, installer metadata, Linux desktop entry and every translated `common.app_title`, and state in the README that this is an independent third-party client that is not affiliated with, endorsed by or sponsored by Telegram FZ-LLC, as the [Telegram API Terms of Service](https://core.telegram.org/api/terms) require.
+- The bundle identifier is unchanged, so existing sessions, vaults, settings and keychain entries keep working. Linux `.deb` and macOS bundle artifact names change; the Arch packaging script accepts both the new and the legacy `.deb` name.
+- The locale budget grows by the exact 290 bytes the new title adds (11 bytes in the largest catalog).
+
 ### The full-history secret scan passes again after the #6 squash merge
 
 - Squash-merging #6 put an earlier wording of a `.gitleaksignore` comment into a new commit (21645df). The full-history gitleaks scan reported it as a generic API key. The comment is reworded, and `.gitleaksignore` records that fingerprint along with its reason.

@@ -2,7 +2,7 @@
 
 <img src="Docs/assets/logo.svg" alt="Telegram Drive logo" width="92">
 
-# Telegram Drive
+# Unofficial Telegram Drive
 
 ### A local-first file workspace powered by your own Telegram account
 
@@ -25,7 +25,7 @@ Organize, transfer, preview, stream, sync, and share the files you keep in Saved
 Telegram Drive turns Telegram's familiar file storage into a focused, desktop-style workspace. The app connects directly to Telegram with credentials you provide; it does not run a separate file-storage or relay service. Every application feature is available without payment.
 
 > [!IMPORTANT]
-> Telegram Drive is an independent project and is not affiliated with Telegram FZ-LLC. Files remain subject to Telegram's account, service, and per-file limits. Telegram Drive should not be treated as literally unlimited storage or as the only backup of important data.
+> **Unofficial Telegram Drive is an unofficial third-party client.** It is an independent project and is not affiliated with, endorsed by, or sponsored by Telegram FZ-LLC. It uses the Telegram API under the [Telegram API Terms of Service](https://core.telegram.org/api/terms), which require third-party apps that use "Telegram" in their title to mark themselves as "Unofficial". Files remain subject to Telegram's account, service, and per-file limits. Telegram Drive should not be treated as literally unlimited storage or as the only backup of important data.
 
 ## Contents
 

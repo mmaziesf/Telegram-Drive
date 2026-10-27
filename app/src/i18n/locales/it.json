@@ -1,6 +1,6 @@
 {
   "common": {
-    "app_title": "Telegram Drive",
+    "app_title": "Unofficial Telegram Drive",
     "logout": "Esci",
     "signout_remote_unconfirmed": "Disconnessione eseguita su questo dispositivo, ma Telegram non ha confermato la chiusura della sessione. Apri Telegram → Impostazioni → Dispositivi e terminala lì.",
     "search_placeholder": "Cerca file...",

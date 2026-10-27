@@ -59,7 +59,7 @@ pub fn report(error: &str) {
     {
         let dialog = rfd::MessageDialog::new()
             .set_level(rfd::MessageLevel::Error)
-            .set_title("Telegram Drive could not start")
+            .set_title("Unofficial Telegram Drive could not start")
             .set_description(message);
         match log_file.as_deref().and_then(Path::parent) {
             Some(folder) => {
