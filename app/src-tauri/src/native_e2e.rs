@@ -1140,6 +1140,7 @@ impl Driver {
             | "account_validation_status"
             | "advance_share_unlock_clock"
             | "share_metadata_check"
+            | "proxy_settings_check"
             | "capture_account"
             | "validate_account"
             | "save_collection"
@@ -1520,6 +1521,20 @@ impl Driver {
                     Ok(json!({"version": query.read::<i64,_>(0).map_err(error)?}))
                 })
                 .await
+            }
+            "proxy_settings_check" => {
+                crate::commands::settings::validate_proxy_request(
+                    request["enabled"].as_bool().ok_or("enabled is required")?,
+                    text(&request, "proxyType")?,
+                    text(&request, "host")?,
+                    request["port"]
+                        .as_u64()
+                        .and_then(|port| u16::try_from(port).ok())
+                        .ok_or("port is required")?,
+                    text(&request, "username")?,
+                    text(&request, "password")?,
+                )?;
+                Ok(json!({}))
             }
             "share_metadata_check" => {
                 let checked = crate::commands::sharing::validate_share_metadata(

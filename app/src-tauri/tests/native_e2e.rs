@@ -9832,3 +9832,53 @@ fn share_creation_rejects_unbounded_metadata_before_contacting_telegram() {
         .contains("negative"));
     app.stop();
 }
+
+#[test]
+fn proxy_settings_refuse_values_that_change_the_proxy_url_structure() {
+    let fixture = Fixture::new();
+    let mut app = Backend::start(&fixture.0);
+    let proxy = |kind: &str, host: &str, port: u64, user: &str| json!({"command":"proxy_settings_check","enabled":true,"proxyType":kind,"host":host,"port":port,"username":user,"password":""});
+    for (kind, host) in [
+        ("socks5", "proxy.example.net"),
+        ("http", "10.0.0.2"),
+        ("https", "[2001:db8::1]"),
+        ("socks5", "corp_proxy"),
+    ] {
+        app.ok(proxy(kind, host, 1080, "user"));
+    }
+    // A disabled proxy is stored inert, so partial input stays editable.
+    app.ok(json!({"command":"proxy_settings_check","enabled":false,"proxyType":"","host":"half typed/","port":0,"username":"","password":""}));
+    for host in [
+        "",
+        "attacker.example@proxy.example.net",
+        "proxy.example.net/path",
+        "proxy.example.net#frag",
+        "proxy.example.net:9050",
+        "2001:db8::1",
+        "[not-an-ip]",
+        " proxy.example.net",
+        &"a".repeat(254),
+    ] {
+        assert!(
+            app.failure(proxy("socks5", host, 1080, "user"))
+                .contains("Proxy host"),
+            "host={host:?}"
+        );
+    }
+    assert!(app
+        .failure(proxy("mtproto", "proxy.example.net", 1080, "user"))
+        .contains("SOCKS5"));
+    assert!(app
+        .failure(proxy("socks5", "proxy.example.net", 0, "user"))
+        .contains("port"));
+    assert!(app
+        .failure(proxy("socks5", "proxy.example.net", 1080, &"u".repeat(256)))
+        .contains("usernames"));
+    assert!(app
+        .failure(proxy("socks5", "proxy.example.net", 1080, "line\nbreak"))
+        .contains("usernames"));
+    let mut long_secret = proxy("socks5", "proxy.example.net", 1080, "user");
+    long_secret["password"] = json!("p".repeat(256));
+    assert!(app.failure(long_secret).contains("passwords"));
+    app.stop();
+}

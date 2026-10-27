@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+### Proxy settings refuse malformed hosts and credentials
+
+- `cmd_apply_proxy_settings` now validates an enabled proxy before saving it. The type must be SOCKS5, HTTP or HTTPS. The host must be a hostname, an IPv4 address or a bracketed IPv6 address, with no `@`, `/`, `#`, `:` or whitespace. The port cannot be 0, and the username and password must be at most 255 bytes (the SOCKS5 field limit) without control characters. These values are inserted into `socks5://user:pass@host:port`, and before this check a malformed host was saved and silently changed that URL's structure. A disabled proxy is still saved as typed, apart from the password limit.
+- A native E2E journey covers accepted and refused values (RT-10 in the red-team report).
+
 ### Share links refuse out-of-range metadata
 
 - `cmd_create_share` now checks the WebView-supplied file name, size and expiry before it contacts Telegram. Expiry must be 1 to 8,760 hours (one year). It is computed with checked arithmetic, so a huge value can no longer wrap the stored expiry in release builds or panic in debug builds. Zero or negative hours, which created links that were already expired, are refused too. File names must have 1 to 255 characters and no control characters, and the size cannot be negative.
