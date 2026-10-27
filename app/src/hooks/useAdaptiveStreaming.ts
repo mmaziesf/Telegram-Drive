@@ -645,9 +645,9 @@ export function useAdaptiveStreaming(
 
             // Clear any other track options to keep this one isolated
             for (const t of tracks) {
-                try { (mp4boxfile as any).unsetSegmentOptions(t.id); } catch {}
+                try { mp4boxfile.unsetSegmentOptions(t.id); } catch {}
             }
-            (mp4boxfile as any).isFragmentationInitialized = false;
+            mp4boxfile.isFragmentationInitialized = false;
 
             debugAdaptiveStreaming('[AdaptiveStreaming] 📐 initSegments: generating isolated options for track id=', track.id);
             mp4boxfile.setSegmentOptions(track.id, sb as unknown as object, {
@@ -656,7 +656,7 @@ export function useAdaptiveStreaming(
             });
 
             try {
-                const segmentationResult = (mp4boxfile as any).initializeSegmentation();
+                const segmentationResult = mp4boxfile.initializeSegmentation();
                 if (segmentationResult && segmentationResult.buffer) {
                     initBuffers[track.id] = segmentationResult.buffer;
                     hasInitializedAny = true;
@@ -668,9 +668,9 @@ export function useAdaptiveStreaming(
 
         // Now restore/set segment options for ALL active tracks together so mp4box segments them during playback
         for (const t of tracks) {
-            try { (mp4boxfile as any).unsetSegmentOptions(t.id); } catch {}
+            try { mp4boxfile.unsetSegmentOptions(t.id); } catch {}
         }
-        (mp4boxfile as any).isFragmentationInitialized = false;
+        mp4boxfile.isFragmentationInitialized = false;
 
         for (const track of tracks) {
             const sb = sourceBuffersRef.current[track.id];
@@ -693,7 +693,7 @@ export function useAdaptiveStreaming(
 
         // Initialize multi-track segmentation state on the file
         try {
-            (mp4boxfile as any).initializeSegmentation();
+            mp4boxfile.initializeSegmentation();
         } catch (e) {
             console.error('[AdaptiveStreaming] 📐 Final initializeSegmentation crashed:', e);
             segmentationFailedRef.current = true;
@@ -803,10 +803,10 @@ export function useAdaptiveStreaming(
                 // Patch missing mehd on the *playback* file (the scout file
                 // was patched earlier, but this is a fresh mp4box instance
                 // with its own moov parsed from the discovery bytes).
-                const pbMoov = (playbackFile as any).moov;
+                const pbMoov = playbackFile.moov;
                 if (pbMoov?.mvex && !pbMoov.mvex.mehd) {
                     debugAdaptiveStreaming('[AdaptiveStreaming] 🏗️ Patching missing mehd on playback file');
-                    pbMoov.mvex.mehd = { fragment_duration: 0 };
+                    pbMoov.mvex.mehd = { fragment_duration: 0 } as typeof pbMoov.mvex.mehd;
                 }
                 initSegments(playbackFile);
                 // If initSegments triggered fallback (e.g. initializeSegmentation crash),
@@ -1046,10 +1046,10 @@ export function useAdaptiveStreaming(
             // Fix: inject a stub mehd so initializeSegmentation succeeds.
             // Duration of 0 is safe — MSE computes actual duration from
             // segment timestamps (same as DASH/CMAF live streams).
-            const moov = (mp4boxfile as any).moov;
+            const moov = mp4boxfile.moov;
             if (moov?.mvex && !moov.mvex.mehd) {
                 debugAdaptiveStreaming('[AdaptiveStreaming] 📦 Patching missing mehd on fragmented MP4');
-                moov.mvex.mehd = { fragment_duration: 0 };
+                moov.mvex.mehd = { fragment_duration: 0 } as typeof moov.mvex.mehd;
             }
 
             // Capture accurate resume offset if discovery didn't set one (moov-at-end)

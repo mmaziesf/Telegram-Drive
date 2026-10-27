@@ -5,6 +5,7 @@ import { DownloadCloud, Trash2, Pencil, CheckSquare, X, Check, FolderInput, More
 import { FileTypeIcon } from '../shared/FileTypeIcon';
 import { ActionPopover, ActionItem } from './ActionPopover';
 import { TelegramFile, TelegramFolder } from '../../types';
+import { resolvePublicFolderUsername } from '../desktop/dashboard/fileActionDescriptors';
 import i18n from '../../i18n';
 
 interface TouchFileListProps {
@@ -158,8 +159,7 @@ export function TouchFileList({ files, isLoading, onDownload, onDelete, onPrevie
     }
     // Telegram native t.me link (only for files in public channels with a username)
     if (file.type !== 'folder' && onCopyTelegramLink) {
-      const folder = folders.find(f => f.id === file.folder_id) || folders.find(f => f.id === activeFolderId);
-      const username = folder?.username || (folder as any)?.chat?.username || (folder as any)?.channel?.username;
+      const username = resolvePublicFolderUsername(file, folders, activeFolderId);
       if (username) {
         actions.push({
           label: 'Copy Telegram Link',
