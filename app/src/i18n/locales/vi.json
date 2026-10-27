@@ -1,6 +1,6 @@
 {
   "common": {
-    "app_title": "Telegram Drive",
+    "app_title": "Unofficial Telegram Drive",
     "logout": "Đăng xuất",
     "signout_remote_unconfirmed": "Đã đăng xuất trên thiết bị này, nhưng Telegram chưa xác nhận phiên đã kết thúc. Hãy mở Telegram → Cài đặt → Thiết bị và kết thúc phiên tại đó.",
     "search_placeholder": "Tìm kiếm tệp...",
@@ -266,7 +266,7 @@
     "copy_share_link": "Sao chép liên kết chia sẻ",
     "revoke_link": "Thu hồi liên kết",
     "copy_diagnostics": "Sao chép chẩn đoán",
-    "tagline": "Không gian làm việc tệp ưu tiên cục bộ, vận hành bằng tài khoản Telegram của bạn. Mã nguồn mở và miễn phí sử dụng.",
+    "tagline": "Không gian làm việc tệp ưu tiên cục bộ, vận hành bằng tài khoản Telegram của bạn. Miễn phí sử dụng.",
     "reset_defaults": "Đặt lại mặc định",
     "done": "Xong",
     "clear_local_cache": "Xóa bộ nhớ đệm cục bộ",
@@ -534,7 +534,7 @@
     "donate": "Ủng hộ",
     "getting_started": "Bắt đầu",
     "close_help": "Đóng trợ giúp",
-    "privacy_note": "Thông tin xác thực của bạn được lưu cục bộ trên thiết bị và không bao giờ được gửi đến máy chủ bên thứ ba. Mọi dữ liệu được truyền trực tiếp giữa bạn và Telegram.",
+    "privacy_note": "API ID, API hash và phiên Telegram của bạn được lưu trên thiết bị này và chỉ được gửi tới Telegram. Một số tính năng kết nối với dịch vụ khác, như quảng cáo và giấy phép người ủng hộ.",
     "code_sent_telegram_app": "Telegram đã gửi mã đăng nhập đến cuộc trò chuyện Telegram đã xác minh trên một thiết bị đang đăng nhập của bạn.",
     "code_sent_sms": "Telegram đã gửi mã đăng nhập qua SMS.",
     "code_sent_call": "Telegram sẽ gọi và đọc mã đăng nhập cho bạn.",
@@ -1463,7 +1463,7 @@
   },
   "auth_copy": {
     "qr_title": "Đăng nhập an toàn ưu tiên QR",
-    "qr_description": "Đăng nhập trên máy tính dùng quy trình thiết bị QR của Telegram. Telegram vẫn yêu cầu nhập API ID và hash một lần để nhận diện ứng dụng khách mã nguồn mở này.",
+    "qr_description": "Đăng nhập trên máy tính dùng quy trình thiết bị QR của Telegram. Telegram vẫn yêu cầu nhập API ID và hash một lần để nhận diện ứng dụng khách này.",
     "advanced": "Thông tin xác thực nâng cao của ứng dụng khách",
     "continue_phone": "Tiếp tục đăng nhập bằng điện thoại",
     "continue_qr": "Tiếp tục đăng nhập bằng QR",

@@ -1,7 +1,7 @@
 pkgname=telegram-drive-bin
 pkgver=@PKGVER@
 pkgrel=1
-pkgdesc='Local-first Telegram file workspace (prebuilt upstream binary)'
+pkgdesc='Unofficial local-first Telegram file workspace (prebuilt binary)'
 arch=('x86_64')
 url='https://github.com/caamer20/Telegram-Drive'
 license=('LicenseRef-Upstream-Unspecified')
@@ -67,7 +67,7 @@ package() {
   mv "${pkgdir}/usr/bin/app" "${pkgdir}/usr/lib/telegram-drive/app"
   install -Dm755 "${srcdir}/telegram-drive" "${pkgdir}/usr/bin/telegram-drive"
 
-  rm -f "${pkgdir}/usr/share/applications/Telegram Drive.desktop"
+  rm -f "${pkgdir}/usr/share/applications/Telegram Drive.desktop" "${pkgdir}/usr/share/applications/Unofficial Telegram Drive.desktop"
   install -Dm644 \
     "${srcdir}/com.cameronamer.telegramdrive.desktop" \
     "${pkgdir}/usr/share/applications/com.cameronamer.telegramdrive.desktop"
