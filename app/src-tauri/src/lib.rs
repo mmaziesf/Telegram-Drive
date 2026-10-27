@@ -108,6 +108,7 @@ pub(crate) mod local_search;
 pub mod mp4_utils;
 pub mod server;
 mod server_lifecycle;
+pub(crate) mod session_protection;
 pub mod share_routes;
 #[cfg(not(any(target_os = "android", target_os = "ios")))]
 mod sponsor_link_bridge;
