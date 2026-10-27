@@ -3,7 +3,7 @@ pkgver=@PKGVER@
 pkgrel=1
 pkgdesc='Unofficial local-first Telegram file workspace (prebuilt binary)'
 arch=('x86_64')
-url='https://github.com/caamer20/Telegram-Drive'
+url='https://github.com/mmaziesf/Telegram-Drive'
 license=('LicenseRef-Upstream-Unspecified')
 depends=(
   'cairo'
@@ -31,7 +31,7 @@ _deb_name='@DEB_NAME@'
 source=(
   "${_deb_name}"
   'telegram-drive'
-  'com.cameronamer.telegramdrive.desktop'
+  'io.github.mmaziesf.unofficialtelegramdrive.desktop'
   'UPSTREAM-LICENSE-NOTICE'
 )
 noextract=("${_deb_name}")
@@ -69,11 +69,11 @@ package() {
 
   rm -f "${pkgdir}/usr/share/applications/Telegram Drive.desktop" "${pkgdir}/usr/share/applications/Unofficial Telegram Drive.desktop"
   install -Dm644 \
-    "${srcdir}/com.cameronamer.telegramdrive.desktop" \
-    "${pkgdir}/usr/share/applications/com.cameronamer.telegramdrive.desktop"
+    "${srcdir}/io.github.mmaziesf.unofficialtelegramdrive.desktop" \
+    "${pkgdir}/usr/share/applications/io.github.mmaziesf.unofficialtelegramdrive.desktop"
 
   while IFS= read -r -d '' icon; do
-    mv "${icon}" "${icon%/app.png}/com.cameronamer.telegramdrive.png"
+    mv "${icon}" "${icon%/app.png}/io.github.mmaziesf.unofficialtelegramdrive.png"
   done < <(find "${pkgdir}/usr/share/icons/hicolor" -type f -path '*/apps/app.png' -print0)
 
   install -Dm644 \

@@ -41,13 +41,13 @@ sha256_file() {
 assets_directory="${repository_root}/packaging/arch"
 deb_sha256="$(sha256_file "${deb_path}")"
 launcher_sha256="$(sha256_file "${assets_directory}/telegram-drive")"
-desktop_sha256="$(sha256_file "${assets_directory}/com.cameronamer.telegramdrive.desktop")"
+desktop_sha256="$(sha256_file "${assets_directory}/io.github.mmaziesf.unofficialtelegramdrive.desktop")"
 notice_sha256="$(sha256_file "${assets_directory}/UPSTREAM-LICENSE-NOTICE")"
 
 mkdir -p "${output_directory}"
 cp "${deb_path}" "${output_directory}/${expected_name}"
 cp "${assets_directory}/telegram-drive" "${output_directory}/telegram-drive"
-cp "${assets_directory}/com.cameronamer.telegramdrive.desktop" "${output_directory}/com.cameronamer.telegramdrive.desktop"
+cp "${assets_directory}/io.github.mmaziesf.unofficialtelegramdrive.desktop" "${output_directory}/io.github.mmaziesf.unofficialtelegramdrive.desktop"
 cp "${assets_directory}/UPSTREAM-LICENSE-NOTICE" "${output_directory}/UPSTREAM-LICENSE-NOTICE"
 
 sed \

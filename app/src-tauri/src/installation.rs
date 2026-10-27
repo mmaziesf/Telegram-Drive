@@ -25,8 +25,3 @@ fn installation_info(value: Option<&OsStr>) -> InstallationInfo {
 pub fn current_installation_info() -> InstallationInfo {
     installation_info(std::env::var_os("TELEGRAM_DRIVE_PACKAGE_MANAGER").as_deref())
 }
-
-#[tauri::command]
-pub fn cmd_get_installation_info() -> InstallationInfo {
-    current_installation_info()
-}

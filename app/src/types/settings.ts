@@ -17,6 +17,10 @@ export interface Settings {
   viewMode: 'grid' | 'list';
   fileSortField: 'name' | 'size' | 'date';
   fileSortDirection: 'asc' | 'desc';
+  /**
+   * Retained only so encrypted settings bundles from other installs still
+   * validate; this build has no updater and never reads the value.
+   */
   autoUpdate: boolean;
   maxConcurrentUploads: number;
   maxConcurrentDownloads: number;
@@ -27,8 +31,6 @@ export interface Settings {
   crashReportingEnabled: boolean;
   crashReportingConsentSeen: boolean;
   telegramSettingsSyncEnabled: boolean;
-  supporterMode: boolean;
-  supporterPromptLastShownAt: number;
   driveTourSeen: boolean;
   /** Per-device: the first-run encryption setup prompt has been answered. */
   encryptionSetupSeen: boolean;

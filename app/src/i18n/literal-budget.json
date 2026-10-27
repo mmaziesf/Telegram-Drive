@@ -1,14 +1,6 @@
 {
-  "maxFindings": 298,
+  "maxFindings": 291,
   "areaBudgets": {
-    "supporterAndSponsors": {
-      "maxFindings": 1,
-      "patterns": [
-        "Supporter",
-        "AdBanner",
-        "Adsterra"
-      ]
-    },
     "encryptionAndAccess": {
       "maxFindings": 0,
       "patterns": [
@@ -30,7 +22,7 @@
       ]
     },
     "transfersAndLocalServices": {
-      "maxFindings": 90,
+      "maxFindings": 87,
       "patterns": [
         "TransferCenter",
         "ShareDialog",
@@ -56,7 +48,7 @@
       ]
     },
     "other": {
-      "maxFindings": 138,
+      "maxFindings": 135,
       "patterns": []
     }
   },
