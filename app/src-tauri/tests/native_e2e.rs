@@ -787,6 +787,31 @@ async fn real_http_server_streams_owned_cache_and_revokes_it_after_account_switc
         b"synthetic owned media bytes"
     );
     let fmp4 = format!("{url}/fmp4/101_0_42/output.mp4?token={token}");
+    // Near misses (one byte off, a prefix, an extension, an empty value) are
+    // refused on every token-checked route.
+    let near_misses = [
+        "synthetic-e2e-stream-tokeN".to_owned(),
+        token[..token.len() - 1].to_owned(),
+        format!("{token}x"),
+        String::new(),
+    ];
+    for route in [
+        "/stream/home/1",
+        "/hls/101_0_42/480p/index.m3u8",
+        "/hls/101_0_42/480p/segment000.ts",
+        "/fmp4/101_0_42/output.mp4",
+    ] {
+        for candidate in &near_misses {
+            let status = client
+                .get(format!("{url}{route}"))
+                .query(&[("token", candidate)])
+                .send()
+                .await
+                .unwrap()
+                .status();
+            assert_eq!(status, 403, "{route} with {candidate:?}");
+        }
+    }
     assert_eq!(
         client
             .get(format!("{url}/fmp4/101_0_42/output.mp4"))

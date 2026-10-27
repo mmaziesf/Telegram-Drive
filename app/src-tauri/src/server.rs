@@ -92,6 +92,21 @@ pub struct StreamTokenData {
     media_cache: MediaResolutionCache<grammers_client::types::Message>,
 }
 
+impl StreamTokenData {
+    /// Checks a presented stream token without an early exit on the first
+    /// differing byte. Both sides are hashed first so the comparison also
+    /// does not depend on the presented length.
+    pub fn accepts(&self, presented: Option<&str>) -> bool {
+        use sha2::{Digest, Sha256};
+        let Some(presented) = presented else {
+            return false;
+        };
+        let expected: [u8; 32] = Sha256::digest(self.token.as_bytes()).into();
+        let presented: [u8; 32] = Sha256::digest(presented.as_bytes()).into();
+        constant_time_eq::constant_time_eq_32(&expected, &presented)
+    }
+}
+
 #[derive(serde::Deserialize)]
 struct StreamQuery {
     token: Option<String>,
@@ -708,7 +723,7 @@ async fn stream_media(
     account_root: web::Data<crate::share_routes::ShareAccountRoot>,
     crypto_state: web::Data<crate::crypto::state::CryptoState>,
 ) -> impl Responder {
-    if query.token.as_deref() != Some(token_data.token.as_str()) {
+    if !token_data.accepts(query.token.as_deref()) {
         return HttpResponse::Forbidden().body("Invalid or missing stream token");
     }
     let (folder_id_str, message_id) = path.into_inner();
