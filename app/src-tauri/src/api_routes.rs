@@ -2399,7 +2399,7 @@ pub fn serve(
             .wrap(cors)
             // Outermost: a rebound host name is refused before CORS or auth.
             .wrap(actix_web::middleware::from_fn(
-                crate::local_cors::require_loopback_host,
+                crate::local_cors::guard_loopback_request,
             ))
             // Malformed input is reported in the same shape as every other error.
             .app_data(web::JsonConfig::default().error_handler(|error, _| {

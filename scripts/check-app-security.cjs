@@ -25,6 +25,10 @@ for (const [name, expected] of [['object-src', "'none'"], ['frame-src', "'none'"
   const sources = directives.get(name);
   if (sources?.length !== 1 || sources[0] !== expected) throw new Error(`Invalid ${name} restriction.`);
 }
+// Media URLs carry the local stream token in their query string.
+if (!/<meta name="referrer" content="no-referrer" \/>/.test(fs.readFileSync(path.join(root, 'index.html'), 'utf8'))) {
+  throw new Error('index.html must set <meta name="referrer" content="no-referrer" />.');
+}
 const mobile = json('src-tauri/capabilities/mobile.json');
 const desktop = json('src-tauri/capabilities/default.json');
 if (mobile.platforms?.length !== 1 || mobile.platforms[0] !== 'android') {

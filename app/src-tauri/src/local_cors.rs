@@ -1,7 +1,7 @@
 use actix_web::body::{EitherBody, MessageBody};
 use actix_web::dev::{ServiceRequest, ServiceResponse};
 use actix_web::http::{
-    header::{HeaderValue, HOST},
+    header::{HeaderValue, HOST, REFERRER_POLICY},
     Uri,
 };
 use actix_web::middleware::Next;
@@ -14,7 +14,11 @@ const DEVELOPMENT_FRONTEND_PORT: u16 = 1420;
 /// address. The servers bind 127.0.0.1 only, but a web page can point a domain
 /// it controls at 127.0.0.1 (DNS rebinding) and then reach them as same-origin;
 /// such requests carry the attacker's host name and stop here with 421.
-pub(crate) async fn require_loopback_host<B: MessageBody + 'static>(
+///
+/// Every response, including the refusal, says `Referrer-Policy: no-referrer`:
+/// stream URLs carry the session stream token in their query string, and no
+/// page loaded from these servers may pass its URL on as a referrer.
+pub(crate) async fn guard_loopback_request<B: MessageBody + 'static>(
     request: ServiceRequest,
     next: Next<B>,
 ) -> Result<ServiceResponse<EitherBody<B>>, actix_web::Error> {
@@ -24,13 +28,16 @@ pub(crate) async fn require_loopback_host<B: MessageBody + 'static>(
         .get(HOST)
         .and_then(|host| host.to_str().ok())
         .is_some_and(|host| is_loopback_host(host, port));
-    if !allowed {
-        let response = HttpResponse::MisdirectedRequest().body("Unexpected Host header");
-        return Ok(request.into_response(response).map_into_right_body());
-    }
-    next.call(request)
-        .await
-        .map(ServiceResponse::map_into_left_body)
+    let mut response = if allowed {
+        next.call(request).await?.map_into_left_body()
+    } else {
+        let refusal = HttpResponse::MisdirectedRequest().body("Unexpected Host header");
+        request.into_response(refusal).map_into_right_body()
+    };
+    response
+        .headers_mut()
+        .insert(REFERRER_POLICY, HeaderValue::from_static("no-referrer"));
+    Ok(response)
 }
 
 fn is_loopback_host(host: &str, port: u16) -> bool {
