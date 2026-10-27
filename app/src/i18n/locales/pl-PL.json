@@ -1,6 +1,6 @@
 {
   "common": {
-    "app_title": "Telegram Drive",
+    "app_title": "Unofficial Telegram Drive",
     "logout": "Wyloguj się",
     "signout_remote_unconfirmed": "Wylogowano na tym urządzeniu, ale Telegram nie potwierdził zakończenia sesji. Otwórz Telegram → Ustawienia → Urządzenia i zakończ ją tam.",
     "search_placeholder": "Wyszukaj pliki...",
@@ -272,7 +272,7 @@
     "copy_share_link": "Skopiuj link do udostępniania",
     "revoke_link": "Unieważnij link",
     "copy_diagnostics": "Kopiuj diagnostykę",
-    "tagline": "Lokalny obszar roboczy plików oparty na Twoim koncie Telegram. Open source i bezpłatny w użyciu.",
+    "tagline": "Lokalny obszar roboczy plików oparty na Twoim koncie Telegram. Bezpłatny w użyciu.",
     "reset_defaults": "Przywróć ustawienia domyślne",
     "done": "Zrobione",
     "clear_local_cache": "Wyczyść lokalną pamięć podręczną",
@@ -542,7 +542,7 @@
     "donate": "Wesprzyj projekt",
     "getting_started": "Pierwsze kroki",
     "close_help": "Zamknij pomoc",
-    "privacy_note": "Twoje dane uwierzytelniające są przechowywane lokalnie na Twoim urządzeniu i nigdy nie są wysyłane na serwery stron trzecich. Wszystkie dane przesyłane są bezpośrednio między Tobą a Telegramem.",
+    "privacy_note": "Twój API ID, API hash i sesja Telegram są przechowywane na tym urządzeniu i wysyłane wyłącznie do Telegram. Niektóre funkcje łączą się z innymi usługami, takimi jak reklamy i licencje wspierających.",
     "code_sent_telegram_app": "Telegram wysłał kod logowania do zweryfikowanego czatu Telegram na jednym z zalogowanych urządzeń.",
     "code_sent_sms": "Telegram wysłał kod do logowania SMS-em.",
     "code_sent_call": "Telegram zadzwoni do Ciebie i odczyta na głos kod logowania.",
@@ -1477,7 +1477,7 @@
   },
   "auth_copy": {
     "qr_title": "Bezpieczne logowanie przez QR",
-    "qr_description": "Logowanie na komputerze używa procesu QR urządzeń Telegram. Telegram nadal wymaga jednorazowego podania API ID i skrótu, aby rozpoznać tego klienta o otwartym kodzie.",
+    "qr_description": "Logowanie na komputerze używa procesu QR urządzeń Telegram. Telegram nadal wymaga jednorazowego podania API ID i skrótu, aby rozpoznać tego klienta.",
     "advanced": "Zaawansowane dane klienta",
     "continue_phone": "Przejdź do logowania telefonem",
     "continue_qr": "Przejdź do logowania przez QR",

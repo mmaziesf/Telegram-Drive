@@ -1,6 +1,6 @@
 {
   "common": {
-    "app_title": "Telegram Drive",
+    "app_title": "Unofficial Telegram Drive",
     "logout": "Log Out",
     "signout_remote_unconfirmed": "Signed out on this device, but Telegram did not confirm that the session was ended. Open Telegram → Settings → Devices and end it there.",
     "search_placeholder": "Search files...",
@@ -246,7 +246,7 @@
     "respect_flood_desc": "Auto-sleep on FLOOD_WAIT errors",
     "bandwidth_throttle": "Bandwidth Throttle",
     "download_limit": "Download limit",
-    "unlimited": "Unlimited",
+    "unlimited": "No limit",
     "transfer_chunk_size": "Transfer Chunk Size",
     "chunk_size_desc": "Smaller = better for unstable connections",
     "keep_alive": "Keep-Alive Ping",
@@ -272,7 +272,7 @@
     "copy_share_link": "Copy share link",
     "revoke_link": "Revoke link",
     "copy_diagnostics": "Copy Diagnostics",
-    "tagline": "A local-first file workspace powered by your Telegram account. Open-source and free to use.",
+    "tagline": "A local-first file workspace powered by your Telegram account. Free to use.",
     "reset_defaults": "Reset to Defaults",
     "done": "Done",
     "clear_local_cache": "Clear Local Cache",
@@ -534,7 +534,7 @@
     "donate": "Donate",
     "getting_started": "Getting Started",
     "close_help": "Close help",
-    "privacy_note": "Your credentials are stored locally on your device and are never sent to any third-party servers. All data goes directly between you and Telegram.",
+    "privacy_note": "Your API ID, API hash and Telegram session are stored on this device and sent only to Telegram. Some features contact other services, such as ads and supporter licenses.",
     "code_sent_telegram_app": "Telegram sent the login code to the verified Telegram chat on one of your signed-in devices.",
     "code_sent_sms": "Telegram sent the login code by SMS.",
     "code_sent_call": "Telegram will call you and read the login code aloud.",
@@ -1463,7 +1463,7 @@
   },
   "auth_copy": {
     "qr_title": "QR-first secure sign in",
-    "qr_description": "Desktop sign-in uses Telegram's QR device flow. A one-time API ID and hash are still required by Telegram to identify this open-source client.",
+    "qr_description": "Desktop sign-in uses Telegram's QR device flow. A one-time API ID and hash are still required by Telegram to identify this client.",
     "advanced": "Advanced client credentials",
     "continue_phone": "Continue to phone sign in",
     "continue_qr": "Continue to QR sign in",

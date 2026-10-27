@@ -8,6 +8,25 @@
 - A "forgot passphrase" option deletes only the local session; the device stays listed in Telegram's active sessions until it is ended from another device.
 - Android sessions are unchanged in this release.
 
+### Accurate product claims
+
+- Remove "open-source" from the in-app tagline and QR sign-in text in all 24 locales and from the GitHub Pages site (`Docs/Telegram-Drive.html`). The upstream code has no license, so the project is source-available at most.
+- Replace the sign-in note "never sent to any third-party servers. All data goes directly between you and Telegram" in all 24 locales. It now says that the API ID, API hash and Telegram session are stored on the device and sent only to Telegram, and that some features contact other services such as ads and supporter licenses.
+- Show "No limit" instead of "Unlimited" for a zero bandwidth, archive or stream-quality cap in English, so the label cannot be read as a storage claim.
+- Note in the README that sponsor placements load third-party ad content and that one ad host is resolved through Cloudflare DNS-over-HTTPS.
+
+### Unofficial client naming
+
+- Show the app as "Unofficial Telegram Drive" in the window title, installer metadata, Linux desktop entry and every translated `common.app_title`, and state in the README that this is an independent third-party client that is not affiliated with, endorsed by or sponsored by Telegram FZ-LLC, as the [Telegram API Terms of Service](https://core.telegram.org/api/terms) require.
+- The bundle identifier is unchanged, so existing sessions, vaults, settings and keychain entries keep working. Linux `.deb` and macOS bundle artifact names change; the Arch packaging script accepts both the new and the legacy `.deb` name.
+- The locale budget grows by the exact 290 bytes the new title adds (11 bytes in the largest catalog).
+
+
+
+### The full-history secret scan passes again after the #6 squash merge
+
+- Squash-merging #6 put an earlier wording of a `.gitleaksignore` comment into a new commit (21645df). The full-history gitleaks scan reported it as a generic API key. The comment is reworded, and `.gitleaksignore` records that fingerprint along with its reason.
+
 ### Continuous integration
 
 - Add a CI workflow for pull requests and pushes to `main`. It runs ESLint with zero warnings, `tsc --noEmit`, the locale checks, the production build with its bundle budget, the Playwright journeys, `cargo fmt --check`, Clippy with `-D warnings`, the native Rust integration tests, `cargo deny`, `cargo audit` and a gitleaks scan of the full history.
@@ -16,7 +35,7 @@
 - Workflows use read-only tokens by default, pin every action to a commit SHA and do not persist checkout credentials. Only the CodeQL job can write security events.
 - Fix the frontend lint findings, including 22 conditional hook calls in the sign-in screen. Two rules stay off with an inline reason: `no-explicit-any` (141 uses) and `react-hooks/exhaustive-deps` (43 uses).
 - `cargo audit` ignores the same advisories as `deny.toml`, with the same reasons. `.gitleaksignore` lists each known false positive with its reason.
-- Fix the TV keyboard journey in `accessibility.spec.ts`. After Escape releases the native select, the test now presses ArrowLeft to reach the number field beside it. It used to press ArrowDown, which correctly moves to the list below, so the test failed on every run.
+- Fix the TV keyboard journey in `accessibility.spec.ts`. After Escape releases the native select, the test now presses ArrowLeft to reach the number field beside it. It used to press ArrowDown, and spatial navigation picks the element below by on-screen geometry. With some installed fonts, such as Inter, that element is a button instead of the number field, so the test failed on those machines but passed on the CI runner.
 
 ### Dependency security
 
