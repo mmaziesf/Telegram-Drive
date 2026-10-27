@@ -9,6 +9,7 @@
 - `PRIVACY.md`, `SECURITY.md`, `AGENTS.md`, `TESTING.md` and the README say the app shows no ads and takes no payments. Historical upstream records keep their text and carry a banner.
 - Add `node scripts/check-no-ads.cjs`, which fails when a tracked file names an ad network, a payment or donation provider, the DoH fallback or a spoofed Chrome User-Agent. It runs on every pull request in its own workflow and in release preflight, and the assurance suite checks that it catches each kind of reference. Browser journeys assert that sign-in, the workspace and settings show no donation, purchase or sponsor content and no iframe.
 - Dependabot no longer watches `supporter-service/`, and `.gitignore` drops its entries.
+- `check-no-ads.cjs` skips `.gitleaksignore`: its fingerprints must name the removed ad components that hold reviewed historic gitleaks findings.
 - Release preflight no longer checks a supporter service and accepts a README without download links.
 - Kept: the Android Kotlin entry points `get/put/deleteSupporterSecret` keep their names because they are the JNI contract for the API-hash store and the Android sources are not in this repository.
 
