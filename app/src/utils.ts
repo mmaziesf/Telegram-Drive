@@ -6,10 +6,7 @@ export {
   isImageFile,
   isMediaFile,
   isPdfFile,
-  isRarFile,
-  isSevenZFile,
   isVideoFile,
-  isZipFile,
   sanitizeFilename,
 } from './utils/files';
 export {
@@ -18,4 +15,3 @@ export {
   type FileDialogFallbackOptions,
 } from './utils/dialogs';
 export { copyToClipboard, nativeShareOrCopy } from './utils/sharing';
-export { createDragGhost } from './utils/drag';
