@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+### No referrers from local servers or the WebView; token risk documented
+
+- Every response from the streaming/share, REST API and WebDAV servers, including the 421 refusals, now carries `Referrer-Policy: no-referrer`. The WebView's `index.html` sets `<meta name="referrer" content="no-referrer">`, and `check-app-security.cjs` requires it. Stream URLs carry the session stream token in their query string, so no page may pass them on as a referrer.
+- Confirmed, with no change: the stream token is 16 random bytes generated in memory on each app start and never stored, so a restart rotates it. Nothing logs it. The log journey now also checks that a WebDAV capability path and a stream-token query are redacted.
+- `Docs/THREAT_MODEL.md` now explains why release builds keep accepting `Origin: null` (WebKit media requests; everything behind it still needs a token or key), and that removing it needs a macOS/Linux playback check. It also describes the remaining stream-token risk (the token sits in URLs, but loopback only, rotated on restart, no referrer, redacted from logs) and adds rows for DNS rebinding and share unlocks.
+
 ### Local servers check the Host header; dev origin is debug-only
 
 - The streaming/share server, the REST API server and the WebDAV server now refuse with 421 any request whose `Host` is not `127.0.0.1:<port>` or `localhost:<port>` for the port they are bound to. They already bound loopback only, but a web page could point a domain it controls at 127.0.0.1 (DNS rebinding) and then talk to them as its own origin. The check runs before CORS, the API key check and routing. A native journey covers all three servers with a rebound name, a lookalike, the wrong port and a bare name.
