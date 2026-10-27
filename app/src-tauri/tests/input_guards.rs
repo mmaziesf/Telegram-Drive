@@ -134,3 +134,32 @@ fn upload_urls_naming_local_hosts_are_refused_before_any_lookup() {
         assert_eq!(validate_remote_url_syntax(&url), Ok(()), "{text}");
     }
 }
+
+#[test]
+fn folder_group_names_and_colours_are_bounded() {
+    use app_lib::commands::folder_groups::validate_group_fields;
+
+    assert_eq!(validate_group_fields("Work", "#3B82F6"), Ok(()));
+    assert_eq!(validate_group_fields("Ünïcödé 📁", "#ef4444"), Ok(()));
+    assert_eq!(validate_group_fields(&"é".repeat(64), "#10B981"), Ok(()));
+    for (name, colour) in [
+        ("", "#3B82F6"),
+        ("   ", "#3B82F6"),
+        ("line\nbreak", "#3B82F6"),
+        ("bell\u{7}", "#3B82F6"),
+        ("Work", "3B82F6"),
+        ("Work", "#3B8"),
+        ("Work", "#3B82F6FF"),
+        ("Work", "#GGGGGG"),
+        ("Work", "red"),
+        ("Work", "#3B82F6;background:url(x)"),
+        ("Work", "url(https://example.com/x)"),
+    ] {
+        assert!(
+            validate_group_fields(name, colour).is_err(),
+            "{name:?} / {colour:?} must be refused"
+        );
+    }
+    assert!(validate_group_fields(&"x".repeat(65), "#3B82F6").is_err());
+    assert!(validate_group_fields(&"x".repeat(100_000), "#3B82F6").is_err());
+}
