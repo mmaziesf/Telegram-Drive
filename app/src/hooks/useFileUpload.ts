@@ -565,6 +565,9 @@ export function useFileUpload(
             await Promise.all(preparedPaths
                 .filter(candidate => candidate.androidStaged)
                 .map(candidate => invoke('cmd_delete_android_staged_upload', { path: candidate.path }).catch(() => undefined)));
+            // ACCOUNT_CHANGED is a control-flow signal: after an account switch the
+            // staging error no longer matters, so it is not attached as a cause.
+            // eslint-disable-next-line preserve-caught-error
             if (!isCurrent()) throw new Error('ACCOUNT_CHANGED');
             toast.error(`Android could not preserve the selected file for background recovery: ${String(error)}`);
             return 0;

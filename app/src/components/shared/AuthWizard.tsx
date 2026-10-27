@@ -36,12 +36,18 @@ function AuthThemeToggle() {
         </button>
     );
 }
+/**
+ * Sign-in flow. Outside the desktop shell (a plain browser tab) there is no
+ * native backend, so only a notice to open the app window is shown.
+ */
 export function AuthWizard({ onLogin }: { onLogin: () => void }) {
-    const { t } = useTranslation();
     const isBrowser = typeof window !== 'undefined' && !('__TAURI_INTERNALS__' in window);
+    return isBrowser ? <DesktopRequiredNotice /> : <AuthFlow onLogin={onLogin} />;
+}
 
-    if (isBrowser) {
-        return (
+function DesktopRequiredNotice() {
+    const { t } = useTranslation();
+    return (
             <div className="auth-gradient flex h-full items-center justify-center p-6 text-center text-app-text">
               <div className="quiet-raised max-w-md p-6">
                 <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-container bg-app-danger/10">
@@ -56,9 +62,11 @@ export function AuthWizard({ onLogin }: { onLogin: () => void }) {
                 </div>
               </div>
             </div>
-        )
-    }
+    );
+}
 
+function AuthFlow({ onLogin }: { onLogin: () => void }) {
+    const { t } = useTranslation();
     const [step, setStep] = useState<AuthStep>("setup");
     const [loading, setLoading] = useState(false);
 
