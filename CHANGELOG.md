@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+### TDENC2 fuzz targets
+
+- Add `app/src-tauri/fuzz`, a cargo-fuzz research harness outside the app build, CI and release, with its own workspace and lockfile. `envelope_header` feeds arbitrary bytes to the header parser, metadata verification and decrypter setup; `envelope_decrypt` feeds forged ciphertext, in input-chosen fragments, behind a valid header and aborts if any of it authenticates. Local 10-minute smoke runs found no crash: `envelope_header` ran 112,243,538 inputs (seeded with the known-answer envelopes, which raised its coverage from 111 to 416 edges) and `envelope_decrypt` ran 10,765,974. The 24-hour run is still pending. TESTING.md, Docs/CRYPTO.md, Docs/TDENC2_FORMAT.md and Docs/RELEASE_ACCEPTANCE.md describe the harness and its status.
+
 ### Upload concurrency limit
 
 - New installs now upload 2 files at a time instead of 6, and the setting goes up to 4 instead of 10 (the transfer engine accepted up to 32). The Telegram client sends each file over 10 MB with four parallel part workers, so 6 files meant about 24 concurrent part uploads on one account and 10 meant about 40; that is the kind of burst Telegram answers with FLOOD_WAIT and may flag as abuse. With 4 files the peak is 16. A higher value saved or synced by an older version is lowered to 4 when the settings load, by the desktop upload queue and by `cmd_transfer_set_limits`; synced settings still accept up to 32 so older devices can sync. Download limits are unchanged. `upload-concurrency.spec.ts` covers the default, the new maximum and the lowering of an old value.

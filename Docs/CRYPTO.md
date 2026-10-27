@@ -57,7 +57,7 @@ Known-answer tests are in `app/src-tauri/tests/crypto_kat.rs`; run them with `ca
 | HKDF-SHA-256 matches RFC 5869 | `hkdf_sha256_matches_rfc_5869_test_case_3` |
 | A body longer or shorter than the declared size is rejected, as is an edited declared size | `a_body_that_differs_from_the_declared_size_is_rejected`, `an_edited_declared_size_is_rejected` |
 
-The vectors use a fixed key slot whose wrapped DEK is opaque bytes, so they do not cover DEK wrapping; `key_slots_round_trip_and_bind_every_parameter` covers that. Fuzzing is not done yet.
+The vectors use a fixed key slot whose wrapped DEK is opaque bytes, so they do not cover DEK wrapping; `key_slots_round_trip_and_bind_every_parameter` covers that. The header parser and decrypter have libFuzzer targets in `app/src-tauri/fuzz`; only 10-minute local smoke runs have been done, and a 24-hour run is pending.
 
 ## What is not encrypted by the app
 
