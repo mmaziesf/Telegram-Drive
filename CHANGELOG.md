@@ -5,6 +5,7 @@
 - README: the notice now says that this is a fork of caamer20/Telegram-Drive, that the original code is © its author with no license granted, that no releases are published and that the app uses the Telegram API with the user's own credentials. A "Security hardening by Grok Bot" section links each change to its pull request and evidence, and a "Known limitations" section lists what is not covered.
 - Add `Docs/THREAT_MODEL.md` (assets, adversaries, controls with code references, known limitations) and `Docs/CRYPTO.md` (primitives, parameters and the tests behind each encryption claim).
 - Add `CONTRIBUTING.md` and a pull-request template.
+- The README states that #4's dependency updates reached `main` through #6 without GitHub's Windows and macOS builds, and that GitHub Actions is disabled for this repository. It also lists #16.
 
 ### No ads, payments or donations
 
