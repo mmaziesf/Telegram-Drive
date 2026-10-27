@@ -1986,9 +1986,10 @@ pub fn cmd_transfer_set_limits(
     max_downloads: usize,
     engine: State<'_, Arc<TransferEngine>>,
 ) -> Result<(), String> {
-    engine
-        .max_uploads
-        .store(max_uploads.clamp(1, MAX_CONCURRENT_UPLOADS), Ordering::Relaxed);
+    engine.max_uploads.store(
+        max_uploads.clamp(1, MAX_CONCURRENT_UPLOADS),
+        Ordering::Relaxed,
+    );
     engine
         .max_downloads
         .store(max_downloads.clamp(1, 32), Ordering::Relaxed);
