@@ -28,6 +28,10 @@ Individual suites:
 
 `npm test` is an alias for `test:e2e` in both JavaScript projects. `visual:test` and `visual:update` remain browser tooling aliases. The native E2E driver is feature-gated and is excluded from normal application builds.
 
+## Fuzzing (research harness)
+
+`app/src-tauri/fuzz` holds cargo-fuzz targets for the TDENC2 header parser (`envelope_header`) and decrypter (`envelope_decrypt`). They are not part of CI or the release and need a nightly toolchain; `app/src-tauri/fuzz/README.md` gives the commands, including seeding the header target with the known-answer envelopes. Status: 10-minute local smoke runs of each target found no crash (112,243,538 and 10,765,974 inputs); the 24-hour run is pending. A crashing input should become a native regression test before the fix.
+
 ## Static checks and builds
 
 E2E-only describes behavioral tests. Keep the independent checks that catch invalid configuration, type errors, dependency advisories, licensing problems, formatting issues, translation regressions, and oversized bundles:

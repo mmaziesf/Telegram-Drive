@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+### TDENC2 fuzz targets
+
+- Add `app/src-tauri/fuzz`, a cargo-fuzz research harness outside the app build, CI and release, with its own workspace and lockfile. `envelope_header` feeds arbitrary bytes to the header parser, metadata verification and decrypter setup; `envelope_decrypt` feeds forged ciphertext, in input-chosen fragments, behind a valid header and aborts if any of it authenticates. Local 10-minute smoke runs found no crash: `envelope_header` ran 112,243,538 inputs (seeded with the known-answer envelopes, which raised its coverage from 111 to 416 edges) and `envelope_decrypt` ran 10,765,974. The 24-hour run is still pending. TESTING.md, Docs/CRYPTO.md, Docs/TDENC2_FORMAT.md and Docs/RELEASE_ACCEPTANCE.md describe the harness and its status.
+
 ### Preview cache drop-order regression test
 
 - The lease a detached legacy preview hash holds is now built by `legacy_lease` in `workspace/assets.rs`, which documents why the legacy file claim must drop before the capacity, file and category guards (the race fixed in #14). The native test `legacy_hash_lease_releases_the_file_claim_before_the_category_guard` drops a lease built by that function and checks the release order; it fails with the pre-#14 order. It checks the order only; it does not replay the timing race. The README hardening row for #14 now names the test.
