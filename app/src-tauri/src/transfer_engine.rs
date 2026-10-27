@@ -41,6 +41,9 @@ const SUPERVISED_OFFLINE_GRACE: std::time::Duration = std::time::Duration::from_
 const WITHDRAW_SETTLE_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(10);
 /// `origin` of a transfer Folder Sync runs and waits for.
 pub const ORIGIN_SYNC: &str = "sync";
+/// Most uploads the engine runs at once. Each file over 10 MB is sent by four
+/// parallel part workers, so this caps one account at sixteen part uploads.
+const MAX_CONCURRENT_UPLOADS: usize = 4;
 
 const DATABASE_SCHEMA: &str = r#"
 PRAGMA journal_mode = WAL;
@@ -626,7 +629,7 @@ impl TransferEngine {
             progress_checkpoints: AsyncMutex::new(HashMap::new()),
             notify: Notify::new(),
             changes: Notify::new(),
-            max_uploads: AtomicUsize::new(6),
+            max_uploads: AtomicUsize::new(2),
             max_downloads: AtomicUsize::new(6),
             shutting_down: AtomicBool::new(false),
         }))
@@ -1985,7 +1988,7 @@ pub fn cmd_transfer_set_limits(
 ) -> Result<(), String> {
     engine
         .max_uploads
-        .store(max_uploads.clamp(1, 32), Ordering::Relaxed);
+        .store(max_uploads.clamp(1, MAX_CONCURRENT_UPLOADS), Ordering::Relaxed);
     engine
         .max_downloads
         .store(max_downloads.clamp(1, 32), Ordering::Relaxed);
