@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+### Folder group names and colours are checked
+
+- Creating or editing a folder group now refuses an empty name, a name longer than 64 characters, or one with control characters. The colour must be a `#RRGGBB` hex value. It is used as a CSS colour in the sidebar, so values like `url(...)` or extra declarations are refused. The desktop name field is limited to 64 characters (RT-15).
+
 ### Upload-from-URL refuses more reserved and local addresses
 
 - "Upload from URL" (and the crash reporter's endpoint check) now share one address guard. It refuses every IPv4 block in the IANA special-purpose registry that is not globally reachable, adding `192.88.99.0/24`. For IPv6 it only allows global unicast `2000::/3`, minus IETF assignments, Teredo and benchmarking (`2001::/23`) and documentation (`2001:db8::/32`, `3fff::/20`). IPv4-mapped, NAT64 `64:ff9b::/96` and 6to4 `2002::/16` addresses are judged by the IPv4 address inside them. IPv4-compatible `::/96`, local-use NAT64 `64:ff9b:1::/48`, `fec0::/10` site-local and SRv6 `5f00::/16` are refused.

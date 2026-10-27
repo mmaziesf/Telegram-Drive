@@ -233,6 +233,7 @@ export function Sidebar({
                                         className="quiet-control h-8 w-full border border-app-border bg-app-surface-sunken/50 px-2 text-ui text-app-text outline-none"
                                         placeholder={t('common.enter_group_name')}
                                         value={groupName}
+                                        maxLength={64}
                                         onChange={e => setGroupName(e.target.value)}
                                     />
                                 </div>
