@@ -1,6 +1,6 @@
 {
   "common": {
-    "app_title": "Telegram Drive",
+    "app_title": "Unofficial Telegram Drive",
     "logout": "Sair",
     "signout_remote_unconfirmed": "Você saiu neste dispositivo, mas o Telegram não confirmou o encerramento da sessão. Abra Telegram → Configurações → Dispositivos e encerre-a por lá.",
     "search_placeholder": "Buscar arquivos...",
@@ -213,7 +213,7 @@
     "copy_share_link": "Copiar link de compartilhamento",
     "revoke_link": "Revogar link",
     "copy_diagnostics": "Copiar diagnóstico",
-    "tagline": "Um espaço de trabalho de arquivos com prioridade local, usando sua conta do Telegram. Código aberto e gratuito para usar.",
+    "tagline": "Um espaço de trabalho de arquivos com prioridade local, usando sua conta do Telegram. Gratuito para usar.",
     "reset_defaults": "Restaurar padrões",
     "done": "Concluído",
     "auto": "Automático",
@@ -539,7 +539,7 @@
     "donate": "Doar",
     "getting_started": "Primeiros passos",
     "close_help": "Fechar ajuda",
-    "privacy_note": "Suas credenciais ficam armazenadas localmente no seu dispositivo e nunca são enviadas a servidores de terceiros. Todos os dados são transferidos diretamente entre você e o Telegram.",
+    "privacy_note": "Seu API ID, seu API hash e sua sessão do Telegram ficam armazenados neste dispositivo e são enviados somente ao Telegram. Alguns recursos se conectam a outros serviços, como anúncios e licenças de apoiador.",
     "code_sent_telegram_app": "O Telegram enviou o código de acesso para a conversa verificada do Telegram em um dos seus dispositivos conectados.",
     "code_sent_sms": "O Telegram enviou o código de acesso por SMS.",
     "code_sent_call": "O Telegram ligará para você e lerá o código de acesso.",
@@ -1472,7 +1472,7 @@
   },
   "auth_copy": {
     "qr_title": "Entrada segura por QR",
-    "qr_description": "A entrada no desktop usa o fluxo QR de dispositivos do Telegram. O Telegram ainda exige API ID e hash, informados uma vez, para identificar este cliente de código aberto.",
+    "qr_description": "A entrada no desktop usa o fluxo QR de dispositivos do Telegram. O Telegram ainda exige API ID e hash, informados uma vez, para identificar este cliente.",
     "advanced": "Credenciais avançadas do cliente",
     "continue_phone": "Continuar para entrada por telefone",
     "continue_qr": "Continuar para entrada por QR",

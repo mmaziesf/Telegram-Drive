@@ -1,6 +1,6 @@
 {
   "common": {
-    "app_title": "Telegram Drive",
+    "app_title": "Unofficial Telegram Drive",
     "logout": "Se déconnecter",
     "signout_remote_unconfirmed": "Vous êtes déconnecté sur cet appareil, mais Telegram n'a pas confirmé la fin de la session. Ouvrez Telegram → Paramètres → Appareils et terminez-la à cet endroit.",
     "search_placeholder": "Rechercher des fichiers...",
@@ -213,7 +213,7 @@
     "copy_share_link": "Copier le lien de partage",
     "revoke_link": "Révoquer le lien",
     "copy_diagnostics": "Copier le diagnostic",
-    "tagline": "Un espace de travail local pour vos fichiers, alimenté par votre compte Telegram. Open source et gratuit.",
+    "tagline": "Un espace de travail local pour vos fichiers, alimenté par votre compte Telegram. Gratuit.",
     "reset_defaults": "Rétablir les valeurs par défaut",
     "done": "Terminé",
     "auto": "Automatique",
@@ -539,7 +539,7 @@
     "donate": "Faire un don",
     "getting_started": "Premiers pas",
     "close_help": "Fermer l’aide",
-    "privacy_note": "Vos identifiants sont stockés localement sur votre appareil et ne sont jamais envoyés à des serveurs tiers. Toutes les données circulent directement entre vous et Telegram.",
+    "privacy_note": "Votre API ID, votre API hash et votre session Telegram sont stockés sur cet appareil et envoyés uniquement à Telegram. Certaines fonctions contactent d’autres services, comme la publicité et les licences de soutien.",
     "code_sent_telegram_app": "Telegram a envoyé le code de connexion dans la conversation Telegram vérifiée sur l'un de vos appareils connectés.",
     "code_sent_sms": "Telegram a envoyé le code de connexion par SMS.",
     "code_sent_call": "Telegram va vous appeler et lire le code de connexion à voix haute.",
@@ -1472,7 +1472,7 @@
   },
   "auth_copy": {
     "qr_title": "Connexion sécurisée par QR",
-    "qr_description": "La connexion sur ordinateur utilise le processus QR de Telegram pour les appareils. Telegram exige toujours un API ID et un hash, saisis une fois, pour identifier ce client open source.",
+    "qr_description": "La connexion sur ordinateur utilise le processus QR de Telegram pour les appareils. Telegram exige toujours un API ID et un hash, saisis une fois, pour identifier ce client.",
     "advanced": "Identifiants avancés du client",
     "continue_phone": "Continuer vers la connexion par téléphone",
     "continue_qr": "Continuer vers la connexion par QR",

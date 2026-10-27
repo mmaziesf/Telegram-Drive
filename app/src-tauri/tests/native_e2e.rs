@@ -6243,7 +6243,7 @@ fn desktop_notifications_tray_tracks_saved_and_runtime_language_without_a_transf
     app.ok(json!({"command":"notifications_start"}));
     let tray = app.ok(json!({"command":"notification_tray"}));
     assert_eq!(tray["status"], "Telegram Drive — En pausa: 1");
-    assert_eq!(tray["open"], "Abrir Telegram Drive");
+    assert_eq!(tray["open"], "Abrir Unofficial Telegram Drive");
     assert_eq!(tray["quit"], "Salir de Telegram Drive");
     assert_eq!(tray["resume_enabled"], true);
     assert_eq!(tray["pause_enabled"], false);

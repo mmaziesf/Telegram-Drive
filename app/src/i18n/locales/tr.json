@@ -1,6 +1,6 @@
 {
   "common": {
-    "app_title": "Telegram Drive",
+    "app_title": "Unofficial Telegram Drive",
     "logout": "Çıkış Yap",
     "signout_remote_unconfirmed": "Bu cihazda oturum kapatıldı, ancak Telegram oturumun sonlandırıldığını doğrulamadı. Telegram → Ayarlar → Cihazlar bölümünü açıp oturumu oradan sonlandırın.",
     "search_placeholder": "Dosya ara...",
@@ -213,7 +213,7 @@
     "copy_share_link": "Paylaşım bağlantısını kopyala",
     "revoke_link": "Bağlantıyı iptal et",
     "copy_diagnostics": "Tanı bilgilerini kopyala",
-    "tagline": "Telegram hesabınızla çalışan, yerel öncelikli bir dosya çalışma alanı. Açık kaynaklı ve ücretsiz.",
+    "tagline": "Telegram hesabınızla çalışan, yerel öncelikli bir dosya çalışma alanı. Ücretsiz.",
     "reset_defaults": "Varsayılanları geri yükle",
     "done": "Bitti",
     "auto": "Otomatik",
@@ -535,7 +535,7 @@
     "donate": "Bağış yap",
     "getting_started": "Başlarken",
     "close_help": "Yardımı kapat",
-    "privacy_note": "Kimlik bilgileriniz cihazınızda yerel olarak saklanır ve hiçbir zaman üçüncü taraf sunuculara gönderilmez. Tüm veriler doğrudan sizinle Telegram arasında aktarılır.",
+    "privacy_note": "API ID, API hash ve Telegram oturumunuz bu cihazda saklanır ve yalnızca Telegram’a gönderilir. Bazı özellikler reklamlar ve destekçi lisansları gibi başka hizmetlere bağlanır.",
     "code_sent_telegram_app": "Telegram, giriş kodunu oturum açık cihazlarınızdan birindeki doğrulanmış Telegram sohbetine gönderdi.",
     "code_sent_sms": "Telegram giriş kodunu SMS ile gönderdi.",
     "code_sent_call": "Telegram sizi arayacak ve giriş kodunu sesli olarak okuyacak.",
@@ -1465,7 +1465,7 @@
   },
   "auth_copy": {
     "qr_title": "QR ile güvenli giriş",
-    "qr_description": "Masaüstü girişinde Telegram’ın QR cihaz akışı kullanılır. Telegram, bu açık kaynaklı istemciyi tanımak için bir kez API ID ve hash girilmesini yine gerektirir.",
+    "qr_description": "Masaüstü girişinde Telegram’ın QR cihaz akışı kullanılır. Telegram, bu istemciyi tanımak için bir kez API ID ve hash girilmesini yine gerektirir.",
     "advanced": "Gelişmiş istemci kimlik bilgileri",
     "continue_phone": "Telefonla girişe devam et",
     "continue_qr": "QR ile girişe devam et",

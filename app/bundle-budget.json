@@ -3,8 +3,8 @@
   "maxJavaScriptChunkBytes": 550000,
   "maxTotalJavaScriptBytes": 3300000,
   "maxTotalCssBytes": 140000,
-  "maxTotalLocaleDataBytes": 1988882,
-  "maxLocaleDataBytes": 141328,
+  "maxTotalLocaleDataBytes": 1988902,
+  "maxLocaleDataBytes": 141256,
   "routeJavaScriptBudgets": {
     "src/components/desktop/DesktopDashboard.tsx": 302500
   },
@@ -15,5 +15,5 @@
     "src/components/desktop/dashboard/ArchiveViewerModal.tsx": 25000,
     "node_modules/hls.js/dist/hls.mjs": 540000
   },
-  "policy": "Initial JavaScript, desktop route and Settings ceilings were lowered after measured P2 reductions. Other reviewed ceilings remain unchanged. The PDF viewer feature ceiling rose from 500000 to 510000 for the PDF.js 6 security upgrade (GHSA-hq66-cqwq-w95j); the chunk loads only when a PDF is opened. Locale-only ceilings include the existing reviewed 24-language supporter UI expansion, the shared key dictionary and every canonical translated value. Further increases require a performance review. The 4.1.0 performance review adds exactly 9002 canonical locale bytes (0.461%) and 611 bytes to the largest catalog for four caption/reload labels in all 24 locales. Dictionary plus English grows 368 bytes; dictionary plus the largest selected catalog grows 744 bytes, with unchanged loading requests. JavaScript, CSS, route, feature and literal ceilings are unchanged. The encryption-on-by-default security change (first-run encryption setup, plaintext warnings) adds exactly 27446 canonical locale bytes (1.40%) and 1927 bytes to the largest catalog for 15 new strings in all 24 locales, and raises the desktop route ceiling from 302000 to 302500 bytes (measured 302466) for the setup check; the setup dialog itself is lazy-loaded only when shown."
+  "policy": "Initial JavaScript, desktop route and Settings ceilings were lowered after measured P2 reductions. Other reviewed ceilings remain unchanged. The PDF viewer feature ceiling rose from 500000 to 510000 for the PDF.js 6 security upgrade (GHSA-hq66-cqwq-w95j); the chunk loads only when a PDF is opened. Locale-only ceilings include the existing reviewed 24-language supporter UI expansion, the shared key dictionary and every canonical translated value. Further increases require a performance review. The 4.1.0 performance review adds exactly 9002 canonical locale bytes (0.461%) and 611 bytes to the largest catalog for four caption/reload labels in all 24 locales. Dictionary plus English grows 368 bytes; dictionary plus the largest selected catalog grows 744 bytes, with unchanged loading requests. JavaScript, CSS, route, feature and literal ceilings are unchanged. The Telegram API ToS rename (common.app_title becomes \"Unofficial Telegram Drive\") adds exactly 290 canonical locale bytes and 11 bytes to the largest catalog; nothing else changes. The encryption-on-by-default security change (first-run encryption setup, plaintext warnings) adds exactly 27176 canonical locale bytes (1.39%) and 1844 bytes to the largest catalog for 15 new strings in all 24 locales, and raises the desktop route ceiling from 302000 to 302500 bytes (measured 302466) for the setup check; the setup dialog itself is lazy-loaded only when shown."
 }

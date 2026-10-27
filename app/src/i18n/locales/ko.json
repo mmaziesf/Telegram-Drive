@@ -1,6 +1,6 @@
 {
   "common": {
-    "app_title": "Telegram Drive",
+    "app_title": "Unofficial Telegram Drive",
     "logout": "로그아웃",
     "signout_remote_unconfirmed": "이 기기에서 로그아웃했지만 Telegram에서 세션 종료를 확인하지 않았습니다. Telegram → 설정 → 기기를 열어 해당 세션을 종료하세요.",
     "search_placeholder": "파일 검색...",
@@ -213,7 +213,7 @@
     "copy_share_link": "공유 링크 복사",
     "revoke_link": "링크 취소",
     "copy_diagnostics": "진단 정보 복사",
-    "tagline": "Telegram 계정을 기반으로 하는 로컬 우선 파일 작업 공간입니다. 오픈 소스이며 무료로 사용할 수 있습니다.",
+    "tagline": "Telegram 계정을 기반으로 하는 로컬 우선 파일 작업 공간입니다. 무료로 사용할 수 있습니다.",
     "reset_defaults": "기본 설정으로 초기화",
     "done": "완료",
     "auto": "자동",
@@ -535,7 +535,7 @@
     "donate": "기부",
     "getting_started": "시작하기",
     "close_help": "도움말 닫기",
-    "privacy_note": "자격 증명은 기기에 로컬로 저장되며 타사 서버로 전송되지 않습니다. 모든 데이터는 사용자와 Telegram 사이에서 직접 전송됩니다.",
+    "privacy_note": "API ID, API hash 및 Telegram 세션은 이 기기에 저장되며 Telegram으로만 전송됩니다. 일부 기능은 광고, 후원자 라이선스 등 다른 서비스에 연결합니다.",
     "code_sent_telegram_app": "Telegram이 로그인된 기기의 인증된 Telegram 채팅으로 로그인 코드를 보냈습니다.",
     "code_sent_sms": "Telegram이 SMS로 로그인 코드를 보냈습니다.",
     "code_sent_call": "Telegram이 전화로 로그인 코드를 읽어 줍니다.",
@@ -1465,7 +1465,7 @@
   },
   "auth_copy": {
     "qr_title": "QR로 안전하게 로그인",
-    "qr_description": "데스크톱 로그인은 Telegram의 QR 기기 연결 절차를 사용합니다. Telegram은 이 오픈 소스 클라이언트를 식별하기 위해 API ID와 해시를 한 번 입력하도록 요구합니다.",
+    "qr_description": "데스크톱 로그인은 Telegram의 QR 기기 연결 절차를 사용합니다. Telegram은 이 클라이언트를 식별하기 위해 API ID와 해시를 한 번 입력하도록 요구합니다.",
     "advanced": "고급 클라이언트 인증 정보",
     "continue_phone": "전화번호 로그인으로 계속",
     "continue_qr": "QR 로그인으로 계속",

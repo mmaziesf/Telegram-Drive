@@ -9,7 +9,7 @@ async function upsertDraft(github, context, tag, body) {
   const data = { ...repo, body, draft: true, prerelease: policy.prerelease, make_latest: 'false' };
   const response = matches.length
     ? await github.rest.repos.updateRelease({ ...data, release_id: matches[0].id })
-    : await github.rest.repos.createRelease({ ...data, tag_name: tag, name: `Telegram Drive ${tag}` });
+    : await github.rest.repos.createRelease({ ...data, tag_name: tag, name: `Unofficial Telegram Drive ${tag}` });
   return response.data.id;
 }
 async function publish(github, context, releaseId, tag) {

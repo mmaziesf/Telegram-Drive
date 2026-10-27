@@ -1,6 +1,6 @@
 {
   "common": {
-    "app_title": "Telegram Drive",
+    "app_title": "Unofficial Telegram Drive",
     "logout": "Abmelden",
     "signout_remote_unconfirmed": "Auf diesem Gerät abgemeldet, aber Telegram hat das Beenden der Sitzung nicht bestätigt. Öffne Telegram → Einstellungen → Geräte und beende sie dort.",
     "search_placeholder": "Dateien suchen...",
@@ -213,7 +213,7 @@
     "copy_share_link": "Freigabelink kopieren",
     "revoke_link": "Link widerrufen",
     "copy_diagnostics": "Diagnose kopieren",
-    "tagline": "Ein lokal ausgerichteter Datei-Arbeitsbereich auf Basis deines Telegram-Kontos. Open Source und kostenlos nutzbar.",
+    "tagline": "Ein lokal ausgerichteter Datei-Arbeitsbereich auf Basis deines Telegram-Kontos. Kostenlos nutzbar.",
     "reset_defaults": "Standardwerte wiederherstellen",
     "done": "Fertig",
     "auto": "Automatisch",
@@ -535,7 +535,7 @@
     "donate": "Spenden",
     "getting_started": "Erste Schritte",
     "close_help": "Hilfe schließen",
-    "privacy_note": "Deine Zugangsdaten bleiben lokal auf deinem Gerät und werden nie an Drittanbieter-Server gesendet. Alle Daten werden direkt zwischen dir und Telegram übertragen.",
+    "privacy_note": "Deine API ID, dein API-Hash und deine Telegram-Sitzung werden auf diesem Gerät gespeichert und nur an Telegram gesendet. Einige Funktionen kontaktieren andere Dienste, etwa für Werbung und Unterstützerlizenzen.",
     "code_sent_telegram_app": "Telegram hat den Anmeldecode an den verifizierten Telegram-Chat auf einem deiner angemeldeten Geräte gesendet.",
     "code_sent_sms": "Telegram hat den Anmeldecode per SMS gesendet.",
     "code_sent_call": "Telegram ruft dich an und liest den Anmeldecode vor.",
@@ -1465,7 +1465,7 @@
   },
   "auth_copy": {
     "qr_title": "Sichere Anmeldung per QR",
-    "qr_description": "Die Desktop-Anmeldung nutzt Telegrams QR-Verfahren für Geräte. Telegram benötigt weiterhin einmalig API ID und Hash, um diesen quelloffenen Client zu identifizieren.",
+    "qr_description": "Die Desktop-Anmeldung nutzt Telegrams QR-Verfahren für Geräte. Telegram benötigt weiterhin einmalig API ID und Hash, um diesen Client zu identifizieren.",
     "advanced": "Erweiterte Client-Zugangsdaten",
     "continue_phone": "Weiter zur Anmeldung per Telefon",
     "continue_qr": "Weiter zur Anmeldung per QR",

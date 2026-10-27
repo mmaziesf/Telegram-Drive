@@ -1,6 +1,6 @@
 {
   "common": {
-    "app_title": "Telegram Drive",
+    "app_title": "Unofficial Telegram Drive",
     "logout": "ログアウト",
     "signout_remote_unconfirmed": "このデバイスではサインアウトしましたが、Telegram はセッションの終了を確認しませんでした。Telegram → 設定 → デバイス を開き、そこでセッションを終了してください。",
     "search_placeholder": "ファイルを検索...",
@@ -213,7 +213,7 @@
     "copy_share_link": "共有リンクをコピー",
     "revoke_link": "リンクを失効",
     "copy_diagnostics": "診断情報をコピー",
-    "tagline": "Telegram アカウントを活用する、ローカルファーストのファイルワークスペース。オープンソースで無料で利用できます。",
+    "tagline": "Telegram アカウントを活用する、ローカルファーストのファイルワークスペース。無料で利用できます。",
     "reset_defaults": "既定値に戻す",
     "done": "完了",
     "auto": "自動",
@@ -535,7 +535,7 @@
     "donate": "寄付",
     "getting_started": "はじめに",
     "close_help": "ヘルプを閉じる",
-    "privacy_note": "認証情報はこのデバイス内に保存され、第三者のサーバーへ送信されることはありません。すべてのデータはユーザーと Telegram の間で直接送受信されます。",
+    "privacy_note": "API ID、API hash、Telegram セッションはこのデバイスに保存され、Telegram にのみ送信されます。一部の機能は、広告やサポーターライセンスなど、他のサービスに接続します。",
     "code_sent_telegram_app": "Telegramは、ログイン済みデバイスの認証済みTelegramチャットにログインコードを送信しました。",
     "code_sent_sms": "TelegramはログインコードをSMSで送信しました。",
     "code_sent_call": "Telegramから電話があり、ログインコードが読み上げられます。",
@@ -1465,7 +1465,7 @@
   },
   "auth_copy": {
     "qr_title": "QRを優先する安全なサインイン",
-    "qr_description": "デスクトップのサインインはTelegramのQRデバイス連携を使用します。このオープンソースクライアントを識別するため、Telegramは引き続きAPI IDとハッシュの初回入力を必要とします。",
+    "qr_description": "デスクトップのサインインはTelegramのQRデバイス連携を使用します。このクライアントを識別するため、Telegramは引き続きAPI IDとハッシュの初回入力を必要とします。",
     "advanced": "高度なクライアント認証情報",
     "continue_phone": "電話番号でのサインインへ進む",
     "continue_qr": "QRでのサインインへ進む",

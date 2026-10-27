@@ -1,6 +1,6 @@
 {
   "common": {
-    "app_title": "Telegram Drive",
+    "app_title": "Unofficial Telegram Drive",
     "logout": "Cerrar sesión",
     "signout_remote_unconfirmed": "Se cerró la sesión en este dispositivo, pero Telegram no confirmó que la sesión haya finalizado. Abre Telegram → Ajustes → Dispositivos y ciérrala allí.",
     "search_placeholder": "Buscar archivos...",
@@ -213,7 +213,7 @@
     "copy_share_link": "Copiar enlace compartido",
     "revoke_link": "Revocar enlace",
     "copy_diagnostics": "Copiar diagnóstico",
-    "tagline": "Un espacio de trabajo de archivos local, impulsado por tu cuenta de Telegram. De código abierto y de uso gratuito.",
+    "tagline": "Un espacio de trabajo de archivos local, impulsado por tu cuenta de Telegram. De uso gratuito.",
     "reset_defaults": "Restablecer valores predeterminados",
     "done": "Listo",
     "auto": "Automático",
@@ -539,7 +539,7 @@
     "donate": "Donar",
     "getting_started": "Primeros pasos",
     "close_help": "Cerrar ayuda",
-    "privacy_note": "Sus credenciales se almacenan localmente en su dispositivo y nunca se envían a servidores de terceros.",
+    "privacy_note": "Tu API ID, tu API hash y tu sesión de Telegram se guardan en este dispositivo y solo se envían a Telegram. Algunas funciones contactan otros servicios, como anuncios y licencias de colaborador.",
     "code_sent_telegram_app": "Telegram envió el código de inicio de sesión al chat verificado de Telegram en uno de tus dispositivos conectados.",
     "code_sent_sms": "Telegram envió el código de inicio de sesión por SMS.",
     "code_sent_call": "Telegram te llamará y leerá el código de inicio de sesión en voz alta.",
@@ -1472,7 +1472,7 @@
   },
   "auth_copy": {
     "qr_title": "Inicio de sesión seguro con QR",
-    "qr_description": "El inicio de sesión en escritorio usa el flujo de dispositivos QR de Telegram. Telegram sigue necesitando un API ID y un hash, introducidos una vez, para identificar este cliente de código abierto.",
+    "qr_description": "El inicio de sesión en escritorio usa el flujo de dispositivos QR de Telegram. Telegram sigue necesitando un API ID y un hash, introducidos una vez, para identificar este cliente.",
     "advanced": "Credenciales avanzadas del cliente",
     "continue_phone": "Continuar al inicio de sesión por teléfono",
     "continue_qr": "Continuar al inicio de sesión con QR",

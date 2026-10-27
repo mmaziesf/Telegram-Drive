@@ -1,6 +1,6 @@
 {
   "common": {
-    "app_title": "Telegram Drive",
+    "app_title": "Unofficial Telegram Drive",
     "logout": "Esci",
     "signout_remote_unconfirmed": "Disconnessione eseguita su questo dispositivo, ma Telegram non ha confermato la chiusura della sessione. Apri Telegram → Impostazioni → Dispositivi e terminala lì.",
     "search_placeholder": "Cerca file...",
@@ -266,7 +266,7 @@
     "copy_share_link": "Copia link di condivisione",
     "revoke_link": "Revoca link",
     "copy_diagnostics": "Copia diagnostica",
-    "tagline": "Uno spazio di lavoro locale per i file, basato sul tuo account Telegram. Open source e gratuito.",
+    "tagline": "Uno spazio di lavoro locale per i file, basato sul tuo account Telegram. Gratuito.",
     "reset_defaults": "Ripristina impostazioni predefinite",
     "done": "Fine",
     "clear_local_cache": "Svuota cache locale",
@@ -539,7 +539,7 @@
     "donate": "Dona",
     "getting_started": "Per iniziare",
     "close_help": "Chiudi guida",
-    "privacy_note": "Le tue credenziali sono archiviate localmente sul dispositivo e non vengono mai inviate a server di terze parti. Tutti i dati passano direttamente tra te e Telegram.",
+    "privacy_note": "API ID, API hash e sessione Telegram sono salvati su questo dispositivo e inviati solo a Telegram. Alcune funzioni contattano altri servizi, come pubblicità e licenze sostenitore.",
     "code_sent_telegram_app": "Telegram ha inviato il codice di accesso alla chat verificata di Telegram su uno dei tuoi dispositivi connessi.",
     "code_sent_sms": "Telegram ha inviato il codice di accesso tramite SMS.",
     "code_sent_call": "Telegram ti chiamerà e leggerà ad alta voce il codice di accesso.",
@@ -1472,7 +1472,7 @@
   },
   "auth_copy": {
     "qr_title": "Accesso sicuro tramite QR",
-    "qr_description": "L’accesso desktop usa il flusso QR dei dispositivi Telegram. Telegram richiede ancora API ID e hash, inseriti una volta, per identificare questo client open source.",
+    "qr_description": "L’accesso desktop usa il flusso QR dei dispositivi Telegram. Telegram richiede ancora API ID e hash, inseriti una volta, per identificare questo client.",
     "advanced": "Credenziali avanzate del client",
     "continue_phone": "Continua all’accesso con telefono",
     "continue_qr": "Continua all’accesso con QR",
