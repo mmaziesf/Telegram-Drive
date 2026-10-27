@@ -4,6 +4,10 @@
 
 - Clearing previews while a cancelled legacy preview was still being hashed could leave that file on disk and still report success. The hashing worker now ends its claim on the file before it releases the cache category, so the waiting clear removes it.
 
+### Pull requests skip macOS runners and cancel superseded runs
+
+Pull requests now build Windows and Linux. Both macOS targets still run on every push to `main`, nightly and on manual dispatch. A new push to a pull request cancels that pull request's runs that are still going; runs on `main` are never cancelled. `scripts/check-workflow-pins.cjs` enforces both rules on every pull request that changes a workflow.
+
 ### Telegram session file protection
 
 - On Unix, `telegram.session` and its SQLite sidecars are now created owner-only (`0600`) inside an owner-only account directory (`0700`). The files are opened without following symlinks.

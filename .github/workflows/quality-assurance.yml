@@ -11,7 +11,8 @@ on:
       - 'scripts/e2e/**'
       - 'scripts/*smoke*'
       - 'supporter-service/**'
-      - '.github/workflows/quality-assurance.yml'
+      - 'scripts/check-workflow-pins.cjs'
+      - '.github/workflows/**'
   push:
     branches: [main, develop]
     paths:
@@ -23,8 +24,15 @@ on:
       - 'scripts/e2e/**'
       - 'scripts/*smoke*'
       - 'supporter-service/**'
-      - '.github/workflows/quality-assurance.yml'
+      - 'scripts/check-workflow-pins.cjs'
+      - '.github/workflows/**'
   workflow_dispatch:
+
+# A newer push to the same pull request supersedes the running checks.
+# Runs on main are never cancelled, so every main commit keeps a full result.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read
@@ -51,6 +59,7 @@ jobs:
           node scripts/check-test-policy.cjs
           node scripts/check-app-security.cjs
           node scripts/check-android-publication.cjs --tracked-only
+          node scripts/check-workflow-pins.cjs
       - name: Install browser for end-to-end journeys
         working-directory: app
         run: npx playwright install --with-deps chromium
