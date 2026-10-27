@@ -203,7 +203,9 @@ test('TV Escape exits native field editing and arrows can leave the field withou
   // Type-ahead has already selected the value. Enter can open a native picker
   // on Linux Chromium, which consumes Escape before the field handler sees it.
   await select.press('ArrowDown');await select.press('s');await expect(select).toHaveValue('b');
-  await select.press('Escape');await select.press('ArrowDown');
+  // After Escape the select no longer owns the arrows. The number field is its
+  // left neighbour in the same row; ArrowDown would move to the list below.
+  await select.press('Escape');await select.press('ArrowLeft');
   await expect(number).toBeFocused();
   await number.press('Escape');await number.press('Tab');await page.keyboard.press('Shift+Tab');
   await expect(number).toBeFocused();
