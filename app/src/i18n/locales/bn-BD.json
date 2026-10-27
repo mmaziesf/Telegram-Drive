@@ -1,6 +1,7 @@
 {
   "common": {
     "app_title": "Unofficial Telegram Drive",
+    "telegram_api_notice": "এই অনানুষ্ঠানিক অ্যাপটি Telegram API ব্যবহার করে। এটি Telegram-এর সাথে যুক্ত নয় এবং Telegram দ্বারা অনুমোদিত বা পৃষ্ঠপোষকতাপ্রাপ্ত নয়।",
     "logout": "লগ আউট করুন",
     "signout_remote_unconfirmed": "এই ডিভাইস থেকে সাইন আউট হয়েছে, কিন্তু Telegram সেশন শেষ হওয়ার বিষয়টি নিশ্চিত করেনি। Telegram → সেটিংস → ডিভাইস খুলে সেখানে সেশনটি শেষ করুন।",
     "search_placeholder": "ফাইলগুলি অনুসন্ধান করুন...",

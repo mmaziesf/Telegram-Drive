@@ -1,6 +1,7 @@
 {
   "common": {
     "app_title": "Unofficial Telegram Drive",
+    "telegram_api_notice": "この非公式アプリは Telegram API を使用しています。Telegram との提携関係はなく、Telegram による承認や後援も受けていません。",
     "logout": "ログアウト",
     "signout_remote_unconfirmed": "このデバイスではサインアウトしましたが、Telegram はセッションの終了を確認しませんでした。Telegram → 設定 → デバイス を開き、そこでセッションを終了してください。",
     "search_placeholder": "ファイルを検索...",

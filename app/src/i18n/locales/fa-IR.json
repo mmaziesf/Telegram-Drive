@@ -1,6 +1,7 @@
 {
   "common": {
     "app_title": "Unofficial Telegram Drive",
+    "telegram_api_notice": "این برنامهٔ غیررسمی از Telegram API استفاده می‌کند. این برنامه وابسته به Telegram نیست و مورد تأیید یا حمایت مالی Telegram قرار ندارد.",
     "logout": "از سیستم خارج شوید",
     "signout_remote_unconfirmed": "از این دستگاه خارج شدید، اما تلگرام پایان نشست را تأیید نکرد. تلگرام ← تنظیمات ← دستگاه‌ها را باز کنید و نشست را همان‌جا پایان دهید.",
     "search_placeholder": "جستجوی فایل ها...",

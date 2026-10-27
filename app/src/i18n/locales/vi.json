@@ -1,6 +1,7 @@
 {
   "common": {
     "app_title": "Unofficial Telegram Drive",
+    "telegram_api_notice": "Ứng dụng không chính thức này sử dụng Telegram API. Ứng dụng không liên kết với, không được Telegram xác nhận hay tài trợ.",
     "logout": "Đăng xuất",
     "signout_remote_unconfirmed": "Đã đăng xuất trên thiết bị này, nhưng Telegram chưa xác nhận phiên đã kết thúc. Hãy mở Telegram → Cài đặt → Thiết bị và kết thúc phiên tại đó.",
     "search_placeholder": "Tìm kiếm tệp...",

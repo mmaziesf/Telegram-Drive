@@ -1,6 +1,7 @@
 {
   "common": {
     "app_title": "Unofficial Telegram Drive",
+    "telegram_api_notice": "یہ غیر سرکاری ایپ Telegram API استعمال کرتی ہے۔ یہ Telegram سے وابستہ نہیں ہے اور نہ ہی Telegram کی جانب سے منظور شدہ یا اسپانسر شدہ ہے۔",
     "logout": "لاگ آؤٹ",
     "signout_remote_unconfirmed": "اس ڈیوائس سے سائن آؤٹ ہو گیا، لیکن ٹیلیگرام نے سیشن ختم ہونے کی تصدیق نہیں کی۔ ٹیلیگرام ← ترتیبات ← ڈیوائسز کھولیں اور اسے وہاں ختم کریں۔",
     "search_placeholder": "فائلیں تلاش کریں...",

@@ -1,6 +1,7 @@
 {
   "common": {
     "app_title": "Unofficial Telegram Drive",
+    "telegram_api_notice": "此非官方應用程式使用 Telegram API，與 Telegram 無關聯，也未獲得 Telegram 的認可或贊助。",
     "logout": "退出",
     "signout_remote_unconfirmed": "已在此裝置上登出，但 Telegram 未確認工作階段已結束。請開啟 Telegram → 設定 → 裝置，並在那裡結束該工作階段。",
     "search_placeholder": "搜尋文件...",

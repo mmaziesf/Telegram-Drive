@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { TelegramApiNotice } from './TelegramApiNotice';
 import { invoke } from "@tauri-apps/api/core";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShieldCheck, Sun, Moon, ExternalLink, X, Heart } from "lucide-react";
@@ -422,6 +423,7 @@ function AuthFlow({ onLogin }: { onLogin: () => void }) {
                     </div>
                     <h1 className="text-app-title font-semibold tracking-[-0.01em] text-app-text">{i18n.t("common.app_title")}</h1>
                     <p className="mt-1 text-metadata text-app-text-secondary">{i18n.t("auth.tagline")}</p>
+                    <TelegramApiNotice className="mx-auto mt-2 max-w-[22rem] text-metadata leading-relaxed text-app-text-secondary" />
                 </div>
 
                 <AnimatePresence mode="wait">

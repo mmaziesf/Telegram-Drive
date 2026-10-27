@@ -1,6 +1,7 @@
 {
   "common": {
     "app_title": "Unofficial Telegram Drive",
+    "telegram_api_notice": "Diese inoffizielle App nutzt die Telegram-API. Sie steht in keiner Verbindung zu Telegram und wird von Telegram weder unterstützt noch gesponsert.",
     "logout": "Abmelden",
     "signout_remote_unconfirmed": "Auf diesem Gerät abgemeldet, aber Telegram hat das Beenden der Sitzung nicht bestätigt. Öffne Telegram → Einstellungen → Geräte und beende sie dort.",
     "search_placeholder": "Dateien suchen...",
