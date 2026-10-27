@@ -1,3 +1,8 @@
+/// Fully qualified Kotlin class of the Android upload foreground service.
+#[cfg(target_os = "android")]
+const UPLOAD_SERVICE_CLASS: &str =
+    "io.github.mmaziesf.unofficialtelegramdrive.UploadForegroundService";
+
 #[cfg(target_os = "android")]
 pub fn start_foreground_service() {
     log::info!("JNI: start_foreground_service called");
@@ -10,8 +15,7 @@ pub fn start_foreground_service() {
             match env.call_method(&ctx, "getClassLoader", "()Ljava/lang/ClassLoader;", &[]) {
                 Ok(class_loader_val) => {
                     if let Ok(class_loader) = class_loader_val.l() {
-                        let class_name =
-                            env.new_string("com.cameronamer.telegramdrive.UploadForegroundService");
+                        let class_name = env.new_string(UPLOAD_SERVICE_CLASS);
                         if let Ok(class_name_obj) = class_name {
                             let class_obj_val = env.call_method(
                                 &class_loader,
@@ -78,8 +82,7 @@ pub fn stop_foreground_service() {
             match env.call_method(&ctx, "getClassLoader", "()Ljava/lang/ClassLoader;", &[]) {
                 Ok(class_loader_val) => {
                     if let Ok(class_loader) = class_loader_val.l() {
-                        let class_name =
-                            env.new_string("com.cameronamer.telegramdrive.UploadForegroundService");
+                        let class_name = env.new_string(UPLOAD_SERVICE_CLASS);
                         if let Ok(class_name_obj) = class_name {
                             let class_obj_val = env.call_method(
                                 &class_loader,
@@ -152,8 +155,7 @@ pub fn update_foreground_service(active: i32, progress: i32, speed: i64, paused:
     let Ok(class_loader) = class_loader_value.l() else {
         return;
     };
-    let Ok(class_name) = env.new_string("com.cameronamer.telegramdrive.UploadForegroundService")
-    else {
+    let Ok(class_name) = env.new_string(UPLOAD_SERVICE_CLASS) else {
         return;
     };
     let Ok(class_value) = env.call_method(

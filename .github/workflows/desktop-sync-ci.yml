@@ -103,6 +103,10 @@ jobs:
         working-directory: app
         run: npm run build:verify
 
+      - name: Run crypto envelope property tests
+        working-directory: app/src-tauri
+        run: cargo test --locked --test crypto_envelope
+
       - name: Run native process and HTTP end-to-end journeys
         working-directory: app/src-tauri
         run: cargo test --locked --features native-e2e --test native_e2e
@@ -119,7 +123,7 @@ jobs:
       - name: Exercise smoke harness process ownership and failure journeys
         run: node scripts/e2e/packaged-startup.e2e.cjs
 
-      - name: Build disposable CI installers with updater archives
+      - name: Build disposable CI installers
         working-directory: app
         run: npm run tauri -- build --ci --no-sign ${{ matrix.target && format('--target {0}', matrix.target) || '' }}
 

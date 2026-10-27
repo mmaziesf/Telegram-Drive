@@ -27,7 +27,7 @@ test('all twelve Settings tabs and expanded network controls pass axe',async ({p
   await page.goto('/');await openSettings(page);
   const dialog=page.getByRole('dialog');
   const findings:{tab:string;violations:unknown}[]=[];
-  for(const tab of ['General','Themes','Privacy','Encryption','Folder Sync','Sharing','Advanced','Lifetime license purchased','About']) {
+  for(const tab of ['General','Themes','Privacy','Encryption','Folder Sync','Sharing','Advanced','About']) {
     await dialog.getByRole('button',{name:tab,exact:true}).click();
     await expect(dialog.locator('#settings-dialog-title + p')).toHaveText(tab);
     await page.waitForTimeout(180); // Outgoing tab animation must finish before inspecting the active view.

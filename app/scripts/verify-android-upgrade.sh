@@ -3,7 +3,7 @@ set -euo pipefail
 
 previous_apk="${1:?Usage: verify-android-upgrade.sh PREVIOUS.apk CURRENT.apk}"
 current_apk="${2:?Usage: verify-android-upgrade.sh PREVIOUS.apk CURRENT.apk}"
-package_name="com.cameronamer.telegramdrive"
+package_name="io.github.mmaziesf.unofficialtelegramdrive"
 build_tools="${ANDROID_HOME:?ANDROID_HOME must be configured}/build-tools/36.0.0"
 apksigner="$build_tools/apksigner"
 apkanalyzer="${ANDROID_HOME}/cmdline-tools/latest/bin/apkanalyzer"

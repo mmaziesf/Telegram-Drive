@@ -73,7 +73,7 @@ node scripts/create-android-release-manifest.cjs \
   --apk "$release_dir/Telegram-Drive-v${version}-android-universal.apk" \
   --version "$version" \
   --version-code "$version_code" \
-  --repository "${GITHUB_REPOSITORY:-caamer20/Telegram-Drive}" \
+  --repository "${GITHUB_REPOSITORY:-mmaziesf/Telegram-Drive}" \
   --tag "${GITHUB_REF_NAME:-v${version}}" \
   --output "$release_dir/android-update.json"
 

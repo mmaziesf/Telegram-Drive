@@ -8,7 +8,7 @@
 use keyring::Entry;
 
 #[cfg(not(target_os = "android"))]
-const KEYRING_SERVICE: &str = "com.cameronamer.telegramdrive.telegram-api";
+const KEYRING_SERVICE: &str = "io.github.mmaziesf.unofficialtelegramdrive.telegram-api";
 const API_HASH_ACCOUNT: &str = "api-hash-v1";
 
 #[cfg(not(target_os = "android"))]
@@ -46,6 +46,12 @@ pub fn delete_api_hash() -> Result<(), String> {
     }
 }
 
+/// Reads, writes or deletes the API hash in the Android Keystore-backed store.
+///
+/// The Kotlin entry points keep their historical `*SupporterSecret` names:
+/// they are a generic secret store and the names form the JNI contract checked
+/// by `app/scripts/check-android-jni-contract.cjs`, so renaming them would need
+/// a matching change to the Android sources that are not in this repository.
 #[cfg(target_os = "android")]
 fn android_secret(operation: &str, value: Option<&str>) -> Result<Option<String>, String> {
     let main_class = crate::jni_cache::get_main_activity_jclass().ok_or_else(|| {

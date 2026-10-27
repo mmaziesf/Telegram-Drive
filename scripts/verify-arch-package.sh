@@ -39,7 +39,7 @@ done
 
 assert_file 'usr/bin/telegram-drive'
 assert_file 'usr/lib/telegram-drive/app'
-assert_file 'usr/share/applications/com.cameronamer.telegramdrive.desktop'
+assert_file 'usr/share/applications/io.github.mmaziesf.unofficialtelegramdrive.desktop'
 assert_file 'usr/share/licenses/telegram-drive-bin/UPSTREAM-LICENSE-NOTICE'
 
 if grep -Eq '^(home|root)/|/\.config/|/\.local/share/' <<<"${package_files}"; then
@@ -57,10 +57,10 @@ bsdtar -xf "${package_path}" -C "${temporary_root}"
 
 sh -n "${temporary_root}/usr/bin/telegram-drive"
 grep -Fq 'TELEGRAM_DRIVE_PACKAGE_MANAGER=pacman' "${temporary_root}/usr/bin/telegram-drive"
-grep -Fqx 'Exec=telegram-drive' "${temporary_root}/usr/share/applications/com.cameronamer.telegramdrive.desktop"
-grep -Fqx 'Icon=com.cameronamer.telegramdrive' "${temporary_root}/usr/share/applications/com.cameronamer.telegramdrive.desktop"
+grep -Fqx 'Exec=telegram-drive' "${temporary_root}/usr/share/applications/io.github.mmaziesf.unofficialtelegramdrive.desktop"
+grep -Fqx 'Icon=io.github.mmaziesf.unofficialtelegramdrive' "${temporary_root}/usr/share/applications/io.github.mmaziesf.unofficialtelegramdrive.desktop"
 if command -v desktop-file-validate >/dev/null 2>&1; then
-  desktop-file-validate "${temporary_root}/usr/share/applications/com.cameronamer.telegramdrive.desktop"
+  desktop-file-validate "${temporary_root}/usr/share/applications/io.github.mmaziesf.unofficialtelegramdrive.desktop"
 fi
 file "${temporary_root}/usr/lib/telegram-drive/app" | grep -Fq 'ELF 64-bit'
 
