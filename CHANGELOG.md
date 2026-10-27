@@ -5,6 +5,15 @@
 - Add `tests/crypto_envelope.rs`, an in-memory suite that exercises the public envelope, key-slot and recovery-bundle API. It covers round-trips under random sizes, metadata and download fragmentation; rejection of every flipped bit, truncation, trailing bytes, reordered, dropped or cross-file records, and wrong keys; key-slot binding of the file identity, slot ID, kind and salt; nonce and file-identity uniqueness; and byte-identical resumed uploads. Property cases use `proptest` (a dev-dependency only).
 - CI runs the suite alongside the native journeys, and TESTING.md documents it.
 
+### Pull requests skip macOS runners and cancel superseded runs
+
+Pull requests now build Windows and Linux. Both macOS targets still run on every push to `main`, nightly and on manual dispatch. A new push to a pull request cancels that pull request's runs that are still going; runs on `main` are never cancelled. `scripts/check-workflow-pins.cjs` enforces both rules on every pull request that changes a workflow.
+
+### Telegram session file protection
+
+- On Unix, `telegram.session` and its SQLite sidecars are now created owner-only (`0600`) inside an owner-only account directory (`0700`). The files are opened without following symlinks.
+- Existing installs are tightened the next time the app starts or signs in. On file systems without Unix permissions, a warning is logged and sign-in continues.
+
 ## [4.1.2] - 2026-10-14
 
 ### Desktop video streaming metadata
