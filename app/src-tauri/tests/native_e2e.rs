@@ -9882,3 +9882,26 @@ fn proxy_settings_refuse_values_that_change_the_proxy_url_structure() {
     assert!(app.failure(long_secret).contains("passwords"));
     app.stop();
 }
+
+#[test]
+fn sync_roots_inside_the_apps_own_state_are_refused() {
+    let fixture = Fixture::new();
+    for dir in ["app-data/sessions", "app-cache/previews", "Documents"] {
+        std::fs::create_dir_all(fixture.path(dir)).unwrap();
+    }
+    let mut app = Backend::start(&fixture.0);
+    app.ok(json!({"command":"sync_root_check","local":"Documents"}));
+    for local in [
+        "app-data",
+        "app-data/sessions",
+        "app-cache/previews",
+        "Documents/../app-data",
+    ] {
+        assert!(
+            app.failure(json!({"command":"sync_root_check","local":local}))
+                .contains("outside the app's own data"),
+            "local={local}"
+        );
+    }
+    app.stop();
+}
