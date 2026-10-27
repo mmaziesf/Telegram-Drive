@@ -768,14 +768,12 @@ export function useAdaptiveStreaming(
             };
 
             // Recreate all source buffers (both video and audio if present)
-            let createdCount = 0;
             for (const track of tracks) {
                 if (track.codec) {
                     const isAudio = track.type === 'audio';
                     const sb = createSourceBuffer(track.codec, track.id, isAudio);
                     if (sb) {
                         sourceBuffersRef.current[track.id] = sb;
-                        createdCount++;
                     }
                 }
             }
