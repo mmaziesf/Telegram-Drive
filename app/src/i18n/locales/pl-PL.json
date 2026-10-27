@@ -1471,6 +1471,8 @@
     "keychain_title": "Magazyn poświadczeń niedostępny",
     "keychain_detail": "Sesja Telegrama jest zaszyfrowana kluczem przechowywanym w systemowym magazynie poświadczeń, który jest teraz nieosiągalny. Odblokuj pęk kluczy lub menedżera poświadczeń i spróbuj ponownie.",
     "retry": "Spróbuj ponownie",
+    "keychain_remove": "Usuń zapisaną sesję i zaloguj się ponownie",
+    "keychain_remove_detail": "Zapisana sesja zostanie usunięta z tego urządzenia i trzeba będzie zalogować się ponownie. Jeśli magazyn danych logowania nadal będzie niedostępny, wybierzesz hasło, które ochroni nową sesję. To urządzenie pozostanie na liście aktywnych sesji Telegrama, dopóki nie zakończysz jej z innego urządzenia.",
     "forgot": "Nie pamiętasz hasła?",
     "remove_detail": "Zapisana sesja zostanie usunięta z tego urządzenia i trzeba będzie zalogować się ponownie. To urządzenie pozostanie na liście aktywnych sesji Telegrama, dopóki nie zakończysz jej na innym urządzeniu.",
     "remove_confirm": "Usuń sesję"

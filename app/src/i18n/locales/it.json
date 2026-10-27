@@ -1464,6 +1464,8 @@
     "keychain_title": "Archivio di credenziali non disponibile",
     "keychain_detail": "La sessione di Telegram è cifrata con una chiave conservata nell'archivio di credenziali di sistema, che al momento non è raggiungibile. Sblocca il portachiavi o il gestore credenziali e riprova.",
     "retry": "Riprova",
+    "keychain_remove": "Rimuovi la sessione salvata e accedi di nuovo",
+    "keychain_remove_detail": "La sessione salvata verrà eliminata da questo dispositivo e dovrai accedere di nuovo. Se l'archivio delle credenziali resta non disponibile, sceglierai una passphrase per proteggere la nuova sessione. Questo dispositivo resta elencato tra le sessioni attive di Telegram finché non la termini da un altro dispositivo.",
     "forgot": "Hai dimenticato la passphrase?",
     "remove_detail": "La sessione salvata verrà eliminata da questo dispositivo e dovrai accedere di nuovo. Questo dispositivo resterà nelle sessioni attive di Telegram finché non la chiudi da un altro dispositivo.",
     "remove_confirm": "Elimina sessione"

@@ -1457,6 +1457,8 @@
     "keychain_title": "Kho thông tin xác thực không khả dụng",
     "keychain_detail": "Phiên Telegram của bạn được mã hóa bằng khóa lưu trong kho thông tin xác thực của hệ thống, hiện không truy cập được. Hãy mở khóa keyring hoặc trình quản lý thông tin xác thực rồi thử lại.",
     "retry": "Thử lại",
+    "keychain_remove": "Xóa phiên đã lưu và đăng nhập lại",
+    "keychain_remove_detail": "Phiên đã lưu sẽ bị xóa khỏi thiết bị này và bạn cần đăng nhập lại. Nếu kho thông tin xác thực vẫn không khả dụng, bạn sẽ chọn một cụm mật khẩu để bảo vệ phiên mới. Thiết bị này vẫn hiển thị trong các phiên hoạt động của Telegram cho đến khi bạn kết thúc nó từ thiết bị khác.",
     "forgot": "Quên cụm mật khẩu?",
     "remove_detail": "Phiên đã lưu sẽ bị xóa khỏi thiết bị này và bạn cần đăng nhập lại. Thiết bị này vẫn xuất hiện trong các phiên đang hoạt động của Telegram cho đến khi bạn kết thúc nó từ thiết bị khác.",
     "remove_confirm": "Xóa phiên"

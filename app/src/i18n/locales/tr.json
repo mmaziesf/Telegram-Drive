@@ -1457,6 +1457,8 @@
     "keychain_title": "Kimlik bilgisi deposu kullanılamıyor",
     "keychain_detail": "Telegram oturumun, şu anda erişilemeyen sistem kimlik bilgisi deposunda tutulan bir anahtarla şifreli. Anahtar zincirinin veya kimlik bilgisi yöneticisinin kilidini açıp tekrar dene.",
     "retry": "Tekrar dene",
+    "keychain_remove": "Kayıtlı oturumu kaldır ve yeniden oturum aç",
+    "keychain_remove_detail": "Kayıtlı oturum bu cihazdan silinecek ve yeniden oturum açmanız gerekecek. Kimlik bilgisi deposu hâlâ kullanılamıyorsa yeni oturumu korumak için bir parola ifadesi seçeceksiniz. Bu cihaz, başka bir cihazdan sonlandırana kadar Telegram'ın etkin oturumlarında listelenmeye devam eder.",
     "forgot": "Parola ifadeni mi unuttun?",
     "remove_detail": "Kayıtlı oturum bu cihazdan silinecek ve yeniden giriş yapman gerekecek. Bu cihaz, başka bir cihazdan sonlandırana kadar Telegram'ın etkin oturumlarında listelenmeye devam eder.",
     "remove_confirm": "Oturumu sil"

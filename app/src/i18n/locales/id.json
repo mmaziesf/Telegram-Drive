@@ -1457,6 +1457,8 @@
     "keychain_title": "Penyimpanan kredensial tidak tersedia",
     "keychain_detail": "Sesi Telegram Anda dienkripsi dengan kunci yang disimpan di penyimpanan kredensial sistem, yang saat ini tidak dapat dijangkau. Buka kunci keyring atau pengelola kredensial Anda, lalu coba lagi.",
     "retry": "Coba lagi",
+    "keychain_remove": "Hapus sesi tersimpan dan masuk lagi",
+    "keychain_remove_detail": "Sesi tersimpan akan dihapus dari perangkat ini dan Anda perlu masuk lagi. Jika penyimpanan kredensial masih tidak tersedia, Anda akan memilih frasa sandi untuk melindungi sesi baru. Perangkat ini tetap tercantum di sesi aktif Telegram sampai Anda mengakhirinya dari perangkat lain.",
     "forgot": "Lupa frasa sandi?",
     "remove_detail": "Sesi tersimpan akan dihapus dari perangkat ini dan Anda perlu masuk lagi. Perangkat ini tetap tercantum di sesi aktif Telegram sampai Anda mengakhirinya dari perangkat lain.",
     "remove_confirm": "Hapus sesi"

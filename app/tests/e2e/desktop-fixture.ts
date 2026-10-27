@@ -204,7 +204,8 @@ export async function desktopFixture(page: Page, options: {
           if (command === 'cmd_logout') {
             if (state.logoutFails) throw new Error('Private native diagnostic');
             // Without a credential store the next session needs a new passphrase.
-            if (sessionProtection.startsWith('passphrase')) { state.sessionLocked = true; state.sessionSetup = true; }
+            // The same holds when the credential store is unreachable: the next session falls back to a passphrase.
+            if (sessionProtection.startsWith('passphrase') || state.keychainUnavailable) { state.sessionLocked = true; state.sessionSetup = true; state.keychainUnavailable = false; }
             return { signed_out: true, remote_session_revoked: !state.remoteSignOutUnconfirmed };
           }
           if (command === 'cmd_get_encryption_capabilities') return { contract_version: 2, availability: 'ready', vault: true, per_file: true, core_available:options.encryptionReady ?? false, features:{upload:true,read:true,per_file_passphrase:true,recovery:true,share:true,migration:false},readable_formats:[2],writable_formats:[2],supported_suites:[1],blockers:[],vault_backend:'persistent_file',mode_alpha:false,upload_enabled:true,read_enabled:true,share_enabled:true,migration_enabled:false,envelope_version:2,app_version:'fixture',backend_build_id:'fixture' };

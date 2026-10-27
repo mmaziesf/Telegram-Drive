@@ -1464,6 +1464,8 @@
     "keychain_title": "Armazenamento de credenciais indisponível",
     "keychain_detail": "Sua sessão do Telegram está criptografada com uma chave guardada no armazenamento de credenciais do sistema, que não pode ser acessado agora. Desbloqueie seu chaveiro ou gerenciador de credenciais e tente novamente.",
     "retry": "Tentar novamente",
+    "keychain_remove": "Remover a sessão salva e entrar novamente",
+    "keychain_remove_detail": "A sessão salva será excluída deste dispositivo e você precisará entrar novamente. Se o armazenamento de credenciais continuar indisponível, você escolherá uma frase secreta para proteger a nova sessão. Este dispositivo continua listado nas sessões ativas do Telegram até que você a encerre em outro dispositivo.",
     "forgot": "Esqueceu sua frase secreta?",
     "remove_detail": "A sessão salva será excluída deste dispositivo e você precisará entrar novamente. Este dispositivo continuará listado nas sessões ativas do Telegram até que você o encerre em outro dispositivo.",
     "remove_confirm": "Excluir sessão"

@@ -1457,6 +1457,8 @@
     "keychain_title": "Hindi available ang credential store",
     "keychain_detail": "Naka-encrypt ang iyong Telegram session gamit ang key na nasa credential store ng system, na hindi maabot ngayon. I-unlock ang iyong keyring o credential manager, saka subukang muli.",
     "retry": "Subukang muli",
+    "keychain_remove": "Alisin ang naka-save na session at mag-sign in muli",
+    "keychain_remove_detail": "Buburahin ang naka-save na session sa device na ito at kailangan mong mag-sign in muli. Kung hindi pa rin available ang credential store, pipili ka ng passphrase para protektahan ang bagong session. Mananatiling nakalista ang device na ito sa mga aktibong session ng Telegram hangga't hindi mo ito tinatapos mula sa ibang device.",
     "forgot": "Nakalimutan ang passphrase?",
     "remove_detail": "Buburahin ang naka-save na session sa device na ito at kailangan mong mag-sign in muli. Mananatiling nakalista ang device na ito sa mga aktibong session ng Telegram hanggang tapusin mo ito mula sa ibang device.",
     "remove_confirm": "Burahin ang session"

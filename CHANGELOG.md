@@ -6,6 +6,9 @@
 - When no credential store is reachable, the app asks for a passphrase (at least 12 characters) and derives the key with Argon2id. The passphrase stays in memory only.
 - A plaintext session from an earlier release is imported, sealed and its old file overwritten before removal. Overwriting is best effort on SSDs and copy-on-write file systems.
 - A "forgot passphrase" option deletes only the local session; the device stays listed in Telegram's active sessions until it is ended from another device.
+- When the credential store is unreachable, the unlock screen also offers to remove the saved session after confirmation. The next sign-in then asks for a passphrase if the store is still unavailable. A failed removal shows a generic error and keeps the session.
+- A key that cannot be deleted from the credential store (because the store is locked or unreachable) is recorded by name only in `.orphaned-keys` and deleted on a later start. A key still named by a session file is never deleted.
+- Bundle ceiling: the removal option adds 2 strings in 24 locales (within the locale ceilings) and 270 bytes of initial JavaScript; that ceiling rises from 378523 to the measured 378793 bytes.
 - Android sessions are unchanged in this release.
 - Bundle ceilings: the 21 new strings in 24 locales raise the locale ceilings to 1981377 bytes in total and 140733 bytes for the largest catalog (measured 1668504 and 117879), and the session check raises the initial JavaScript ceiling from 378375 to the measured 378523 bytes.
 

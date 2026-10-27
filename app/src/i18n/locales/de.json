@@ -1457,6 +1457,8 @@
     "keychain_title": "Anmeldedatenspeicher nicht verfügbar",
     "keychain_detail": "Deine Telegram-Sitzung ist mit einem Schlüssel aus dem Anmeldedatenspeicher des Systems verschlüsselt, der gerade nicht erreichbar ist. Entsperre deinen Schlüsselbund bzw. die Anmeldeinformationsverwaltung und versuche es erneut.",
     "retry": "Erneut versuchen",
+    "keychain_remove": "Gespeicherte Sitzung entfernen und neu anmelden",
+    "keychain_remove_detail": "Die gespeicherte Sitzung wird von diesem Gerät gelöscht und du musst dich erneut anmelden. Ist der Anmeldedatenspeicher weiterhin nicht erreichbar, wählst du eine Passphrase, die die neue Sitzung schützt. Dieses Gerät bleibt in den aktiven Telegram-Sitzungen aufgeführt, bis du es von einem anderen Gerät aus beendest.",
     "forgot": "Passphrase vergessen?",
     "remove_detail": "Die gespeicherte Sitzung wird von diesem Gerät gelöscht und du musst dich erneut anmelden. Dieses Gerät bleibt in den aktiven Telegram-Sitzungen aufgeführt, bis du es auf einem anderen Gerät beendest.",
     "remove_confirm": "Sitzung löschen"

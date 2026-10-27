@@ -1464,6 +1464,8 @@
     "keychain_title": "Magasin d'identifiants indisponible",
     "keychain_detail": "Votre session Telegram est chiffrée avec une clé conservée dans le magasin d'identifiants du système, inaccessible pour le moment. Déverrouillez votre trousseau ou gestionnaire d'identifiants, puis réessayez.",
     "retry": "Réessayer",
+    "keychain_remove": "Supprimer la session enregistrée et se reconnecter",
+    "keychain_remove_detail": "La session enregistrée sera supprimée de cet appareil et vous devrez vous reconnecter. Si le magasin d'identifiants reste indisponible, vous choisirez une phrase secrète pour protéger la nouvelle session. Cet appareil reste listé dans les sessions actives de Telegram jusqu'à ce que vous y mettiez fin depuis un autre appareil.",
     "forgot": "Phrase secrète oubliée ?",
     "remove_detail": "La session enregistrée sera supprimée de cet appareil et vous devrez vous reconnecter. Cet appareil restera listé dans les sessions actives de Telegram jusqu'à ce que vous y mettiez fin depuis un autre appareil.",
     "remove_confirm": "Supprimer la session"

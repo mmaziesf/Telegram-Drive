@@ -68,3 +68,33 @@ test('a forgotten passphrase deletes only the local session after confirmation',
   await expect(page.getByRole('heading', { name: 'Protect your Telegram session' })).toBeVisible();
   expect(await nativeCalls(page, 'cmd_logout')).toHaveLength(1);
 });
+
+test('an unreachable credential store offers to remove the session and protect the next one with a passphrase', async ({ page }) => {
+  await desktopFixture(page, { sessionProtection: 'keychain-unavailable' });
+  await page.goto('/');
+  await expect(page.getByRole('heading', { name: 'System credential store unavailable' })).toBeVisible();
+  await page.getByRole('button', { name: 'Remove saved session and sign in again', exact: true }).click();
+  await expect(page.getByText(/you will choose a passphrase to protect the new session/)).toBeVisible();
+  await page.getByRole('button', { name: 'Cancel', exact: true }).click();
+  expect(await nativeCalls(page, 'cmd_logout')).toHaveLength(0);
+  await page.getByRole('button', { name: 'Remove saved session and sign in again', exact: true }).click();
+  await page.getByRole('button', { name: 'Delete session', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Protect your Telegram session' })).toBeVisible();
+  expect(await nativeCalls(page, 'cmd_logout')).toHaveLength(1);
+  await page.getByLabel('Passphrase', { exact: true }).fill('a long enough passphrase');
+  await page.getByLabel('Confirm passphrase', { exact: true }).fill('a long enough passphrase');
+  await page.getByRole('button', { name: 'Protect session', exact: true }).click();
+  await expect(page.getByText('Holiday folder photo.jpg', { exact: true })).toBeVisible();
+  expect(await nativeCalls(page, 'cmd_unlock_session')).toEqual([{ command: 'cmd_unlock_session', args: { passphrase: 'a long enough passphrase' } }]);
+});
+
+test('a failed removal on the credential store screen is reported and keeps the session', async ({ page }) => {
+  await desktopFixture(page, { sessionProtection: 'keychain-unavailable' });
+  await page.goto('/');
+  await page.evaluate(() => { (window as any).__desktopTest.logoutFails = true; });
+  await page.getByRole('button', { name: 'Remove saved session and sign in again', exact: true }).click();
+  await page.getByRole('button', { name: 'Delete session', exact: true }).click();
+  await expect(page.getByRole('alert').filter({ hasText: 'The operation could not be completed.' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'System credential store unavailable' })).toBeVisible();
+  await expect(page.getByText('Private native diagnostic')).toHaveCount(0);
+});

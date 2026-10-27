@@ -1457,6 +1457,8 @@
     "keychain_title": "Storan kelayakan tidak tersedia",
     "keychain_detail": "Sesi Telegram anda disulitkan dengan kunci yang disimpan dalam storan kelayakan sistem, yang tidak dapat dicapai sekarang. Buka kunci keyring atau pengurus kelayakan anda, kemudian cuba lagi.",
     "retry": "Cuba lagi",
+    "keychain_remove": "Alih keluar sesi tersimpan dan log masuk semula",
+    "keychain_remove_detail": "Sesi tersimpan akan dipadam daripada peranti ini dan anda perlu log masuk semula. Jika stor kelayakan masih tidak tersedia, anda akan memilih frasa laluan untuk melindungi sesi baharu. Peranti ini kekal disenaraikan dalam sesi aktif Telegram sehingga anda menamatkannya daripada peranti lain.",
     "forgot": "Terlupa frasa laluan?",
     "remove_detail": "Sesi yang disimpan akan dipadam daripada peranti ini dan anda perlu log masuk semula. Peranti ini kekal disenaraikan dalam sesi aktif Telegram sehingga anda menamatkannya daripada peranti lain.",
     "remove_confirm": "Padam sesi"

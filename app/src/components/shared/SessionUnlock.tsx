@@ -64,12 +64,13 @@ export function SessionUnlock({ lock, onResolved }: SessionUnlockProps) {
     setBusy(true);
     setError(null);
     try {
-      // Without the passphrase the session cannot be decrypted, so sign-out
-      // only deletes the local copy and its key.
+      // Without its key the session cannot be decrypted, so sign-out only
+      // deletes the local copy and its key. A key the unreachable credential
+      // store cannot delete now is removed on a later start.
       await invoke("cmd_logout");
       onResolved();
     } catch {
-      setError(t("session_lock.failed"));
+      setError(t("common.operation_failed"));
     } finally {
       setBusy(false);
     }
@@ -142,10 +143,13 @@ export function SessionUnlock({ lock, onResolved }: SessionUnlockProps) {
           </form>
         )}
 
-        {lock.kind === "passphrase" && !setup && (
+        {(lock.kind === "keychain-unavailable" || !setup) && (
           confirmRemoval ? (
             <div className="space-y-3 rounded-control border border-app-danger/30 p-3">
-              <p className="text-metadata text-app-text-secondary">{t("session_lock.remove_detail")}</p>
+              <p className="text-metadata text-app-text-secondary">
+                {lock.kind === "keychain-unavailable" ? t("session_lock.keychain_remove_detail") : t("session_lock.remove_detail")}
+              </p>
+              {lock.kind === "keychain-unavailable" && error && <p role="alert" className="text-metadata text-app-danger">{error}</p>}
               <div className="flex gap-2">
                 <button type="button" disabled={busy} onClick={() => void removeSession()} className="quiet-control auth-secondary-action w-full text-app-danger">
                   {t("session_lock.remove_confirm")}
@@ -157,7 +161,7 @@ export function SessionUnlock({ lock, onResolved }: SessionUnlockProps) {
             </div>
           ) : (
             <button type="button" onClick={() => setConfirmRemoval(true)} className="quiet-control auth-secondary-action w-full">
-              {t("session_lock.forgot")}
+              {lock.kind === "keychain-unavailable" ? t("session_lock.keychain_remove") : t("session_lock.forgot")}
             </button>
           )
         )}

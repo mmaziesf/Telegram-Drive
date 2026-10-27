@@ -1464,6 +1464,8 @@
     "keychain_title": "Almacén de credenciales no disponible",
     "keychain_detail": "Tu sesión de Telegram está cifrada con una clave guardada en el almacén de credenciales del sistema, al que no se puede acceder ahora. Desbloquea tu llavero o administrador de credenciales e inténtalo de nuevo.",
     "retry": "Reintentar",
+    "keychain_remove": "Eliminar la sesión guardada e iniciar sesión de nuevo",
+    "keychain_remove_detail": "La sesión guardada se eliminará de este dispositivo y tendrás que iniciar sesión de nuevo. Si el almacén de credenciales sigue sin estar disponible, elegirás una frase de contraseña para proteger la nueva sesión. Este dispositivo seguirá apareciendo en las sesiones activas de Telegram hasta que la cierres desde otro dispositivo.",
     "forgot": "¿Olvidaste tu frase de contraseña?",
     "remove_detail": "La sesión guardada se eliminará de este dispositivo y tendrás que volver a iniciar sesión. Este dispositivo seguirá apareciendo en las sesiones activas de Telegram hasta que la cierres desde otro dispositivo.",
     "remove_confirm": "Eliminar sesión"
