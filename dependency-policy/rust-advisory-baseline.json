@@ -8,10 +8,7 @@
     "RUSTSEC-2026-0119": "Requires upstream grammers support for Hickory 0.26.",
     "RUSTSEC-2026-0253": "The transitive dav-server cache uses non-panicking key types; a major dependency migration is tracked separately.",
     "RUSTSEC-2026-0194": "The affected parser handles repository-controlled Tauri plist metadata, not untrusted XML.",
-    "RUSTSEC-2026-0195": "The affected parser handles repository-controlled Tauri plist metadata, not untrusted XML.",
-    "RUSTSEC-2026-0367": "zip@4 is pinned by tauri-plugin-updater (2.14 still requires zip ^4) and only unpacks minisign-verified update archives; app archive code uses zip 9. Remove when the updater moves to zip >= 9.",
-    "RUSTSEC-2026-0368": "zip@4 is pinned by tauri-plugin-updater (2.14 still requires zip ^4) and only unpacks minisign-verified update archives; app archive code uses zip 9. Remove when the updater moves to zip >= 9.",
-    "RUSTSEC-2026-0369": "zip@4 is pinned by tauri-plugin-updater (2.14 still requires zip ^4) and only unpacks minisign-verified update archives; app archive code uses zip 9. Remove when the updater moves to zip >= 9."
+    "RUSTSEC-2026-0195": "The affected parser handles repository-controlled Tauri plist metadata, not untrusted XML."
   },
   "yankedCrates": {
     "chacha20@0.10.0": "Transitive Actix dependency awaiting a compatible lockfile refresh.",
