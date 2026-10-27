@@ -17,6 +17,15 @@
 - `zip` 4 remains only inside `tauri-plugin-updater` (2.14 still requires `zip` ^4). It only unpacks minisign-verified update archives, so RUSTSEC-2026-0367, -0368 and -0369 are recorded as reviewed exceptions in `deny.toml` and the advisory baseline, to be removed when the updater moves to `zip` 9.
 - Raise the supporter service's pinned `undici` override (used only by the `miniflare` test harness) from 7.29.1 to 7.30.1, fixing GHSA-4qv8-2p9j-2685, GHSA-f72v-6w45-q472 and GHSA-xjj6-f33q-929c.
 
+### Pull requests skip macOS runners and cancel superseded runs
+
+Pull requests now build Windows and Linux. Both macOS targets still run on every push to `main`, nightly and on manual dispatch. A new push to a pull request cancels that pull request's runs that are still going; runs on `main` are never cancelled. `scripts/check-workflow-pins.cjs` enforces both rules on every pull request that changes a workflow.
+
+### Telegram session file protection
+
+- On Unix, `telegram.session` and its SQLite sidecars are now created owner-only (`0600`) inside an owner-only account directory (`0700`). The files are opened without following symlinks.
+- Existing installs are tightened the next time the app starts or signs in. On file systems without Unix permissions, a warning is logged and sign-in continues.
+
 ## [4.1.2] - 2026-10-14
 
 ### Desktop video streaming metadata
