@@ -25,8 +25,12 @@ da1b65975f33c100e1c0d394ac597f2808a3b885:app/src/components/shared/AdsterraBanne
 db7489f6795d253e5cf369f96a504159c492e959:app/src-tauri/src/server.rs:generic-api-key:66
 ec4451c8c024b01b0633dd5a8c656aec2754d286:app/src/components/desktop/dashboard/DesktopAdBanner.tsx:generic-api-key:9
 
-# Design document prose ("key slots, Argon2id/HKDF wrapping"). It contains no key material.
+# Design document prose about wrapping each slot with Argon2id and HKDF. It contains no secret.
 1b6d2cc0563cda8e98484b10fe15aa5c03ff2ee4:ENCRYPTION_MODE_IMPLEMENTATION_PLAN.md:generic-api-key:782
+
+# The squash merge of #6 (21645df) added an earlier wording of the comment above, which the
+# generic-api-key rule read as an assignment. That line is prose, not a credential.
+21645df17366a31ead82c9bff29253a9e40e8d19:.gitleaksignore:generic-api-key:28
 
 # macOS crash reports (Error.html, app/LatestError.html) that were committed and later deleted. The match is the
 # crash reporter's anonymous device identifier field. It is not a credential and grants no access.
