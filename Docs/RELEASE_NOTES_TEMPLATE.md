@@ -7,7 +7,7 @@ Replace VERSION and filenames with the actual release. Use the reviewed first ch
 Download the artifact and `SHA256SUMS.txt` from the same release. On Linux run `sha256sum -c SHA256SUMS.txt`; on macOS use `shasum -a 256` for the selected file; on Windows use `Get-FileHash -Algorithm SHA256` and compare the matching manifest entry. Checksums detect corruption; provenance verifies the producing repository/workflow.
 
 ```sh
-gh attestation verify ./DOWNLOADED_ARTIFACT --repo caamer20/Telegram-Drive
+gh attestation verify ./DOWNLOADED_ARTIFACT --repo mmaziesf/Telegram-Drive
 ```
 
 Require a successful verification for the expected repository and inspect the reported release workflow/ref against the tag you downloaded. Do not install on a failed or unexpected verification. Source CycloneDX SBOM, Arch runtime SBOM and Sigstore bundles accompany the checksums. Verification needs a current GitHub CLI with attestation support and network access; no verification is claimed until run.
