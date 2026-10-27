@@ -3658,6 +3658,20 @@ fn an_api_consumer_cannot_consume_the_desktop_inventory_change_notification() {
 }
 
 #[test]
+fn legacy_hash_lease_releases_the_file_claim_before_the_category_guard() {
+    // Regression for #14: a clear waiting on the category guard must not
+    // run while the legacy preview use still marks the file active.
+    let fixture = Fixture::new();
+    let mut app = Backend::start(&fixture.0);
+    let result = app.ok(json!({"command": "legacy_lease_drop_order"}));
+    assert_eq!(
+        result["order"],
+        json!(["legacy", "capacity", "file", "category"])
+    );
+    app.stop();
+}
+
+#[test]
 fn slow_initial_inventory_reads_keep_the_watched_folder_until_the_change_poll() {
     // Regression for the CI flake in
     // an_api_consumer_cannot_consume_the_desktop_inventory_change_notification:
