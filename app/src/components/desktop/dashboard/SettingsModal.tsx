@@ -1,10 +1,9 @@
 import i18n from '../../../i18n';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, RotateCcw, Download, Upload, Trash2, HardDrive, Globe, Key, Copy, Check, RefreshCw, FolderArchive, Shield, Zap, Activity, Gauge, Wifi, ChevronDown, Link, Sparkles, Info, Monitor, Loader2, Languages, Play, Palette, Tag, Search, Bug, Database, FolderSync } from 'lucide-react';
+import { X, RotateCcw, Download, Upload, Trash2, HardDrive, Globe, Key, Copy, Check, RefreshCw, FolderArchive, Shield, Zap, Activity, Gauge, Wifi, ChevronDown, Link, Info, Monitor, Loader2, Languages, Play, Palette, Tag, Search, Bug, Database, FolderSync } from 'lucide-react';
 import { invoke } from '@tauri-apps/api/core';
 import { toast } from 'sonner';
-import { useSupporter } from '../../../context/SupporterContext';
 import { useSettings } from '../../../context/SettingsContext';
 import { useConfirm } from '../../../context/ConfirmContext';
 import { useTranslation } from 'react-i18next';
@@ -17,13 +16,12 @@ import { AccessTransparencyDialog, type LocalAccessService } from '../../shared/
 import { getDetailedTranscodeCache, transcodeCacheErrorMessage } from '../../../services/transcodeCacheClient';
 import { formatBytes } from '../../../utils';
 import { SettingsRow, SettingsStepper, SettingsToggle } from './settings/SettingsControls';
-import { AboutSettingsTab, AdvancedSettingsTab, EncryptionSettingsTab, GeneralSettingsTab, LicenseSettingsTab, PrivacySettingsTab, ProxySettingsTab, SharingSettingsTab, ThemeSettingsTab, VpnSettingsTab, WebDavSettingsTab } from './settings/SettingsTabs';
+import { AboutSettingsTab, AdvancedSettingsTab, EncryptionSettingsTab, GeneralSettingsTab, PrivacySettingsTab, ProxySettingsTab, SharingSettingsTab, ThemeSettingsTab, VpnSettingsTab, WebDavSettingsTab } from './settings/SettingsTabs';
 import { FfmpegInstallNotice } from '../../shared/FfmpegInstallNotice';
 import { SyncSettingsPanel } from '../sync/SyncSettingsPanel';
 import { DesktopBehaviorSettings } from './settings/DesktopBehaviorSettings';
 import { userFacingError } from '../../../services/userFacingError';
 import { useActionScope } from '../../../hooks/useActionScope';
-import { useUpdates } from '../../../context/UpdateContext';
 import { BandwidthSettings } from './settings/BandwidthSettings';
 import { applyProxySettings, applyVpnSettings } from '../../../services/networkSettings';
 
@@ -32,7 +30,6 @@ interface SettingsModalProps {
     isOpen: boolean;
     onClose: () => void;
     initialTab?: SettingsTab;
-    focusSupporter?: boolean;
 }
 
 interface ApiSettings {
@@ -58,20 +55,17 @@ interface WebDavTokenResponse {
     url: string;
 }
 
-export type SettingsTab = 'general' | 'privacy' | 'license' | 'advanced' | 'webdav' | 'themes' | 'proxy' | 'vpn' | 'encryption' | 'sharing' | 'sync' | 'about';
+export type SettingsTab = 'general' | 'privacy' | 'advanced' | 'webdav' | 'themes' | 'proxy' | 'vpn' | 'encryption' | 'sharing' | 'sync' | 'about';
 
 export function SettingsModal(props: SettingsModalProps) {
     return <OwnedSettingsModal key={props.ownerId ?? 'signed-out'} {...props} />;
 }
 
-function OwnedSettingsModal({ ownerId, isOpen, onClose, initialTab = 'general', focusSupporter = false }: SettingsModalProps) {
+function OwnedSettingsModal({ ownerId, isOpen, onClose, initialTab = 'general' }: SettingsModalProps) {
     const { settings, updateSetting, updateSettings, resetSettings, isLoaded, persistenceStatus } = useSettings();
     const { confirm } = useConfirm();
     const { t } = useTranslation();
-    const { status: supporterStatus } = useSupporter();
-    const tabLabel = (tab: SettingsTab) => tab === 'license'
-        ? t(supporterStatus.ad_free ? 'supporter_license.purchased_title' : 'supporter_license.nav_title')
-        : t(`settings.tab_${tab}`);
+    const tabLabel = (tab: SettingsTab) => t(`settings.tab_${tab}`);
     const [clearing, setClearing] = useState(false);
 
     // Transcode cache state
@@ -97,40 +91,11 @@ function OwnedSettingsModal({ ownerId, isOpen, onClose, initialTab = 'general', 
             setAccessTransparency(null);
         }
     }, [initialTab, isOpen]);
-    useEffect(() => {
-        const container = modalRef.current;
-        if (!isOpen || activeTab !== 'license' || !focusSupporter || !container) return;
-        let frame = 0;
-        const focusSection = () => {
-            const section = container.querySelector<HTMLElement>('#desktop-supporter-section');
-            if (!section) return;
-            observer.disconnect();
-            frame = window.requestAnimationFrame(() => {
-                section.scrollIntoView({ block: 'start' });
-                section.focus({ preventScroll: true });
-            });
-        };
-        // The license section is loaded on demand, so it may mount after the tab.
-        const observer = new MutationObserver(focusSection);
-        observer.observe(container, { childList: true, subtree: true });
-        focusSection();
-        return () => { observer.disconnect(); window.cancelAnimationFrame(frame); };
-    }, [activeTab, focusSupporter, isOpen]);
     const [latencyMs, setLatencyMs] = useState<number | null>(null);
     const [vpnDetected, setVpnDetected] = useState<boolean | null>(null);
     const [proxyStatus, setProxyStatus] = useState<{ reachable: boolean; latency_ms: number } | null>(null);
     const [isTestingProxy, setIsTestingProxy] = useState(false);
 
-    const {
-        checking: updateChecking,
-        available: updateAvailable,
-        version: updateVersion,
-        downloading: updateDownloading,
-        progress: updateProgress,
-        managedByPackageManager,
-        checkForUpdates,
-        downloadAndInstall,
-    } = useUpdates();
     const [networkApplyFailed, setNetworkApplyFailed] = useState({ proxy: false, vpn: false });
     const [networkRetry, setNetworkRetry] = useState(0);
     const networkSettingsReady = isLoaded && persistenceStatus !== 'loading' && persistenceStatus !== 'error';
@@ -140,26 +105,6 @@ function OwnedSettingsModal({ ownerId, isOpen, onClose, initialTab = 'general', 
 
     // Diagnostics state
     const [diagLoading, setDiagLoading] = useState(false);
-
-    const handleCheckForUpdates = useCallback(async () => {
-        const result = await checkForUpdates();
-        if (result.error) {
-            if (result.error.includes('dev') || result.error.includes('no current version')) {
-                toast.info(t('settings.update_prod_only_toast'));
-            } else {
-                toast.error(t('settings.update_check_failed_toast', { error: result.error }));
-            }
-        } else if (result.version) {
-            toast.success(t('settings.update_available_toast', { version: result.version }));
-        } else {
-            toast.success(t('settings.latest_version_toast'));
-        }
-    }, [checkForUpdates, t]);
-
-    const handleInstallUpdate = useCallback(async () => {
-        const result = await downloadAndInstall();
-        if (result.error) toast.error(t('settings.update_failed_toast', { error: result.error }));
-    }, [downloadAndInstall, t]);
 
     // Sharing settings state
     const [shares, setShares] = useState<ShareInfo[]>([]);
@@ -731,7 +676,7 @@ function OwnedSettingsModal({ ownerId, isOpen, onClose, initialTab = 'general', 
                                 [t('ui_copy.nav_security'), [['privacy', Bug, 'Privacy telemetry crash reports consent'], ['encryption', Shield, 'Encryption vault security auto lock']] as const],
                                 [t('ui_copy.nav_connections'), [['sync', FolderSync, 'Folder sync local directories Telegram channels'], ['sharing', Link, 'Sharing links local server']] as const],
                                 [t('settings.tab_advanced'), [['advanced', Gauge, 'REST API proxy VPN WebDAV network integration Finder token port']] as const],
-                                [t('ui_copy.nav_support'), [['license', Key, 'Supporter lifetime license ad-free ads $5 PayPal recovery purchase'], ['about', Info, 'About diagnostics version updates']] as const],
+                                [t('ui_copy.nav_support'), [['about', Info, 'About diagnostics version updates']] as const],
                             ] as const).map(([group, items]) => {
                                 const visibleItems = items.filter(([key, , keywords]) => `${key} ${keywords} ${tabLabel(key)}`.toLowerCase().includes(settingsSearch.trim().toLowerCase()));
                                 if (visibleItems.length === 0) return null;
@@ -1223,63 +1168,9 @@ function OwnedSettingsModal({ ownerId, isOpen, onClose, initialTab = 'general', 
                                 </div>
                             </section>
 
-                            {/* Updates Section */}
-                            <section className="space-y-3">
-                                <h3 className="text-xs font-semibold text-telegram-subtext uppercase tracking-wider flex items-center gap-2">
-                                    <Sparkles className="w-3.5 h-3.5" />
-                                    {t('settings.updates')}
-                                </h3>
-
-                                <div className="p-3 rounded-lg bg-telegram-hover/50 space-y-3">
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-2">
-                                            <Download className="w-4 h-4 text-telegram-subtext" />
-                                            <div>
-                                                <p className="text-sm text-telegram-text font-medium">{t('settings.check_for_updates')}</p>
-                                                <p className="text-xs text-telegram-subtext">
-                                                    {updateVersion ? t('settings.update_available', { version: updateVersion }) : t('settings.check_updates_desc')}
-                                                </p>
-                                            </div>
-                                        </div>
-                                        {updateAvailable && !updateDownloading ? (
-                                            <button
-                                                onClick={handleInstallUpdate}
-                                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-telegram-primary text-white hover:bg-telegram-primary/90 transition"
-                                            >
-                                                <Download className="w-3 h-3" />
-                                                {managedByPackageManager ? t('files.open') : t('settings.update_restart')}
-                                            </button>
-                                        ) : updateDownloading ? (
-                                            <div className="flex items-center gap-2">
-                                                <RefreshCw className="w-3.5 h-3.5 text-telegram-primary animate-spin" />
-                                                <span className="text-xs text-telegram-primary font-mono">{updateProgress}%</span>
-                                            </div>
-                                        ) : (
-                                            <button
-                                                onClick={handleCheckForUpdates}
-                                                disabled={updateChecking}
-                                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-telegram-primary/10 text-telegram-primary hover:bg-telegram-primary/20 transition disabled:opacity-50"
-                                            >
-                                                <RefreshCw className={`w-3 h-3 ${updateChecking ? 'animate-spin' : ''}`} />
-                                                {updateChecking ? t('settings.checking') : t('settings.check_now')}
-                                            </button>
-                                        )}
-                                    </div>
-                                    {updateDownloading && (
-                                        <div className="w-full h-1.5 bg-telegram-border rounded-full overflow-hidden">
-                                            <div
-                                                className="h-full bg-telegram-primary rounded-full transition-all duration-300"
-                                                style={{ width: `${updateProgress}%` }}
-                                            />
-                                        </div>
-                                    )}
-                                </div>
-                            </section>
-
                                     </GeneralSettingsTab>
                                 )}
 
-                                {activeTab === 'license' && <LicenseSettingsTab />}
 
                                 {activeTab === 'privacy' && (
                                     <PrivacySettingsTab
