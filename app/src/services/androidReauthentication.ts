@@ -1,7 +1,7 @@
 import { invoke } from '@tauri-apps/api/core';
 
 export async function requireAndroidReauthentication(reason: string): Promise<void> {
-  let android = false;
+  let android: boolean;
   try {
     const { type } = await import('@tauri-apps/plugin-os');
     android = type() === 'android';
