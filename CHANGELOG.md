@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+### Sync folders cannot sit inside the app's own state
+
+- Previewing, adding or updating a sync mapping now refuses a local folder that is inside (or equal to) the app's data, local data, cache, config or log folder. Such a mapping would upload session and vault files to Telegram, or let remote files overwrite them. The check runs on the canonical path, so `..` tricks are caught.
+- Folders that *contain* the app's folders (for example the whole home folder) are still allowed. Excluding the app's folders during a sync is a separate change and is noted as open in RT-12.
+- A native E2E journey covers allowed and refused roots (RT-12 in the red-team report).
+
 ### Proxy settings refuse malformed hosts and credentials
 
 - `cmd_apply_proxy_settings` now validates an enabled proxy before saving it. The type must be SOCKS5, HTTP or HTTPS. The host must be a hostname, an IPv4 address or a bracketed IPv6 address, with no `@`, `/`, `#`, `:` or whitespace. The port cannot be 0, and the username and password must be at most 255 bytes (the SOCKS5 field limit) without control characters. These values are inserted into `socks5://user:pass@host:port`, and before this check a malformed host was saved and silently changed that URL's structure. A disabled proxy is still saved as typed, apart from the password limit.

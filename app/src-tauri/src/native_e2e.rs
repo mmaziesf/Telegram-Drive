@@ -1141,6 +1141,7 @@ impl Driver {
             | "advance_share_unlock_clock"
             | "share_metadata_check"
             | "proxy_settings_check"
+            | "sync_root_check"
             | "capture_account"
             | "validate_account"
             | "save_collection"
@@ -1521,6 +1522,13 @@ impl Driver {
                     Ok(json!({"version": query.read::<i64,_>(0).map_err(error)?}))
                 })
                 .await
+            }
+            "sync_root_check" => {
+                let local = self.root.join(text(&request, "local")?);
+                let local = local.canonicalize().map_err(error)?;
+                let app_dirs = [self.root.join("app-data"), self.root.join("app-cache")];
+                crate::sync_engine::preview::refuse_app_state_root(&local, &app_dirs)?;
+                Ok(json!({}))
             }
             "proxy_settings_check" => {
                 crate::commands::settings::validate_proxy_request(
