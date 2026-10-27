@@ -1,6 +1,6 @@
 {
   "common": {
-    "app_title": "Telegram Drive",
+    "app_title": "Unofficial Telegram Drive",
     "logout": "退出",
     "signout_remote_unconfirmed": "已在此裝置上登出，但 Telegram 未確認工作階段已結束。請開啟 Telegram → 設定 → 裝置，並在那裡結束該工作階段。",
     "search_placeholder": "搜尋文件...",
@@ -272,7 +272,7 @@
     "copy_share_link": "複製分享鏈接",
     "revoke_link": "撤銷鏈接",
     "copy_diagnostics": "複製診斷",
-    "tagline": "由您的 Telegram 帳戶支援、以本機為優先的檔案工作區。開源且可免費使用。",
+    "tagline": "由您的 Telegram 帳戶支援、以本機為優先的檔案工作區。可免費使用。",
     "reset_defaults": "重設為預設值",
     "done": "完成",
     "clear_local_cache": "清除本機快取",
@@ -534,7 +534,7 @@
     "donate": "捐贈",
     "getting_started": "開始使用",
     "close_help": "關閉幫助",
-    "privacy_note": "您的憑證是本機儲存在您的裝置上，絕不會傳送到任何第三方伺服器。所有資料都直接在您和 Telegram 之間傳輸。",
+    "privacy_note": "您的 API ID、API hash 和 Telegram 工作階段儲存在此裝置上，且只會傳送給 Telegram。部分功能會連線至其他服務，例如廣告和支持者授權。",
     "code_sent_telegram_app": "Telegram 將登入代碼傳送至您已登入的裝置之一上經過驗證的 Telegram 聊天室。",
     "code_sent_sms": "Telegram 透過簡訊傳送了登入代碼。",
     "code_sent_call": "Telegram 會打電話給您並大聲朗讀登入代碼。",
@@ -1463,7 +1463,7 @@
   },
   "auth_copy": {
     "qr_title": "優先使用 QR 安全登入",
-    "qr_description": "桌面登入使用 Telegram 的 QR 裝置流程。Telegram 仍要求一次性輸入 API ID 和雜湊，以識別此開放原始碼用戶端。",
+    "qr_description": "桌面登入使用 Telegram 的 QR 裝置流程。Telegram 仍要求一次性輸入 API ID 和雜湊，以識別此用戶端。",
     "advanced": "進階用戶端憑證",
     "continue_phone": "繼續使用電話登入",
     "continue_qr": "繼續使用 QR 登入",

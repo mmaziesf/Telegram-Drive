@@ -510,10 +510,10 @@ test('RC packaging uses the plain application version for the exact upstream Deb
   const directory = fixture(t);
   const policy = run('release-tag-policy.cjs', '--tag', 'v4.0.0-rc.1'); success(policy);
   const version = JSON.parse(policy.stdout).applicationVersion;
-  const deb = path.join(directory, `Telegram.Drive_${version}_amd64.deb`); fs.writeFileSync(deb, 'fixture binary package');
+  const deb = path.join(directory, `Unofficial.Telegram.Drive_${version}_amd64.deb`); fs.writeFileSync(deb, 'fixture binary package');
   const rendered = path.join(directory, 'recipe');
   const result = spawnSync('bash', [path.join(scripts, 'render-arch-pkgbuild.sh'), deb, version, rendered], {encoding:'utf8',timeout:15000}); success(result);
   const recipe = fs.readFileSync(path.join(rendered, 'PKGBUILD'), 'utf8');
-  assert.match(recipe, /^pkgver=4\.0\.0$/m); assert.match(recipe, /Telegram\.Drive_4\.0\.0_amd64\.deb/);
+  assert.match(recipe, /^pkgver=4\.0\.0$/m); assert.match(recipe, /Unofficial\.Telegram\.Drive_4\.0\.0_amd64\.deb/);
   assert.doesNotMatch(recipe, /rc\.1/);
 });

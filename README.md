@@ -2,7 +2,7 @@
 
 <img src="Docs/assets/logo.svg" alt="Telegram Drive logo" width="92">
 
-# Telegram Drive
+# Unofficial Telegram Drive
 
 ### A local-first file workspace powered by your own Telegram account
 
@@ -25,7 +25,7 @@ Organize, transfer, preview, stream, sync, and share the files you keep in Saved
 Telegram Drive turns Telegram's familiar file storage into a focused, desktop-style workspace. The app connects directly to Telegram with credentials you provide; it does not run a separate file-storage or relay service. Every application feature is available without payment.
 
 > [!IMPORTANT]
-> Telegram Drive is an independent project and is not affiliated with Telegram FZ-LLC. Files remain subject to Telegram's account, service, and per-file limits. Telegram Drive should not be treated as literally unlimited storage or as the only backup of important data.
+> **Unofficial Telegram Drive is an unofficial third-party client.** It is an independent project and is not affiliated with, endorsed by, or sponsored by Telegram FZ-LLC. It uses the Telegram API under the [Telegram API Terms of Service](https://core.telegram.org/api/terms), which require third-party apps that use "Telegram" in their title to mark themselves as "Unofficial". Files remain subject to Telegram's account, service, and per-file limits. Telegram Drive should not be treated as literally unlimited storage or as the only backup of important data.
 
 ## Contents
 
@@ -230,6 +230,7 @@ TDENC2-protected audio, video, and PDF content can stream in supported in-app vi
 - Telegram session data, settings, transfer state, sync metadata, encryption registry data, and vault material are stored locally in the application's data directories.
 - Standard uploads send ordinary file content to Telegram. TDENC2 uploads send ciphertext, although Telegram can still observe transport/account metadata such as ciphertext size, time, account, and destination channel.
 - The project does not operate a separate file-relay service.
+- Sponsor placements load content from third-party ad networks, and the desktop app resolves one ad host through Cloudflare DNS-over-HTTPS (`app/src-tauri/src/server.rs`). The in-app sign-in note therefore says that credentials and the session go only to Telegram, not that all traffic does.
 - Crash reporting is disabled by default and requires explicit consent. Reports exclude file names, paths, contents, messages, Telegram identifiers, credentials, phone numbers, and user-entered values.
 - The REST API and WebDAV server are disabled by default and bind only to `127.0.0.1`.
 - The REST API stores only a hash of its generated key; the plaintext key is shown once.

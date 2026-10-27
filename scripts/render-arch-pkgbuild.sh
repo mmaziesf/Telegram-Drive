@@ -20,9 +20,13 @@ if [[ ! "${version}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
   exit 1
 fi
 
-expected_name="Telegram.Drive_${version}_amd64.deb"
-if [[ "$(basename "${deb_path}")" != "${expected_name}" ]]; then
-  echo "Expected ${expected_name}, received $(basename "${deb_path}")" >&2
+# Current releases are named after the "Unofficial Telegram Drive" product name;
+# the legacy name is still accepted so older pinned fixtures keep rendering.
+expected_name="Unofficial.Telegram.Drive_${version}_amd64.deb"
+legacy_name="Telegram.Drive_${version}_amd64.deb"
+received_name="$(basename "${deb_path}")"
+if [[ "${received_name}" != "${expected_name}" && "${received_name}" != "${legacy_name}" ]]; then
+  echo "Expected ${expected_name}, received ${received_name}" >&2
   exit 1
 fi
 

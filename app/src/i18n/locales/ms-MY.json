@@ -1,6 +1,6 @@
 {
   "common": {
-    "app_title": "Telegram Drive",
+    "app_title": "Unofficial Telegram Drive",
     "logout": "Log Keluar",
     "signout_remote_unconfirmed": "Anda telah log keluar pada peranti ini, tetapi Telegram tidak mengesahkan bahawa sesi telah ditamatkan. Buka Telegram → Tetapan → Peranti dan tamatkan sesi di sana.",
     "search_placeholder": "Cari fail...",
@@ -272,7 +272,7 @@
     "copy_share_link": "Salin pautan kongsi",
     "revoke_link": "Batalkan pautan",
     "copy_diagnostics": "Salin Diagnostik",
-    "tagline": "Ruang kerja fail berasaskan setempat yang dikuasakan oleh akaun Telegram anda. Sumber terbuka dan percuma untuk digunakan.",
+    "tagline": "Ruang kerja fail berasaskan setempat yang dikuasakan oleh akaun Telegram anda. Percuma untuk digunakan.",
     "reset_defaults": "Tetapkan semula kepada Lalai",
     "done": "Selesai",
     "clear_local_cache": "Kosongkan Cache Tempatan",
@@ -534,7 +534,7 @@
     "donate": "Buat derma",
     "getting_started": "Bermula",
     "close_help": "Tutup bantuan",
-    "privacy_note": "Bukti kelayakan anda disimpan secara setempat pada peranti anda dan tidak pernah dihantar ke mana-mana pelayan pihak ketiga. Semua data pergi terus antara anda dan Telegram.",
+    "privacy_note": "API ID, API hash dan sesi Telegram anda disimpan pada peranti ini dan hanya dihantar kepada Telegram. Sesetengah ciri menghubungi perkhidmatan lain, seperti iklan dan lesen penyokong.",
     "code_sent_telegram_app": "Telegram menghantar kod log masuk ke sembang Telegram yang disahkan pada salah satu peranti anda yang dilog masuk.",
     "code_sent_sms": "Telegram menghantar kod log masuk melalui SMS.",
     "code_sent_call": "Telegram akan menghubungi anda dan membaca kod log masuk dengan kuat.",
@@ -1463,7 +1463,7 @@
   },
   "auth_copy": {
     "qr_title": "Log masuk selamat dengan QR",
-    "qr_description": "Log masuk desktop menggunakan aliran peranti QR Telegram. Telegram masih memerlukan API ID dan hash yang dimasukkan sekali untuk mengenal pasti klien sumber terbuka ini.",
+    "qr_description": "Log masuk desktop menggunakan aliran peranti QR Telegram. Telegram masih memerlukan API ID dan hash yang dimasukkan sekali untuk mengenal pasti klien ini.",
     "advanced": "Kelayakan klien lanjutan",
     "continue_phone": "Teruskan log masuk dengan telefon",
     "continue_qr": "Teruskan log masuk dengan QR",

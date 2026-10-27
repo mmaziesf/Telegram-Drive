@@ -1,6 +1,6 @@
 [Desktop Entry]
 Type=Application
-Name=Telegram Drive
+Name=Unofficial Telegram Drive
 Comment=Browse and manage files stored in your Telegram account
 Exec=telegram-drive
 Icon=com.cameronamer.telegramdrive
