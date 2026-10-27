@@ -61,7 +61,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
                     });
                     persistenceQueueRef.current = scrub.catch(() => undefined);
                     await scrub;
-                } catch (error) {
+                } catch {
                     // Keep the legacy value intact until secure storage becomes
                     // available. Never include the credential in diagnostic logs.
                     console.error('[Settings] Secure proxy credential migration is pending.');

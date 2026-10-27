@@ -424,8 +424,12 @@ fn zip_entries(archive: &mut zip::ZipArchive<std::fs::File>) -> Result<Vec<Archi
     let mut entries = Vec::with_capacity(archive.len());
     for index in 0..archive.len() {
         let file = archive.by_index(index).map_err(|error| error.to_string())?;
+        let filename = file
+            .name()
+            .map_err(|error| format!("Invalid ZIP entry name at index {index}: {error}"))?
+            .into_owned();
         entries.push(ArchiveEntry {
-            filename: file.name().into(),
+            filename,
             size: file.size(),
             compressed_size: file.compressed_size(),
             is_dir: file.is_dir(),
@@ -457,7 +461,10 @@ where
             if file.is_dir() {
                 return Err("Cannot extract a directory entry".into());
             }
-            let name = sanitise_entry_name(file.name(), index);
+            let entry_name = file
+                .name()
+                .map_err(|error| format!("Invalid ZIP entry name at index {index}: {error}"))?;
+            let name = sanitise_entry_name(&entry_name, index);
             let size = file.size();
             extract_reader(file, &setup.root, name, size, &setup.account)
                 .map(PendingOutput::Extracted)
