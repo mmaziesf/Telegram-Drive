@@ -30,6 +30,10 @@ use tokio::sync::{Mutex, RwLock};
 
 // Allow bounded source work while lifecycle journeys exercise notifications and retention.
 const INVENTORY_FIXTURE_RECONCILIATION: Duration = Duration::from_secs(30);
+// The timer lifecycle must keep its folder from the cold read through the
+// change poll (a 1 s sleep plus three reads), then evict it after one more
+// sleep. 4 s leaves 3 s for slow reads on loaded CI runners; 2 s left 1 s.
+const INVENTORY_TIMER_RETENTION: Duration = Duration::from_secs(4);
 
 fn error(error: impl std::fmt::Display) -> String {
     error.to_string()
@@ -2402,7 +2406,7 @@ impl Driver {
                     poll: std::time::Duration::from_millis(30),
                     audit: std::time::Duration::from_millis(60),
                     reconciliation: INVENTORY_FIXTURE_RECONCILIATION,
-                    retention: std::time::Duration::from_secs(2),
+                    retention: INVENTORY_TIMER_RETENTION,
                     audit_window: std::time::Duration::from_secs(60),
                 };
                 let cache = InventoryCache::with_timing(timing);
@@ -2430,7 +2434,7 @@ impl Driver {
                         async move { Ok(source) }
                     })
                     .await;
-                tokio::time::sleep(std::time::Duration::from_millis(1500)).await;
+                tokio::time::sleep(INVENTORY_TIMER_RETENTION).await;
                 tokio::fs::copy(child(&self.root, text(&request, "cold")?)?, &live)
                     .await
                     .map_err(error)?;

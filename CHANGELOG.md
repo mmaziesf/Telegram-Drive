@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+### Inventory timer test flake
+
+- `an_api_consumer_cannot_consume_the_desktop_inventory_change_notification` failed on CI with `changedEvents` 0. The native test harness kept the watched folder for 2 s after the cold read, and its lifecycle spends 1 s asleep plus three reads before the change poll, so slow reads on a loaded runner evicted the folder; the API read then started a fresh entry that already held the rename, and the poll had nothing to report. The harness now keeps the folder for 4 s and waits that long before the eviction check. Production retention is unchanged. The new `slow_initial_inventory_reads_keep_the_watched_folder_until_the_change_poll` test slows the first two reads by 700 ms each and failed with the old window.
+
 ### Telegram account risk notice
 
 - The first-run introduction has a fourth step, "Protect your Telegram account". It says that Telegram observes accounts using unofficial clients and bans flooding or spam, gives no storage guarantee, and deletes accounts offline longer than the self-destruct period, and it asks the user to set that period to the longest option and keep backups. It links the Telegram API Terms of Service and Telegram's self-destruction FAQ (opened in the system browser). The strings are in all 24 locales; the non-English ones are machine-drafted and unreviewed. The locale data grows by 16,562 bytes and stays under the existing budget. The README's first-time setup has the same notice. `telegram-api-disclosure.spec.ts` covers the step and both links.
