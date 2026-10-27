@@ -45,7 +45,6 @@ base64 = "0.22"
 image = { version = "0.25.10", default-features = false, features = ["bmp", "gif", "jpeg", "png", "webp"] }
 log = "0.4"
 env_logger = "0.11"
-tauri-plugin-updater = "2"
 actix-web = "4"
 actix-cors = "0.7"
 actix-files = "0.6"
@@ -54,7 +53,6 @@ futures = "0.3"
 bytes = "1"
 async-stream = "0.3"
 actix-rt = "2"
-tauri-plugin-process = "2"
 bitflags = "=2.10.0"
 tauri-plugin-deep-link = "2"
 tauri-plugin-clipboard-manager = "2"
@@ -73,7 +71,7 @@ hkdf = "0.12"
 hmac = "0.12"
 zeroize = { version = "1", features = ["derive"] }
 getrandom = "0.2"
-zip = { version = "2", default-features = false, features = ["deflate"] }
+zip = { version = "9", default-features = false, features = ["deflate"] }
 sevenz-rust2 = "0.7"
 path-clean = "1"
 walkdir = "2"
@@ -91,7 +89,6 @@ unrar = "0.5"
 
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
 dav-server = { version = "0.11", features = ["actix-compat"] }
-ed25519-dalek = "2.2"
 keyring = { version = "3.6", default-features = false, features = ["apple-native", "windows-native", "linux-native-sync-persistent", "crypto-rust"] }
 tauri-plugin-notification = "2"
 tauri-plugin-single-instance = "2"
@@ -106,7 +103,6 @@ windows-sys = { version = "0.61", features = ["Win32_Storage_FileSystem", "Win32
 [target.'cfg(target_os = "android")'.dependencies]
 jni = "0.21"
 ndk-context = "0.1.1"
-ed25519-dalek = "2.2"
 
 
 # This backend driver is opt-in and excluded from normal builds.

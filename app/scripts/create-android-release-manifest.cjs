@@ -20,7 +20,7 @@ const repository = args.get('--repository');
 const tag = args.get('--tag');
 const manifest = {
   schema: 1,
-  packageName: 'com.cameronamer.telegramdrive',
+  packageName: 'io.github.mmaziesf.unofficialtelegramdrive',
   version: args.get('--version'),
   versionCode: Number.parseInt(args.get('--version-code'), 10),
   url: `https://github.com/${repository}/releases/download/${encodeURIComponent(tag)}/${encodeURIComponent(filename)}`,

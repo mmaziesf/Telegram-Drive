@@ -15,7 +15,6 @@ import { useUploadChoice, type UploadChoice } from '../context/UploadChoiceConte
 import { useConfirm } from '../context/ConfirmContext';
 import { triggerHaptic } from '../services/feedback';
 import { isTransientNetworkError, restoreUploadQueue, serializeUploadQueue } from '../services/transferQueuePolicy';
-import { announceSupporterValueMoment } from '../services/supporterVisibility';
 import { userFacingError } from '../services/userFacingError';
 import { invalidateFolderFileQueries } from '../services/fileListRefresh';
 import { effectiveVideoUploadMode } from '../services/videoUploadMode';
@@ -165,7 +164,6 @@ export function useFileUpload(
                     }
                 } else if (job.status === 'completed') {
                     triggerHaptic('success');
-                    announceSupporterValueMoment('upload_completed');
                     void invalidateFolderFileQueries(queryClient, job.folderId, job.ownerId);
                 } else if (job.status === 'failed') {
                     toast.error(i18n.t('transfer_copy.upload_failed',{name:job.filename,error:job.error||i18n.t('transfer_copy.unknown_error')}));
@@ -425,7 +423,6 @@ export function useFileUpload(
             } else {
                 setUploadQueue(q => q.map(i => i.id === item.id ? { ...i, status: 'success', progress: 100 } : i));
                 triggerHaptic('success');
-                announceSupporterValueMoment('upload_completed');
                 void invalidateFolderFileQueries(queryClient, item.folderId, item.ownerId);
             }
             if (!keepTemporaryFileForResume) await cleanupResumableSource(item);
@@ -565,6 +562,9 @@ export function useFileUpload(
             await Promise.all(preparedPaths
                 .filter(candidate => candidate.androidStaged)
                 .map(candidate => invoke('cmd_delete_android_staged_upload', { path: candidate.path }).catch(() => undefined)));
+            // ACCOUNT_CHANGED is a control-flow signal: after an account switch the
+            // staging error no longer matters, so it is not attached as a cause.
+            // eslint-disable-next-line preserve-caught-error
             if (!isCurrent()) throw new Error('ACCOUNT_CHANGED');
             toast.error(`Android could not preserve the selected file for background recovery: ${String(error)}`);
             return 0;

@@ -29,12 +29,7 @@ if [[ "$(uname -s)" == Darwin ]]; then
     one_app "$mounted"
     hdiutil detach "$mounted"; mounted=""
   done < <(find "$bundle" -type f -name '*.dmg' -print)
-  archives=0
-  while IFS= read -r artifact; do
-    archives=$((archives + 1)); directory="$work/archive-$archives"; mkdir "$directory"
-    tar -xzf "$artifact" -C "$directory"; one_app "$directory"
-  done < <(find "$bundle" -type f -name '*.app.tar.gz' -print)
-  [[ $dmgs -gt 0 && $archives -gt 0 ]] || { echo 'Missing DMG or updater application archive' >&2; exit 1; }
+  [[ $dmgs -gt 0 ]] || { echo 'Missing DMG' >&2; exit 1; }
 else
   for kind in AppImage deb rpm; do
     count=0

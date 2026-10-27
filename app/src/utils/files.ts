@@ -34,6 +34,8 @@ export const isArchiveFile = (name: string): boolean => isZipFile(name) || isRar
 
 export function sanitizeFilename(name: string): string {
   return name
+    // Control characters are invalid in file names on every target platform.
+    // eslint-disable-next-line no-control-regex
     .replace(/[<>:"/\\|?*\x00-\x1F]/g, '_')
     .trim()
     .replace(/^\.+|\.+$/g, '')

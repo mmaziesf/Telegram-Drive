@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Unofficial Telegram Drive
+Comment=Browse and manage files stored in your Telegram account
+Exec=telegram-drive
+Icon=io.github.mmaziesf.unofficialtelegramdrive
+Terminal=false
+Categories=Network;FileTransfer;Utility;
+StartupWMClass=app
+StartupNotify=true

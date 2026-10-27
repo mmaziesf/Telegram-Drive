@@ -5,6 +5,83 @@
 - Add `tests/crypto_envelope.rs`, an in-memory suite that exercises the public envelope, key-slot and recovery-bundle API. It covers round-trips under random sizes, metadata and download fragmentation; rejection of every flipped bit, truncation, trailing bytes, reordered, dropped or cross-file records, and wrong keys; key-slot binding of the file identity, slot ID, kind and salt; nonce and file-identity uniqueness; and byte-identical resumed uploads. Property cases use `proptest` (a dev-dependency only).
 - CI runs the suite alongside the native journeys, and TESTING.md documents it.
 
+### Documentation and project hygiene
+
+- README: the notice now says that this is a fork of caamer20/Telegram-Drive, that the original code is © its author with no license granted, that no releases are published and that the app uses the Telegram API with the user's own credentials. A "Security hardening by Grok Bot" section links each change to its pull request and evidence, and a "Known limitations" section lists what is not covered.
+- Add `Docs/THREAT_MODEL.md` (assets, adversaries, controls with code references, known limitations) and `Docs/CRYPTO.md` (primitives, parameters and the tests behind each encryption claim).
+- Add `CONTRIBUTING.md` and a pull-request template.
+- The README states that #4's dependency updates reached `main` through #6 without GitHub's Windows and macOS builds, and that GitHub Actions is disabled for this repository. It also lists #16, says that the new app identifier has no data migration because the fork never published a release, and lists the upstream-designed app icon as a known limitation.
+
+### No ads, payments or donations
+
+- Remove the advertising network. The loopback media server no longer serves `/ad-banner` or `/ad-script` (`app/src-tauri/tests/native_e2e.rs` asserts both return 404), no longer resolves the ad host through Cloudflare DNS-over-HTTPS and no longer sends a spoofed desktop-Chrome User-Agent. The WebView content policy now sets `frame-src 'none'`, enforced by `node scripts/check-app-security.cjs`.
+- Remove the $5 supporter licence: the PayPal checkout, the Cloudflare Worker that issued licences (`supporter-service/`), its CI and backup workflows, the in-app offer, settings section and mobile card, the Ed25519 token verifier and the supporter documents. Every feature was already free; the licence only hid ads, so no feature changes.
+- Remove the sign-in donate dialog with its Litecoin and Bitcoin addresses, and `.github/FUNDING.yml`.
+- Remove the related strings from all 24 locales and lower the literal budget to the measured 291 findings.
+- `PRIVACY.md`, `SECURITY.md`, `AGENTS.md`, `TESTING.md` and the README say the app shows no ads and takes no payments. Historical upstream records keep their text and carry a banner.
+- Add `node scripts/check-no-ads.cjs`, which fails when a tracked file names an ad network, a payment or donation provider, the DoH fallback or a spoofed Chrome User-Agent. It runs on every pull request in its own workflow and in release preflight, and the assurance suite checks that it catches each kind of reference. Browser journeys assert that sign-in, the workspace and settings show no donation, purchase or sponsor content and no iframe.
+- Dependabot no longer watches `supporter-service/`, and `.gitignore` drops its entries.
+- `check-no-ads.cjs` skips `.gitleaksignore`: its fingerprints must name the removed ad components that hold reviewed historic gitleaks findings.
+- Release preflight no longer checks a supporter service and accepts a README without download links.
+- Kept: the Android Kotlin entry points `get/put/deleteSupporterSecret` keep their names because they are the JNI contract for the API-hash store and the Android sources are not in this repository.
+
+### Fork identity and no auto-update
+
+- Remove the built-in updater: the Tauri updater and process plugins, their capabilities, the upstream update signing public key, the update banner, the "What's new" dialog and the "Check for updates" control in About. This build never contacts the upstream release feed. `node scripts/check-app-security.cjs` now fails if an `updater:` or `process:` permission, an updater plugin config or updater artifacts come back.
+- Change the bundle identifier from `com.cameronamer.telegramdrive` to `io.github.mmaziesf.unofficialtelegramdrive`, including keychain service names, the Linux desktop entry, Android class names referenced from Rust, packaging scripts, workflows and the docs that name it. This is a separate app: it does not read the sessions, vaults, settings or keychain entries of an upstream install.
+- No migration from the old identifier and no update channel, by owner decision: this fork has never published a release, so there are no installs of it to migrate or update. A user of the upstream app keeps that app and its data; this build starts with an empty profile and asks for its own `api_id`.
+- Logo audit: the app icons (`app/src-tauri/icons/`), `app/public/logo.svg` and `Docs/assets/logo.svg` show a white shield with a check mark on a blue rounded square. The shield is Lucide's `shield-check` path (ISC licence, same path as `lucide-react`'s `shield-check` icon). None of them use Telegram's logo or paper-plane mark. The design is still the upstream app's icon, so the fork looks like the original app in a dock or taskbar. Replacing it is left to the owner.
+- Removing the updater also removes `zip` 4 from the dependency tree. The RUSTSEC-2026-0367, -0368 and -0369 exceptions for it are deleted from `deny.toml` and the Rust advisory baseline, so cargo-deny fails if any of them returns.
+- Publish nothing automatically. `release.yml` runs only on a manual dispatch and no longer signs updater artifacts, writes an updater manifest or refreshes the upstream product page. The GitHub Pages workflow that deployed the upstream product site is removed. `node scripts/check-workflow-pins.cjs` now fails on a `push:` trigger in `release.yml` or any `actions/deploy-pages` step.
+- Point the README, About, Help and Privacy links at this fork, replace the download section with build-from-source instructions and credit the original project and author in About (desktop and Android) in all 24 locales. A browser journey checks both links in desktop About.
+- `SECURITY.md` asks for private reports through GitHub private vulnerability reporting on this fork and states that there are no releases or auto-updater.
+- Bundle ceilings: initial JavaScript falls from 504923 to 378375 bytes because framer-motion no longer loads with the update banner; the desktop route rises from 302094 to 420791 bytes because the library now loads there; total JavaScript and locale data both fall. All changed ceilings are set to the measured sizes.
+- Not done: Android strings and Microsoft Store packaging cannot be renamed because neither the Android project nor a Store configuration is in this repository.
+
+### Telegram API disclosure
+
+- State on the sign-in screen, on the first step of the first-run introduction and in About (desktop and Android) that this unofficial app uses the Telegram API and is not affiliated with, endorsed by or sponsored by Telegram. The text is translated into all 24 locales.
+- Browser journeys check the notice on the sign-in screen, in the first-run introduction and in desktop About.
+- The locale ceilings rise by the measured 4053 bytes (319 bytes in the largest catalog) and the desktop route ceiling by 94 bytes.
+
+### Accurate product claims
+
+- Remove "open-source" from the in-app tagline and QR sign-in text in all 24 locales and from the GitHub Pages site (`Docs/Telegram-Drive.html`). The upstream code has no license, so the project is source-available at most.
+- Replace the sign-in note "never sent to any third-party servers. All data goes directly between you and Telegram" in all 24 locales. It now says that the API ID, API hash and Telegram session are stored on the device and sent only to Telegram, and that some features contact other services such as ads and supporter licenses.
+- Show "No limit" instead of "Unlimited" for a zero bandwidth, archive or stream-quality cap in English, so the label cannot be read as a storage claim.
+- Note in the README that sponsor placements load third-party ad content and that one ad host is resolved through Cloudflare DNS-over-HTTPS.
+
+### Unofficial client naming
+
+- Show the app as "Unofficial Telegram Drive" in the window title, installer metadata, Linux desktop entry and every translated `common.app_title`, and state in the README that this is an independent third-party client that is not affiliated with, endorsed by or sponsored by Telegram FZ-LLC, as the [Telegram API Terms of Service](https://core.telegram.org/api/terms) require.
+- The bundle identifier is unchanged, so existing sessions, vaults, settings and keychain entries keep working. Linux `.deb` and macOS bundle artifact names change; the Arch packaging script accepts both the new and the legacy `.deb` name.
+- The locale budget grows by the exact 290 bytes the new title adds (11 bytes in the largest catalog).
+
+### The full-history secret scan passes again after the #6 squash merge
+
+- Squash-merging #6 put an earlier wording of a `.gitleaksignore` comment into a new commit (21645df). The full-history gitleaks scan reported it as a generic API key. The comment is reworded, and `.gitleaksignore` records that fingerprint along with its reason.
+
+### Continuous integration
+
+- Add a CI workflow for pull requests and pushes to `main`. It runs ESLint with zero warnings, `tsc --noEmit`, the locale checks, the production build with its bundle budget, the Playwright journeys, `cargo fmt --check`, Clippy with `-D warnings`, the native Rust integration tests, `cargo deny`, `cargo audit` and a gitleaks scan of the full history.
+- Add CodeQL analysis for GitHub Actions, JavaScript/TypeScript and Rust on pull requests, `main` and a weekly schedule.
+- Add Dependabot updates for Cargo, both npm projects and GitHub Actions.
+- Workflows use read-only tokens by default, pin every action to a commit SHA and do not persist checkout credentials. Only the CodeQL job can write security events.
+- Fix the frontend lint findings, including 22 conditional hook calls in the sign-in screen. Two rules stay off with an inline reason: `no-explicit-any` (141 uses) and `react-hooks/exhaustive-deps` (43 uses).
+- `cargo audit` ignores the same advisories as `deny.toml`, with the same reasons. `.gitleaksignore` lists each known false positive with its reason.
+- Fix the TV keyboard journey in `accessibility.spec.ts`. After Escape releases the native select, the test now presses ArrowLeft to reach the number field beside it. It used to press ArrowDown, and spatial navigation picks the element below by on-screen geometry. With some installed fonts, such as Inter, that element is a button instead of the number field, so the test failed on those machines but passed on the CI runner.
+
+### Dependency security
+
+- Update tokio, rustls-webpki, webpki-roots, webpki-root-certs, quinn-proto, actix-http (with zstd) and clipboard-win to releases that fix their published RUSTSEC advisories.
+- Move the archive viewer and extractor to `zip` 9. Entry names that `zip` 9 cannot decode are refused with an error that names the entry index.
+- `zip` 4 remains only inside `tauri-plugin-updater` (2.14 still requires `zip` ^4). It only unpacks minisign-verified update archives, so RUSTSEC-2026-0367, -0368 and -0369 are recorded as reviewed exceptions in `deny.toml` and the advisory baseline, to be removed when the updater moves to `zip` 9.
+- Raise the supporter service's pinned `undici` override (used only by the `miniflare` test harness) from 7.29.1 to 7.30.1, fixing GHSA-4qv8-2p9j-2685, GHSA-f72v-6w45-q472 and GHSA-xjj6-f33q-929c.
+
+### Clearing the legacy preview cache no longer skips a file being hashed
+
+- Clearing previews while a cancelled legacy preview was still being hashed could leave that file on disk and still report success. The hashing worker now ends its claim on the file before it releases the cache category, so the waiting clear removes it.
+
 ### Pull requests skip macOS runners and cancel superseded runs
 
 Pull requests now build Windows and Linux. Both macOS targets still run on every push to `main`, nightly and on manual dispatch. A new push to a pull request cancels that pull request's runs that are still going; runs on `main` are never cancelled. `scripts/check-workflow-pins.cjs` enforces both rules on every pull request that changes a workflow.

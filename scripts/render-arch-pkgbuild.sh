@@ -20,9 +20,13 @@ if [[ ! "${version}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
   exit 1
 fi
 
-expected_name="Telegram.Drive_${version}_amd64.deb"
-if [[ "$(basename "${deb_path}")" != "${expected_name}" ]]; then
-  echo "Expected ${expected_name}, received $(basename "${deb_path}")" >&2
+# Current releases are named after the "Unofficial Telegram Drive" product name;
+# the legacy name is still accepted so older pinned fixtures keep rendering.
+expected_name="Unofficial.Telegram.Drive_${version}_amd64.deb"
+legacy_name="Telegram.Drive_${version}_amd64.deb"
+received_name="$(basename "${deb_path}")"
+if [[ "${received_name}" != "${expected_name}" && "${received_name}" != "${legacy_name}" ]]; then
+  echo "Expected ${expected_name}, received ${received_name}" >&2
   exit 1
 fi
 
@@ -37,13 +41,13 @@ sha256_file() {
 assets_directory="${repository_root}/packaging/arch"
 deb_sha256="$(sha256_file "${deb_path}")"
 launcher_sha256="$(sha256_file "${assets_directory}/telegram-drive")"
-desktop_sha256="$(sha256_file "${assets_directory}/com.cameronamer.telegramdrive.desktop")"
+desktop_sha256="$(sha256_file "${assets_directory}/io.github.mmaziesf.unofficialtelegramdrive.desktop")"
 notice_sha256="$(sha256_file "${assets_directory}/UPSTREAM-LICENSE-NOTICE")"
 
 mkdir -p "${output_directory}"
 cp "${deb_path}" "${output_directory}/${expected_name}"
 cp "${assets_directory}/telegram-drive" "${output_directory}/telegram-drive"
-cp "${assets_directory}/com.cameronamer.telegramdrive.desktop" "${output_directory}/com.cameronamer.telegramdrive.desktop"
+cp "${assets_directory}/io.github.mmaziesf.unofficialtelegramdrive.desktop" "${output_directory}/io.github.mmaziesf.unofficialtelegramdrive.desktop"
 cp "${assets_directory}/UPSTREAM-LICENSE-NOTICE" "${output_directory}/UPSTREAM-LICENSE-NOTICE"
 
 sed \
