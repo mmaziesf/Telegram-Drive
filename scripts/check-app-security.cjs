@@ -38,6 +38,13 @@ if (desktop.platforms?.length !== 3 || !['linux', 'macOS', 'windows'].every(valu
 if (desktop.permissions?.some(value => typeof value === 'string' && /^(updater|process):/.test(value))) {
   throw new Error('Updater and process-restart permissions must stay removed until the fork has its own signing key.');
 }
+// The WebView never uses the fs plugin. Granting it would let injected script
+// read the Telegram session and settings files under the app data directory.
+for (const capability of [mobile, desktop]) {
+  if (capability.permissions.some(value => /^fs:/.test(typeof value === 'string' ? value : value?.identifier ?? ''))) {
+    throw new Error('WebView file-system permissions must stay removed; file access goes through audited Rust commands.');
+  }
+}
 if (![mobile.identifier, desktop.identifier].every(value => config.app.security.capabilities.includes(value))) {
   throw new Error('The application must declare its platform-specific capabilities.');
 }

@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+### WebView file-system permissions removed
+
+- The desktop and Android capabilities no longer grant the WebView `fs:allow-read`/`fs:allow-write` (desktop: whole app directory via `fs:scope-app-recursive`; Android: `$APPDATA/**` and `$APPCACHE/**`). The frontend never imports `@tauri-apps/plugin-fs`; all file access goes through Rust commands. Before this change, script injected into the WebView could have read or overwritten the Telegram session and settings files in the app data directory. `scripts/check-app-security.cjs` now fails if any `fs:` permission comes back.
+
 ### Rust advisory baseline refresh
 
 - A lockfile-only refresh moves plist 1.9.0 → 1.10.3 and wayland-scanner 0.31.10 → 0.31.11, which together replace quick-xml 0.39.4 (RUSTSEC-2026-0194, RUSTSEC-2026-0195) with quick-xml 0.41.0/0.42.0. It also moves the yanked chacha20 0.10.0 → 0.10.2 and adds base64 0.23.1 for plist. Those three exceptions come out of `deny.toml`, `.cargo/audit.toml` and `dependency-policy/rust-advisory-baseline.json`. `.cargo/audit.toml` also drops RUSTSEC-2026-0367/0368/0369: they were for zip 4 through tauri-plugin-updater, which is no longer in the graph, and the locked zip 9.1.2 is already patched. The other entries were rechecked against the latest crates.io releases and still have no compatible fix; the PR lists the reason for each.
