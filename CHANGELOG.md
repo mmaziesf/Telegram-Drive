@@ -19,10 +19,6 @@
 - The bundle identifier is unchanged, so existing sessions, vaults, settings and keychain entries keep working. Linux `.deb` and macOS bundle artifact names change; the Arch packaging script accepts both the new and the legacy `.deb` name.
 - The locale budget grows by the exact 290 bytes the new title adds (11 bytes in the largest catalog).
 
-
-
-
-
 ### The full-history secret scan passes again after the #6 squash merge
 
 - Squash-merging #6 put an earlier wording of a `.gitleaksignore` comment into a new commit (21645df). The full-history gitleaks scan reported it as a generic API key. The comment is reworded, and `.gitleaksignore` records that fingerprint along with its reason.
