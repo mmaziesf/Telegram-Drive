@@ -1308,11 +1308,14 @@ where
             // Retain admission/category guards through the full digest. Clear
             // invalidates the request before it waits for the same category.
             let legacy = Arc::new(crate::commands::preview::LegacyPreviewUse::new(&path));
+            // Tuple fields drop in order. The legacy use must end before the
+            // category guard is released, or a waiting clear sees the file as
+            // still in use, skips it and reports success.
             let lease = (
+                legacy.clone(),
                 capacity.clone(),
                 file_guard.clone(),
                 category_guard.clone(),
-                legacy.clone(),
             );
             crate::external_files::reuse_cached_retained(account.clone(), path.clone(), lease)
                 .await?;

@@ -19,6 +19,12 @@ on:
         type: boolean
         default: false
 
+# A newer push to the same pull request supersedes the running checks.
+# Runs on main are never cancelled, so every main commit keeps a full result.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 permissions:
   contents: read
 

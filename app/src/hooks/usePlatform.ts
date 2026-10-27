@@ -38,7 +38,7 @@ export function usePlatform() {
         };
         void detectTelevision();
       }
-    } catch (e) {
+    } catch {
       // Fallback for browser/development environments
       const ua = navigator.userAgent.toLowerCase();
       const isAndroid = ua.includes('android');

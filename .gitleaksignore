@@ -1,0 +1,38 @@
+# Reviewed gitleaks findings in this repository's history.
+# Each entry is a fingerprint (commit:file:rule:line) with the reason it is not a secret.
+# A new finding fails the CI secret scan until someone reviews it.
+
+# Documentation examples that use the placeholder YOUR_API_KEY, not a real key.
+7fb89dabaf2b7128e691f42a8b9760376e16cf48:REST_API_Documentation.md:curl-auth-header:107
+7fb89dabaf2b7128e691f42a8b9760376e16cf48:REST_API_Documentation.md:curl-auth-header:139
+7fb89dabaf2b7128e691f42a8b9760376e16cf48:REST_API_Documentation.md:curl-auth-header:163
+7fb89dabaf2b7128e691f42a8b9760376e16cf48:REST_API_Documentation.md:curl-auth-header:197
+7fb89dabaf2b7128e691f42a8b9760376e16cf48:REST_API_Documentation.md:curl-auth-header:218
+7fb89dabaf2b7128e691f42a8b9760376e16cf48:REST_API_Documentation.md:curl-auth-header:24
+7fb89dabaf2b7128e691f42a8b9760376e16cf48:REST_API_Documentation.md:curl-auth-header:81
+b8b414a11c7e386ea94e346137f747afcd15c163:REST_API_Documentation.md:curl-auth-header:160
+
+# Public ad-network placement and zone IDs. They are embedded in client pages by design and grant no access.
+234ef153558cde9e52f4f8eaa2fb3b3752aede32:app/src/components/desktop/dashboard/DesktopAdBanner.tsx:generic-api-key:30
+6568a61294cceed88d6a48e30f6647254cb35083:app/src/components/desktop/dashboard/DesktopAdBanner.tsx:generic-api-key:10
+6568a61294cceed88d6a48e30f6647254cb35083:app/src/components/shared/AdsterraBanner.tsx:generic-api-key:11
+731c9e87d20829e359c645f316a95840cab8feb7:app/src/services/sponsorLinks.ts:generic-api-key:3
+731c9e87d20829e359c645f316a95840cab8feb7:app/tests/unit/sponsorLinks.test.ts:generic-api-key:18
+8715927b4651930125d6478b7d69f74281d9010c:app/src-tauri/src/server.rs:generic-api-key:36
+9cd55600e96ebb468c392cf2f21c6c033899e26e:app/tests/unit/sponsorLinks.test.ts:generic-api-key:10
+da1b65975f33c100e1c0d394ac597f2808a3b885:app/src/components/shared/AdGateway.tsx:generic-api-key:8
+da1b65975f33c100e1c0d394ac597f2808a3b885:app/src/components/shared/AdsterraBanner.tsx:generic-api-key:11
+db7489f6795d253e5cf369f96a504159c492e959:app/src-tauri/src/server.rs:generic-api-key:66
+ec4451c8c024b01b0633dd5a8c656aec2754d286:app/src/components/desktop/dashboard/DesktopAdBanner.tsx:generic-api-key:9
+
+# Design document prose ("key slots, Argon2id/HKDF wrapping"). It contains no key material.
+1b6d2cc0563cda8e98484b10fe15aa5c03ff2ee4:ENCRYPTION_MODE_IMPLEMENTATION_PLAN.md:generic-api-key:782
+
+# macOS crash reports (Error.html, app/LatestError.html) that were committed and later deleted. The match is the
+# crash reporter's anonymous device identifier field. It is not a credential and grants no access.
+23a90d93aa70659cad04d9819e9a417ecdc0f369:Error.html:generic-api-key:2384
+23a90d93aa70659cad04d9819e9a417ecdc0f369:app/LatestError.html:generic-api-key:2338
+
+# An earlier revision of this file quoted the crash report field name next to a comma-separated
+# description, which the generic rule read as an assignment. The line is a comment, not a value.
+937c6f8853578559224cfa7dec30dac46e0a68b7:.gitleaksignore:generic-api-key:28
