@@ -239,6 +239,10 @@ pub async fn cmd_test_proxy_traffic(
     let result: Result<bool, String> = tokio::task::spawn_blocking(move || {
         let rt = tokio::runtime::Runtime::new().map_err(|e| e.to_string())?;
         rt.block_on(async {
+            // The probe performs a key exchange, so keep its key file private too.
+            if let Err(error) = crate::session_protection::prepare_session_file(&session_path) {
+                log::warn!("Could not restrict the proxy test session file: {error}");
+            }
             // Open a fresh in-memory-ish SQLite session
             let session = grammers_session::storages::SqliteSession::open(&session_path_str)
                 .map_err(|e| format!("Failed to open test session: {}", e))?;

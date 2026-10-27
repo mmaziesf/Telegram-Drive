@@ -30,6 +30,7 @@ fn open_client_session(root: &std::path::Path) -> sqlite::Result<Arc<SqliteSessi
     }
     #[cfg(any(target_os = "android", target_os = "ios"))]
     {
+        crate::session_protection::prepare_account_session_or_warn(root);
         SqliteSession::open(root.join("telegram.session")).map(Arc::new)
     }
 }
@@ -439,6 +440,7 @@ pub async fn cmd_logout(
     let _ = std::fs::remove_file(session_path);
     let _ = std::fs::remove_file(app_data_dir.join("telegram.session-wal"));
     let _ = std::fs::remove_file(app_data_dir.join("telegram.session-shm"));
+    let _ = std::fs::remove_file(app_data_dir.join("telegram.session-journal"));
 
     log::info!(
         "Logout complete. Vault locked. Remote session revoked: {}. Runner count: {}",
