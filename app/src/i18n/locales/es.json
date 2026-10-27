@@ -1469,5 +1469,18 @@
     "forgot": "¿Olvidaste tu frase de contraseña?",
     "remove_detail": "La sesión guardada se eliminará de este dispositivo y tendrás que volver a iniciar sesión. Este dispositivo seguirá apareciendo en las sesiones activas de Telegram hasta que la cierres desde otro dispositivo.",
     "remove_confirm": "Eliminar sesión"
+  },
+  "stale_sessions": {
+    "title": "Sesiones que siguen abiertas",
+    "intro": "Un cierre de sesión anterior no pudo finalizar estas sesiones de Telegram. Elige las que quieras finalizar. La sesión de este dispositivo no aparece.",
+    "confirm": "Se cerrarán estas sesiones en Telegram. Esta acción no se puede deshacer.",
+    "last_active": "Última actividad: {{date}}",
+    "end_selected": "Finalizar sesiones seleccionadas",
+    "confirm_end": "Finalizar sesiones",
+    "back": "Atrás",
+    "keep": "Conservar estas sesiones",
+    "failed": "No se pudieron finalizar algunas sesiones. Inténtalo de nuevo o finalízalas en los ajustes de Telegram.",
+    "unknown_device": "Dispositivo desconocido",
+    "unknown_app": "Aplicación desconocida"
   }
 }

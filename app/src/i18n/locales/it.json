@@ -1469,5 +1469,18 @@
     "forgot": "Hai dimenticato la passphrase?",
     "remove_detail": "La sessione salvata verrà eliminata da questo dispositivo e dovrai accedere di nuovo. Questo dispositivo resterà nelle sessioni attive di Telegram finché non la chiudi da un altro dispositivo.",
     "remove_confirm": "Elimina sessione"
+  },
+  "stale_sessions": {
+    "title": "Sessioni ancora connesse",
+    "intro": "Una disconnessione precedente non è riuscita a chiudere queste sessioni Telegram. Scegli quelle che vuoi chiudere. La sessione di questo dispositivo non è elencata.",
+    "confirm": "Queste sessioni verranno disconnesse da Telegram. L'operazione non può essere annullata.",
+    "last_active": "Ultima attività: {{date}}",
+    "end_selected": "Chiudi le sessioni selezionate",
+    "confirm_end": "Chiudi sessioni",
+    "back": "Indietro",
+    "keep": "Mantieni queste sessioni",
+    "failed": "Non è stato possibile chiudere alcune sessioni. Riprova oppure chiudile dalle impostazioni di Telegram.",
+    "unknown_device": "Dispositivo sconosciuto",
+    "unknown_app": "App sconosciuta"
   }
 }

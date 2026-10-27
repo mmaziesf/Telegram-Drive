@@ -32,6 +32,7 @@ import { TransferCenter } from './dashboard/TransferCenter';
 import { MoveToFolderModal } from './dashboard/MoveToFolderModal';
 import { ExternalDropBlocker } from './dashboard/ExternalDropBlocker';
 import type { SettingsTab } from './dashboard/SettingsModal';
+import type { StaleSession } from './dashboard/StaleSessionsDialog';
 import { RenameFolderModal } from './dashboard/RenameFolderModal';
 import { RenameFileModal } from './dashboard/RenameFileModal';
 import { RemoteUploadModal } from './dashboard/RemoteUploadModal';
@@ -64,6 +65,7 @@ const LazyPdfViewer = lazy(() => import('./dashboard/PdfViewer').then((module) =
 const LazyArchiveViewerModal = lazy(() => import('./dashboard/ArchiveViewerModal').then((module) => ({ default: module.ArchiveViewerModal })));
 const LazySettingsModal = lazy(() => import('./dashboard/SettingsModal').then((module) => ({ default: module.SettingsModal })));
 const LazyHelpCenterDialog = lazy(() => import('./dashboard/HelpCenterDialog').then((module) => ({ default: module.HelpCenterDialog })));
+const LazyStaleSessionsDialog = lazy(() => import('./dashboard/StaleSessionsDialog').then((module) => ({ default: module.StaleSessionsDialog })));
 const LazyWorkspaceHub = lazy(() => import('../workspace/WorkspaceHub').then(module => ({ default: module.WorkspaceHub })));
 
 export function Dashboard({ onLogout }: { onLogout: () => void }) {
@@ -123,6 +125,15 @@ export function Dashboard({ onLogout }: { onLogout: () => void }) {
     const [transferCenterOpenRequest, setTransferCenterOpenRequest] = useState(0);
     const [showShortcuts, setShowShortcuts] = useState(false);
     const [showHelp, setShowHelp] = useState(false);
+    const [staleSessions, setStaleSessions] = useState<StaleSession[]>([]);
+    useEffect(() => {
+        // Sessions an earlier sign-out could not end; the backend lists none unless one did.
+        let active = true;
+        invoke<StaleSession[]>('cmd_stale_sessions')
+            .then(sessions => { if (active) setStaleSessions(sessions); })
+            .catch(() => { /* Optional: offered again after the next sign-in. */ });
+        return () => { active = false; };
+    }, []);
     const [createFolderRequest, setCreateFolderRequest] = useState(0);
     const [activeSmartView, setActiveSmartView] = useState<SmartView | null>('recents');
     const [insightSummary, setInsightSummary] = useState<{ scope: string; count: number; complete: boolean } | null>(null);
@@ -1019,6 +1030,8 @@ export function Dashboard({ onLogout }: { onLogout: () => void }) {
                     onOpenHelp={() => { updateSetting('driveTourSeen', true); setShowHelp(true); }}
                 />
             )}
+
+            {staleSessions.length > 0 && <LazyFeatureBoundary><LazyStaleSessionsDialog sessions={staleSessions} onClose={() => setStaleSessions([])} /></LazyFeatureBoundary>}
 
             {showHelp && <LazyFeatureBoundary><LazyHelpCenterDialog onClose={() => setShowHelp(false)} /></LazyFeatureBoundary>}
 

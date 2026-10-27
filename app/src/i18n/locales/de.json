@@ -1462,5 +1462,18 @@
     "forgot": "Passphrase vergessen?",
     "remove_detail": "Die gespeicherte Sitzung wird von diesem Gerät gelöscht und du musst dich erneut anmelden. Dieses Gerät bleibt in den aktiven Telegram-Sitzungen aufgeführt, bis du es auf einem anderen Gerät beendest.",
     "remove_confirm": "Sitzung löschen"
+  },
+  "stale_sessions": {
+    "title": "Weiterhin angemeldete Sitzungen",
+    "intro": "Eine frühere Abmeldung konnte diese Telegram-Sitzungen nicht beenden. Wähle aus, welche du beenden möchtest. Die Sitzung dieses Geräts ist nicht aufgeführt.",
+    "confirm": "Diese Sitzungen werden bei Telegram abgemeldet. Das lässt sich nicht rückgängig machen.",
+    "last_active": "Zuletzt aktiv {{date}}",
+    "end_selected": "Ausgewählte Sitzungen beenden",
+    "confirm_end": "Sitzungen beenden",
+    "back": "Zurück",
+    "keep": "Diese Sitzungen behalten",
+    "failed": "Einige Sitzungen konnten nicht beendet werden. Versuche es erneut oder beende sie in den Telegram-Einstellungen.",
+    "unknown_device": "Unbekanntes Gerät",
+    "unknown_app": "Unbekannte App"
   }
 }

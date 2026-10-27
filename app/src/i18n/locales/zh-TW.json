@@ -1462,5 +1462,18 @@
     "forgot": "忘記密碼片語？",
     "remove_detail": "儲存的工作階段將從此裝置刪除，你需要重新登入。在你從其他裝置結束之前，此裝置仍會列在 Telegram 的使用中工作階段。",
     "remove_confirm": "刪除工作階段"
+  },
+  "stale_sessions": {
+    "title": "仍處於登入狀態的工作階段",
+    "intro": "先前的登出未能結束這些 Telegram 工作階段。請選擇要結束的工作階段。本裝置的工作階段不會列出。",
+    "confirm": "這些工作階段將從 Telegram 登出。此動作無法復原。",
+    "last_active": "上次活動：{{date}}",
+    "end_selected": "結束所選工作階段",
+    "confirm_end": "結束工作階段",
+    "back": "返回",
+    "keep": "保留這些工作階段",
+    "failed": "部分工作階段未能結束。請再試一次，或在 Telegram 設定中結束。",
+    "unknown_device": "未知裝置",
+    "unknown_app": "未知應用程式"
   }
 }

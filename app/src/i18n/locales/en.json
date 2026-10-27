@@ -1462,5 +1462,18 @@
     "forgot": "Forgot your passphrase?",
     "remove_detail": "The saved session will be deleted from this device and you will need to sign in again. This device stays listed in Telegram's active sessions until you end it from another device.",
     "remove_confirm": "Delete session"
+  },
+  "stale_sessions": {
+    "title": "Sessions still signed in",
+    "intro": "An earlier sign-out could not end these Telegram sessions. Choose any you want to end. This device's session is not listed.",
+    "confirm": "These sessions will be signed out of Telegram. This cannot be undone.",
+    "last_active": "Last active {{date}}",
+    "end_selected": "End selected sessions",
+    "confirm_end": "End sessions",
+    "back": "Back",
+    "keep": "Keep these sessions",
+    "failed": "Some sessions could not be ended. Try again, or end them in Telegram's settings.",
+    "unknown_device": "Unknown device",
+    "unknown_app": "Unknown app"
   }
 }

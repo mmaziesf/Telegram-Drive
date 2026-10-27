@@ -1462,5 +1462,18 @@
     "forgot": "Lupa frasa sandi?",
     "remove_detail": "Sesi tersimpan akan dihapus dari perangkat ini dan Anda perlu masuk lagi. Perangkat ini tetap tercantum di sesi aktif Telegram sampai Anda mengakhirinya dari perangkat lain.",
     "remove_confirm": "Hapus sesi"
+  },
+  "stale_sessions": {
+    "title": "Sesi yang masih masuk",
+    "intro": "Proses keluar sebelumnya tidak dapat mengakhiri sesi Telegram ini. Pilih sesi yang ingin Anda akhiri. Sesi perangkat ini tidak tercantum.",
+    "confirm": "Sesi ini akan dikeluarkan dari Telegram. Tindakan ini tidak dapat dibatalkan.",
+    "last_active": "Terakhir aktif {{date}}",
+    "end_selected": "Akhiri sesi yang dipilih",
+    "confirm_end": "Akhiri sesi",
+    "back": "Kembali",
+    "keep": "Pertahankan sesi ini",
+    "failed": "Beberapa sesi tidak dapat diakhiri. Coba lagi, atau akhiri melalui pengaturan Telegram.",
+    "unknown_device": "Perangkat tidak dikenal",
+    "unknown_app": "Aplikasi tidak dikenal"
   }
 }

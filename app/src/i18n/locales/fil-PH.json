@@ -1462,5 +1462,18 @@
     "forgot": "Nakalimutan ang passphrase?",
     "remove_detail": "Buburahin ang naka-save na session sa device na ito at kailangan mong mag-sign in muli. Mananatiling nakalista ang device na ito sa mga aktibong session ng Telegram hanggang tapusin mo ito mula sa ibang device.",
     "remove_confirm": "Burahin ang session"
+  },
+  "stale_sessions": {
+    "title": "Mga session na naka-sign in pa",
+    "intro": "Hindi natapos ng naunang pag-sign out ang mga Telegram session na ito. Piliin ang mga gusto mong tapusin. Hindi nakalista ang session ng device na ito.",
+    "confirm": "Masa-sign out sa Telegram ang mga session na ito. Hindi na ito maibabalik.",
+    "last_active": "Huling aktibo {{date}}",
+    "end_selected": "Tapusin ang mga napiling session",
+    "confirm_end": "Tapusin ang mga session",
+    "back": "Bumalik",
+    "keep": "Panatilihin ang mga session na ito",
+    "failed": "Hindi natapos ang ilang session. Subukang muli, o tapusin ang mga ito sa mga setting ng Telegram.",
+    "unknown_device": "Hindi kilalang device",
+    "unknown_app": "Hindi kilalang app"
   }
 }

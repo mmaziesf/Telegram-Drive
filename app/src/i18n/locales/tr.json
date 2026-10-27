@@ -1462,5 +1462,18 @@
     "forgot": "Parola ifadeni mi unuttun?",
     "remove_detail": "Kayıtlı oturum bu cihazdan silinecek ve yeniden giriş yapman gerekecek. Bu cihaz, başka bir cihazdan sonlandırana kadar Telegram'ın etkin oturumlarında listelenmeye devam eder.",
     "remove_confirm": "Oturumu sil"
+  },
+  "stale_sessions": {
+    "title": "Hâlâ oturum açık olan oturumlar",
+    "intro": "Önceki bir oturum kapatma bu Telegram oturumlarını sonlandıramadı. Sonlandırmak istediklerinizi seçin. Bu cihazın oturumu listede yer almaz.",
+    "confirm": "Bu oturumların Telegram'daki oturumu kapatılacak. Bu işlem geri alınamaz.",
+    "last_active": "Son etkinlik {{date}}",
+    "end_selected": "Seçili oturumları sonlandır",
+    "confirm_end": "Oturumları sonlandır",
+    "back": "Geri",
+    "keep": "Bu oturumları koru",
+    "failed": "Bazı oturumlar sonlandırılamadı. Yeniden deneyin veya Telegram ayarlarından sonlandırın.",
+    "unknown_device": "Bilinmeyen cihaz",
+    "unknown_app": "Bilinmeyen uygulama"
   }
 }

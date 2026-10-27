@@ -1462,5 +1462,18 @@
     "forgot": "Terlupa frasa laluan?",
     "remove_detail": "Sesi yang disimpan akan dipadam daripada peranti ini dan anda perlu log masuk semula. Peranti ini kekal disenaraikan dalam sesi aktif Telegram sehingga anda menamatkannya daripada peranti lain.",
     "remove_confirm": "Padam sesi"
+  },
+  "stale_sessions": {
+    "title": "Sesi yang masih log masuk",
+    "intro": "Log keluar sebelum ini tidak dapat menamatkan sesi Telegram ini. Pilih sesi yang ingin anda tamatkan. Sesi peranti ini tidak disenaraikan.",
+    "confirm": "Sesi ini akan dilog keluar daripada Telegram. Tindakan ini tidak boleh dibuat asal.",
+    "last_active": "Kali terakhir aktif {{date}}",
+    "end_selected": "Tamatkan sesi yang dipilih",
+    "confirm_end": "Tamatkan sesi",
+    "back": "Kembali",
+    "keep": "Kekalkan sesi ini",
+    "failed": "Sesetengah sesi tidak dapat ditamatkan. Cuba lagi, atau tamatkannya dalam tetapan Telegram.",
+    "unknown_device": "Peranti tidak diketahui",
+    "unknown_app": "Aplikasi tidak diketahui"
   }
 }

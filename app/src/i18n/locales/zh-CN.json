@@ -1462,5 +1462,18 @@
     "forgot": "忘记密码短语？",
     "remove_detail": "保存的会话将从此设备删除，你需要重新登录。在你从其他设备结束之前，此设备仍会显示在 Telegram 的活动会话中。",
     "remove_confirm": "删除会话"
+  },
+  "stale_sessions": {
+    "title": "仍处于登录状态的会话",
+    "intro": "之前的退出登录未能结束这些 Telegram 会话。请选择要结束的会话。本设备的会话不会列出。",
+    "confirm": "这些会话将从 Telegram 退出登录。此操作无法撤销。",
+    "last_active": "上次活跃：{{date}}",
+    "end_selected": "结束所选会话",
+    "confirm_end": "结束会话",
+    "back": "返回",
+    "keep": "保留这些会话",
+    "failed": "部分会话未能结束。请重试，或在 Telegram 设置中结束它们。",
+    "unknown_device": "未知设备",
+    "unknown_app": "未知应用"
   }
 }

@@ -31,6 +31,10 @@ export async function desktopFixture(page: Page, options: {
   isTelevision?: boolean;
   /** How the saved Telegram session is protected at rest; defaults to an unlocked keychain key. */
   sessionProtection?: 'keychain' | 'keychain-unavailable' | 'passphrase-locked' | 'passphrase-setup';
+  /** Sessions an earlier sign-out could not end, offered after this sign-in. */
+  staleSessions?: { id: string; device: string; app: string; lastActive: number }[];
+  /** Ids of offered sessions that Telegram refuses to end. */
+  staleSessionFailures?: string[];
 } = {}) {
   await page.route(`http://localhost:${options.streamingPort ?? 14201}/**`, route => route.fulfill({ status: 200, contentType: 'text/html', body: '<!doctype html><p>Offline media fixture</p>' }));
   await page.addInitScript(options => {
@@ -62,6 +66,7 @@ export async function desktopFixture(page: Page, options: {
         {id:'download-done',direction:'download',kind:'download',status:'completed',filename:'Fixture finished.bin',messageId:43,downloadOutcome:'saved'},
       ].map((job,index)=>({...job,ownerId:'101',folderId:9,progress:40,transferredBytes:400,totalBytes:1000,speedBytesPerSec:128,queuePosition:index,revision:1,createdAt:Date.now(),updatedAt:Date.now()})) as any[] : [] as any[]),
       holdStartupHealth:options.holdStartupHealth??false,
+      staleSessions: options.staleSessions ?? [],
       releaseStartupHealth:()=>{state.holdStartupHealth=false;releaseStartupHealth?.();},
       searchHold:false, searchFails:false, searchPageSize:256, searchBuilding:0, searchDuplicateIds:false, releaseSearch:()=>{state.searchHold=false;releaseSearch?.();},
       quotaSaveFails:false, weeklyQuota:Number(localStorage.getItem('desktop-e2e-weekly-quota') ?? 250 * 1024 ** 3),
@@ -201,6 +206,17 @@ export async function desktopFixture(page: Page, options: {
           if (command === 'cmd_get_bandwidth') return { up_bytes: 0, down_bytes: 0, limit_bytes: state.weeklyQuota, period: 'weekly', date: '2026-09-28' };
           if (command === 'cmd_set_weekly_quota') { if (state.quotaSaveFails) throw new Error('Storage unavailable'); state.weeklyQuota = args.limitBytes; localStorage.setItem('desktop-e2e-weekly-quota', String(args.limitBytes)); return { up_bytes: 0, down_bytes: 0, limit_bytes: state.weeklyQuota, period: 'weekly', date: '2026-09-28' }; }
           if (command === 'cmd_get_storage_insight') return { files: [file(80, 1)], scanned_count: 1200, duplicate_groups: 0, complete: false };
+          if (command === 'cmd_stale_sessions') return state.staleSessions;
+          if (command === 'cmd_end_stale_sessions') {
+            // Like the backend: only offered ids, never an empty or unknown selection.
+            const offered = new Set(state.staleSessions.map((session: any) => session.id));
+            if (args.ids.length === 0 || args.ids.some((id: string) => !offered.has(id))) throw new Error('Select sessions from the list');
+            const failed = args.ids.filter((id: string) => (options.staleSessionFailures ?? []).includes(id));
+            const ended = args.ids.filter((id: string) => !failed.includes(id));
+            state.staleSessions = state.staleSessions.filter((session: any) => !ended.includes(session.id));
+            return { ended, failed };
+          }
+          if (command === 'cmd_dismiss_stale_sessions') { state.staleSessions = []; return; }
           if (command === 'cmd_logout') {
             if (state.logoutFails) throw new Error('Private native diagnostic');
             // Without a credential store the next session needs a new passphrase.

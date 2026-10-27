@@ -1462,5 +1462,18 @@
     "forgot": "Quên cụm mật khẩu?",
     "remove_detail": "Phiên đã lưu sẽ bị xóa khỏi thiết bị này và bạn cần đăng nhập lại. Thiết bị này vẫn xuất hiện trong các phiên đang hoạt động của Telegram cho đến khi bạn kết thúc nó từ thiết bị khác.",
     "remove_confirm": "Xóa phiên"
+  },
+  "stale_sessions": {
+    "title": "Các phiên vẫn đang đăng nhập",
+    "intro": "Một lần đăng xuất trước đó không thể kết thúc các phiên Telegram này. Hãy chọn những phiên bạn muốn kết thúc. Phiên của thiết bị này không có trong danh sách.",
+    "confirm": "Các phiên này sẽ bị đăng xuất khỏi Telegram. Không thể hoàn tác thao tác này.",
+    "last_active": "Hoạt động lần cuối {{date}}",
+    "end_selected": "Kết thúc các phiên đã chọn",
+    "confirm_end": "Kết thúc phiên",
+    "back": "Quay lại",
+    "keep": "Giữ các phiên này",
+    "failed": "Không thể kết thúc một số phiên. Hãy thử lại hoặc kết thúc chúng trong phần cài đặt của Telegram.",
+    "unknown_device": "Thiết bị không xác định",
+    "unknown_app": "Ứng dụng không xác định"
   }
 }

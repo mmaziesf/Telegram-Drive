@@ -1476,5 +1476,18 @@
     "forgot": "Nie pamiętasz hasła?",
     "remove_detail": "Zapisana sesja zostanie usunięta z tego urządzenia i trzeba będzie zalogować się ponownie. To urządzenie pozostanie na liście aktywnych sesji Telegrama, dopóki nie zakończysz jej na innym urządzeniu.",
     "remove_confirm": "Usuń sesję"
+  },
+  "stale_sessions": {
+    "title": "Sesje nadal zalogowane",
+    "intro": "Wcześniejsze wylogowanie nie zakończyło tych sesji Telegram. Wybierz te, które chcesz zakończyć. Sesja tego urządzenia nie jest wymieniona.",
+    "confirm": "Te sesje zostaną wylogowane z Telegrama. Tej operacji nie można cofnąć.",
+    "last_active": "Ostatnio aktywna {{date}}",
+    "end_selected": "Zakończ wybrane sesje",
+    "confirm_end": "Zakończ sesje",
+    "back": "Wstecz",
+    "keep": "Zachowaj te sesje",
+    "failed": "Nie udało się zakończyć niektórych sesji. Spróbuj ponownie lub zakończ je w ustawieniach Telegrama.",
+    "unknown_device": "Nieznane urządzenie",
+    "unknown_app": "Nieznana aplikacja"
   }
 }
