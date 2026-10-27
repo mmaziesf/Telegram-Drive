@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+### Machine-translation notice
+
+- README "Languages" and Docs/LOCALIZATION_REVIEW.md now open with a visible warning that all 23 non-English locales are machine-translated and unreviewed, including the security and account-risk text, and that English is the reference. The app's strings are unchanged; native-speaker review is still needed.
+
 ### Fuzz build note
 
 - `app/src-tauri/fuzz/README.md` now sets `CARGO_PROFILE_RELEASE_BUILD_OVERRIDE_DEBUG_ASSERTIONS=true` before `cargo fuzz run`. cargo-fuzz turns on debug assertions only for the fuzzed crates, so Tauri's build-time code generator omitted the debug-only `ResolvedCommand.referenced_by` field, and a clean build of the fuzz targets failed with E0063. With the variable set, the build passed on main 393aceb.
