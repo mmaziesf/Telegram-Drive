@@ -1174,6 +1174,7 @@ impl Driver {
             | "inventory_watch_finish"
             | "inventory_timer_lifecycle"
             | "inventory_deadline"
+            | "legacy_lease_drop_order"
             | "legacy_inventory_write" => self.dispatch_inventory(request).await,
             "heic_pin_gate"
             | "heic_pin_start"
@@ -2455,6 +2456,29 @@ impl Driver {
                         "coldLookupBatches":self.inventory_lookups.load(std::sync::atomic::Ordering::SeqCst)-before
                     }
                 ))
+            }
+            "legacy_lease_drop_order" => {
+                struct Release(&'static str, Arc<std::sync::Mutex<Vec<&'static str>>>);
+                impl Drop for Release {
+                    fn drop(&mut self) {
+                        self.1
+                            .lock()
+                            .unwrap_or_else(|error| error.into_inner())
+                            .push(self.0);
+                    }
+                }
+                let order = Arc::new(std::sync::Mutex::new(Vec::new()));
+                drop(crate::workspace::assets::legacy_lease(
+                    Release("legacy", order.clone()),
+                    Release("capacity", order.clone()),
+                    Release("file", order.clone()),
+                    Release("category", order.clone()),
+                ));
+                let order = order
+                    .lock()
+                    .unwrap_or_else(|error| error.into_inner())
+                    .clone();
+                Ok(json!({ "order": order }))
             }
             "inventory_deadline" => {
                 use crate::file_inventory::{InventoryCache, Timing};

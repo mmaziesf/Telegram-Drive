@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+### Preview cache drop-order regression test
+
+- The lease a detached legacy preview hash holds is now built by `legacy_lease` in `workspace/assets.rs`, which documents why the legacy file claim must drop before the capacity, file and category guards (the race fixed in #14). The native test `legacy_hash_lease_releases_the_file_claim_before_the_category_guard` drops a lease built by that function and checks the release order; it fails with the pre-#14 order. It checks the order only; it does not replay the timing race. The README hardening row for #14 now names the test.
+
 ### Inventory timer test flake
 
 - `an_api_consumer_cannot_consume_the_desktop_inventory_change_notification` failed on CI with `changedEvents` 0. The native test harness kept the watched folder for 2 s after the cold read, and its lifecycle spends 1 s asleep plus three reads before the change poll, so slow reads on a loaded runner evicted the folder; the API read then started a fresh entry that already held the rename, and the poll had nothing to report. The harness now keeps the folder for 4 s and waits that long before the eviction check. Production retention is unchanged. The new `slow_initial_inventory_reads_keep_the_watched_folder_until_the_change_poll` test slows the first two reads by 700 ms each and failed with the old window.
