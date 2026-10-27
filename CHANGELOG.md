@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+### Crypto test coverage
+
+- Add `tests/crypto_envelope.rs`, an in-memory suite that exercises the public envelope, key-slot and recovery-bundle API. It covers round-trips under random sizes, metadata and download fragmentation; rejection of every flipped bit, truncation, trailing bytes, reordered, dropped or cross-file records, and wrong keys; key-slot binding of the file identity, slot ID, kind and salt; nonce and file-identity uniqueness; and byte-identical resumed uploads. Property cases use `proptest` (a dev-dependency only).
+- CI runs the suite alongside the native journeys, and TESTING.md documents it.
+
 ### Documentation and project hygiene
 
 - README: the notice now says that this is a fork of caamer20/Telegram-Drive, that the original code is © its author with no license granted, that no releases are published and that the app uses the Telegram API with the user's own credentials. A "Security hardening by Grok Bot" section links each change to its pull request and evidence, and a "Known limitations" section lists what is not covered.
