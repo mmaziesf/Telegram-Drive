@@ -2004,6 +2004,92 @@ async fn rest_api_lists_search_and_reports_cover_the_whole_library_of_one_accoun
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn local_servers_refuse_requests_addressed_to_another_host() {
+    let client = reqwest::Client::builder()
+        .redirect(reqwest::redirect::Policy::none())
+        .timeout(Duration::from_secs(10))
+        .build()
+        .unwrap();
+    let fixture = Fixture::new();
+    let mut app = Backend::start(&fixture.0);
+    app.ok(json!({"command":"database"}));
+    app.ok(json!({"command":"seed_account","owner":101}));
+    let dav_token = "a".repeat(64);
+    let started = |value: Value| value["url"].as_str().unwrap().to_string();
+    let servers = [
+        (
+            started(app.ok(json!({"command":"start_http"}))),
+            "/stream/home/1?token=synthetic-e2e-stream-token".to_owned(),
+        ),
+        (
+            started(app.ok(json!({"command":"start_api","key":"synthetic-e2e-api-key"}))),
+            "/api/v1/health".to_owned(),
+        ),
+        (
+            started(
+                app.ok(json!({"command":"start_webdav","token":dav_token,"writeEnabled":false})),
+            ),
+            format!("/dav/{dav_token}/"),
+        ),
+    ];
+    for (url, path) in &servers {
+        let port = url.rsplit_once(':').unwrap().1.trim_end_matches('/');
+        let other_port = if port == "1" { "2" } else { "1" };
+        // A DNS-rebound name, a lookalike, the right name on another port, and
+        // a bare name are all refused before any route runs.
+        for host in [
+            format!("attacker.example:{port}"),
+            format!("127.0.0.1.attacker.example:{port}"),
+            format!("127.0.0.1:{other_port}"),
+            "localhost".to_owned(),
+        ] {
+            let response = client
+                .get(format!("{url}{path}"))
+                .header("Host", &host)
+                .send()
+                .await
+                .unwrap();
+            assert_eq!(response.status(), 421, "{url}{path} as {host}");
+        }
+        for host in [format!("127.0.0.1:{port}"), format!("LocalHost:{port}")] {
+            let response = client
+                .get(format!("{url}{path}"))
+                .header("Host", &host)
+                .send()
+                .await
+                .unwrap();
+            assert_ne!(response.status(), 421, "{url}{path} as {host}");
+        }
+    }
+    let api = &servers[1].0;
+    let health = client
+        .get(format!("{api}/api/v1/health"))
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(health.status(), 200);
+    // Packaged WebView origins still pass CORS; foreign ones do not.
+    let preflight = |origin: &'static str| {
+        client
+            .request(reqwest::Method::OPTIONS, format!("{api}/api/v1/health"))
+            .header("Origin", origin)
+            .header("Access-Control-Request-Method", "GET")
+            .send()
+    };
+    let packaged = preflight("http://tauri.localhost").await.unwrap();
+    assert_eq!(
+        packaged.headers()["access-control-allow-origin"],
+        "http://tauri.localhost"
+    );
+    let foreign = preflight("https://attacker.example").await.unwrap();
+    assert!(foreign
+        .headers()
+        .get("access-control-allow-origin")
+        .is_none());
+    app.stop();
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn webdav_serves_only_its_token_and_only_the_signed_in_account() {
     let client = reqwest::Client::builder()
         .timeout(Duration::from_secs(20))
