@@ -46,6 +46,9 @@ const FLUSH_DELAY: Duration = Duration::from_millis(500);
 const RETRY_DELAY: Duration = Duration::from_secs(5);
 const JOURNAL: &str = ".next";
 const STAGING: &str = ".migrating";
+/// Names of credential-store keys whose removal failed, kept to retry later.
+/// It holds key names only, never key material.
+const ORPHANED_KEYS: &str = ".orphaned-keys";
 const SQLITE_SIDECARS: [&str; 3] = ["-wal", "-shm", "-journal"];
 
 /// Why a session could not be opened. The messages carry a stable code for
@@ -336,6 +339,82 @@ fn erase_sidecars(path: &Path) {
     }
 }
 
+/// Whether `name` has the shape of a session key name: the 32 hex digits of
+/// a header's key id.
+fn is_key_name(name: &str) -> bool {
+    name.len() == 32
+        && name
+            .bytes()
+            .all(|byte| byte.is_ascii_digit() || (b'a'..=b'f').contains(&byte))
+}
+
+fn orphaned_keys(path: &Path) -> Vec<String> {
+    match files::read(&files::sibling(path, ORPHANED_KEYS)) {
+        Ok(Some(bytes)) => String::from_utf8_lossy(&bytes)
+            .lines()
+            .filter(|name| is_key_name(name))
+            .map(str::to_owned)
+            .collect(),
+        Ok(None) => Vec::new(),
+        Err(error) => {
+            log::warn!("Could not read the list of session keys to remove: {error}");
+            Vec::new()
+        }
+    }
+}
+
+fn save_orphaned_keys(path: &Path, names: &[String]) {
+    let list = files::sibling(path, ORPHANED_KEYS);
+    let saved = if names.is_empty() {
+        files::remove(&list)
+    } else {
+        files::write_private(&list, format!("{}\n", names.join("\n")).as_bytes())
+    };
+    if let Err(error) = saved {
+        log::warn!("Could not update the list of session keys to remove: {error}");
+    }
+}
+
+/// Remove a key from the credential store. If the store refuses, remember the
+/// key's name so [`remove_orphaned_keys`] can remove it once the store is back.
+fn delete_key(path: &Path, store: &dyn KeyStore, name: &str) {
+    if let Err(error) = store.delete(name) {
+        log::warn!(
+            "Could not remove a session key from the credential store; it will be removed later: {}",
+            error.0
+        );
+        let mut names = orphaned_keys(path);
+        if !names.iter().any(|known| known == name) {
+            names.push(name.to_owned());
+            save_orphaned_keys(path, &names);
+        }
+    }
+}
+
+/// Retry removing keys whose earlier removal failed. A key that a session
+/// copy on disk still names is never removed, whatever the list says.
+fn remove_orphaned_keys(path: &Path, store: Option<&dyn KeyStore>) {
+    let Some(store) = store else {
+        return;
+    };
+    let names = orphaned_keys(path);
+    if names.is_empty() {
+        return;
+    }
+    let in_use: Vec<String> = sealed_copies(path)
+        .iter()
+        .map(|(_, header)| header.key_name())
+        .collect();
+    let remaining: Vec<String> = names
+        .into_iter()
+        .filter(|name| !in_use.contains(name) && store.delete(name).is_err())
+        .collect();
+    if remaining.is_empty() {
+        log::info!("Removed session keys left in the credential store by an earlier sign-out");
+    }
+    save_orphaned_keys(path, &remaining);
+}
+
 /// Complete or undo a migration that an earlier run did not finish.
 fn finish_migration(path: &Path, store: Option<&dyn KeyStore>) {
     let staging = files::sibling(path, STAGING);
@@ -377,9 +456,7 @@ fn finish_migration(path: &Path, store: Option<&dyn KeyStore>) {
                     source: KeySource::Keychain,
                 }
                 .key_name();
-                if let Err(error) = store.delete(&name) {
-                    log::warn!("Could not remove an unused session key: {}", error.0);
-                }
+                delete_key(path, store, &name);
             }
             erase_or_warn(&staging);
         }
@@ -519,6 +596,7 @@ fn open_with(
     store: Option<&dyn KeyStore>,
     cache: &KeyCache,
 ) -> Result<SealedSession, SessionOpenError> {
+    remove_orphaned_keys(path, store);
     finish_migration(path, store);
     let bytes = files::read(path)
         .map_err(io_error)?
@@ -678,12 +756,7 @@ fn destroy_with(path: &Path, store: Option<&dyn KeyStore>, cache: &KeyCache) {
     for (_, header) in sealed_copies(path) {
         cache.forget(&header);
         if let (KeySource::Keychain, Some(store)) = (header.source, store) {
-            if let Err(error) = store.delete(&header.key_name()) {
-                log::warn!(
-                    "Could not remove the session key from the credential store: {}",
-                    error.0
-                );
-            }
+            delete_key(path, store, &header.key_name());
         }
     }
     for suffix in ["", JOURNAL, STAGING] {
@@ -693,7 +766,8 @@ fn destroy_with(path: &Path, store: Option<&dyn KeyStore>, cache: &KeyCache) {
 }
 
 /// Sign-out: remove the session's key from the credential store and erase
-/// the session file, its journal and any leftovers. A live [`SealedSession`]
+/// the session file, its journal and any leftovers. A key the credential
+/// store cannot remove now is listed and removed on a later start. A live [`SealedSession`]
 /// for the file stops writing once it notices the file is gone.
 pub(crate) fn destroy(path: &Path) {
     let store = keys::key_store();

@@ -305,7 +305,7 @@ fn telegram_session_files_are_owner_only_and_older_installs_are_tightened() {
 /// writes and sign-out. The journeys run inside the native driver.
 #[test]
 fn session_store_journeys_cover_sealing_keys_migration_and_recovery() {
-    const EXPECTED: [&str; 23] = [
+    const EXPECTED: [&str; 24] = [
         "sealed_round_trip_hides_plaintext",
         "every_write_uses_a_fresh_nonce",
         "wrong_key_is_rejected",
@@ -329,6 +329,7 @@ fn session_store_journeys_cover_sealing_keys_migration_and_recovery() {
         "missing_or_unreachable_keys_are_distinct",
         "signed_out_session_stops_writing",
         "destroy_removes_every_copy_and_the_key",
+        "unremovable_keys_are_removed_on_a_later_start",
     ];
     let fixture = Fixture::new();
     let mut app = Backend::start(&fixture.0);

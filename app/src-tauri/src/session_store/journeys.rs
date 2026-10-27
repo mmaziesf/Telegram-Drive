@@ -113,6 +113,10 @@ pub(crate) const JOURNEYS: &[(&str, Journey)] = &[
         "destroy_removes_every_copy_and_the_key",
         destroy_removes_every_copy_and_the_key,
     ),
+    (
+        "unremovable_keys_are_removed_on_a_later_start",
+        unremovable_keys_are_removed_on_a_later_start,
+    ),
 ];
 
 /// Run the named journey in `directory`, which must be empty or absent.
@@ -924,4 +928,69 @@ fn destroy_removes_every_copy_and_the_key(dir: &Path) -> Result<(), String> {
         )?;
     }
     same(fixture.stored_keys(), 0, "keys after destroy")
+}
+
+fn unremovable_keys_are_removed_on_a_later_start(dir: &Path) -> Result<(), String> {
+    let fixture = Fixture::new(dir);
+    let path = fixture.placeholder()?;
+    fixture.open()?.cache_peer(&me(101));
+    let old_key = step(
+        format::peek_header(&step(std::fs::read(&path), "read")?).ok_or("no header"),
+        "header",
+    )?
+    .key_name();
+    let list = files::sibling(&path, ORPHANED_KEYS);
+
+    // Sign-out while the credential store is unreachable: the session is
+    // erased and the key's name, and nothing else, is kept to retry.
+    destroy_with(&path, Some(&NoKeyStore), &fixture.cache);
+    ensure(!path.exists(), "the session survived sign-out")?;
+    same(
+        fixture.stored_keys(),
+        1,
+        "keys left in the unreachable store",
+    )?;
+    same(
+        step(std::fs::read_to_string(&list), "read list")?,
+        format!("{old_key}\n"),
+        "listed keys",
+    )?;
+    // A second failed removal does not list the key twice.
+    delete_key(&path, &NoKeyStore, &old_key);
+    same(orphaned_keys(&path), vec![old_key.clone()], "listed keys")?;
+
+    // The next start with a reachable store removes the old key.
+    fixture.placeholder()?;
+    let new = fixture.open()?;
+    new.cache_peer(&me(202));
+    drop(new);
+    ensure(
+        !dir.join("keys").join(&old_key).exists(),
+        "the old key is still stored",
+    )?;
+    same(fixture.stored_keys(), 1, "keys after the retry")?;
+    ensure(!list.exists(), "the list survived a successful retry")?;
+
+    // A list that names the live key, or holds junk, never removes the live key.
+    let live_key = step(
+        format::peek_header(&step(std::fs::read(&path), "read")?).ok_or("no header"),
+        "header",
+    )?
+    .key_name();
+    step(
+        std::fs::write(
+            &list,
+            format!("../keys/{live_key}\n{live_key}\nnot a key\n"),
+        ),
+        "forge list",
+    )?;
+    same(
+        owner_after_reopen(&fixture)?,
+        Some(202),
+        "owner after reopen",
+    )?;
+    ensure(
+        dir.join("keys").join(&live_key).exists(),
+        "the live key was removed",
+    )
 }
