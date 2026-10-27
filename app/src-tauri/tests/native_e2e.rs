@@ -234,6 +234,66 @@ fn database_upgrade_preserves_legacy_rows_and_backup_across_process_restarts() {
     assert_eq!(fixture.read("shares.db"), before);
 }
 
+#[cfg(unix)]
+fn file_mode(path: &Path) -> u32 {
+    use std::os::unix::fs::PermissionsExt;
+    std::fs::metadata(path).unwrap().permissions().mode() & 0o777
+}
+
+#[cfg(unix)]
+#[test]
+fn telegram_session_files_are_owner_only_and_older_installs_are_tightened() {
+    use std::os::unix::fs::PermissionsExt;
+    let fixture = Fixture::new();
+    let account = fixture.path("account");
+    std::fs::create_dir(&account).unwrap();
+    std::fs::set_permissions(&account, std::fs::Permissions::from_mode(0o755)).unwrap();
+    let mut app = Backend::start(&fixture.0);
+    app.ok(json!({"command":"seed_account","owner":101,"root":"account"}));
+    let database = account.join("telegram.session");
+    assert_eq!(file_mode(&account), 0o700);
+    assert_eq!(file_mode(&database), 0o600);
+    app.stop();
+
+    // A session written by an earlier release with default modes, including
+    // SQLite sidecars, is tightened when the session next opens.
+    std::fs::set_permissions(&account, std::fs::Permissions::from_mode(0o755)).unwrap();
+    std::fs::set_permissions(&database, std::fs::Permissions::from_mode(0o644)).unwrap();
+    for suffix in ["-wal", "-shm", "-journal"] {
+        let sidecar = account.join(format!("telegram.session{suffix}"));
+        std::fs::write(&sidecar, b"").unwrap();
+        std::fs::set_permissions(&sidecar, std::fs::Permissions::from_mode(0o644)).unwrap();
+    }
+    let mut app = Backend::start(&fixture.0);
+    assert_eq!(
+        app.ok(json!({"command":"open_account_session","root":"account"}))["owner"],
+        101
+    );
+    assert_eq!(file_mode(&account), 0o700);
+    assert_eq!(file_mode(&database), 0o600);
+    for suffix in ["-wal", "-shm", "-journal"] {
+        let sidecar = account.join(format!("telegram.session{suffix}"));
+        if sidecar.exists() {
+            assert_eq!(file_mode(&sidecar), 0o600, "{suffix} stayed readable");
+        }
+    }
+    app.stop();
+
+    // A symbolic link planted in place of the session is never followed when
+    // modes are tightened, so its target keeps its own mode.
+    let outside = fixture.path("outside.txt");
+    std::fs::write(&outside, b"not a session").unwrap();
+    std::fs::set_permissions(&outside, std::fs::Permissions::from_mode(0o644)).unwrap();
+    let linked = fixture.path("linked");
+    std::fs::create_dir(&linked).unwrap();
+    std::os::unix::fs::symlink(&outside, linked.join("telegram.session")).unwrap();
+    let mut app = Backend::start(&fixture.0);
+    let _ = app.request(json!({"command":"open_account_session","root":"linked"}));
+    app.stop();
+    assert_eq!(file_mode(&outside), 0o644);
+    assert_eq!(std::fs::read(&outside).unwrap(), b"not a session");
+}
+
 #[test]
 fn account_isolation_survives_restart_contention_and_account_switch() {
     let fixture = Fixture::new();
