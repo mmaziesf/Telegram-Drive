@@ -1,5 +1,12 @@
 ## [Unreleased]
 
+### Upload-from-URL refuses more reserved and local addresses
+
+- "Upload from URL" (and the crash reporter's endpoint check) now share one address guard. It refuses every IPv4 block in the IANA special-purpose registry that is not globally reachable, adding `192.88.99.0/24`. For IPv6 it only allows global unicast `2000::/3`, minus IETF assignments, Teredo and benchmarking (`2001::/23`) and documentation (`2001:db8::/32`, `3fff::/20`). IPv4-mapped, NAT64 `64:ff9b::/96` and 6to4 `2002::/16` addresses are judged by the IPv4 address inside them. IPv4-compatible `::/96`, local-use NAT64 `64:ff9b:1::/48`, `fec0::/10` site-local and SRv6 `5f00::/16` are refused.
+- IPv6 literals in URLs were compared with their brackets, so the literal check never matched; the resolved-address check still caught them. They are now checked before any lookup.
+- Single-label hostnames and the `.home.arpa`, `.intranet`, `.corp` and `.private` suffixes are refused before a request, including one sent through a proxy. With a proxy active the proxy resolves names itself, so a proxy with a split-horizon resolver remains outside this guard (RT-14).
+- New `input_guards` test target, run in desktop CI next to the crypto known-answer tests.
+
 ### Sync folders cannot sit inside the app's own state
 
 - Previewing, adding or updating a sync mapping now refuses a local folder that is inside (or equal to) the app's data, local data, cache, config or log folder. Such a mapping would upload session and vault files to Telegram, or let remote files overwrite them. The check runs on the canonical path, so `..` tricks are caught.
