@@ -538,6 +538,7 @@ pub async fn cmd_logout(
         session_path.exists(),
         remote_session_revoked,
         chrono::Utc::now().timestamp(),
+        signing_out,
     );
     // Erase every copy of the session and remove its key.
     #[cfg(not(any(target_os = "android", target_os = "ios")))]
@@ -598,12 +599,21 @@ async fn stale_session_context(
         .path()
         .app_data_dir()
         .map_err(|e| e.to_string())?;
-    let Some(since) = crate::session_revocation::pending(&app_data_dir) else {
+    let Some(marker) = crate::session_revocation::pending(&app_data_dir) else {
         return Ok(None);
     };
     let Some(client) = state.client.lock().await.clone() else {
         return Ok(None);
     };
+    let signed_in = timeout(ACTIVE_SESSIONS_TIMEOUT, client.get_me())
+        .await
+        .map_err(|_| "Telegram did not answer in time".to_string())?
+        .map_err(|error| error.to_string())?
+        .bare_id();
+    if !marker.applies_to(signed_in) {
+        return Ok(None);
+    }
+    let since = marker.since;
     let Some(api_id) = *state.api_id.lock().await else {
         return Ok(None);
     };

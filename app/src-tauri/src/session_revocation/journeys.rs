@@ -20,6 +20,10 @@ pub(crate) const JOURNEYS: &[(&str, Journey)] = &[
         unrevoked_sign_out_leaves_a_marker,
     ),
     (
+        "another_account_is_not_offered_the_marker",
+        another_account_is_not_offered_the_marker,
+    ),
+    (
         "only_older_sessions_of_the_same_app_are_offered",
         only_older_sessions_of_the_same_app_are_offered,
     ),
@@ -52,43 +56,69 @@ fn expect<T: PartialEq + std::fmt::Debug>(
 }
 
 fn unrevoked_sign_out_leaves_a_marker(directory: &Path) -> Result<(), String> {
+    let at = |since, owner| Some(Pending { since, owner });
     expect("no marker at first", pending(directory), None)?;
-    after_sign_out(directory, true, true, 100);
+    after_sign_out(directory, true, true, 100, Some(7));
     expect(
         "a revoked session leaves no marker",
         pending(directory),
         None,
     )?;
-    after_sign_out(directory, false, false, 100);
+    after_sign_out(directory, false, false, 100, Some(7));
     expect(
         "no saved session leaves no marker",
         pending(directory),
         None,
     )?;
-    after_sign_out(directory, true, false, 100);
+    after_sign_out(directory, true, false, 100, None);
     expect(
-        "an unrevoked session is recorded",
+        "an unrevoked locked session is recorded without an account",
         pending(directory),
-        Some(100),
-    )?;
-    after_sign_out(directory, true, false, 250);
-    expect(
-        "a later sign-out replaces the time",
-        pending(directory),
-        Some(250),
+        at(100, None),
     )?;
     let stored =
         std::fs::read_to_string(directory.join(MARKER)).map_err(|error| error.to_string())?;
     expect(
-        "the marker holds only the time",
+        "an unknown account is left out",
         stored.as_str(),
-        "{\"since\":250}",
+        "{\"since\":100}",
+    )?;
+    after_sign_out(directory, true, false, 250, Some(7));
+    expect(
+        "a later sign-out replaces the marker",
+        pending(directory),
+        at(250, Some(7)),
+    )?;
+    let stored =
+        std::fs::read_to_string(directory.join(MARKER)).map_err(|error| error.to_string())?;
+    expect(
+        "the marker holds only the time and the account",
+        stored.as_str(),
+        "{\"since\":250,\"owner\":7}",
     )?;
     clear(directory);
     expect("clearing removes the marker", pending(directory), None)?;
     clear(directory);
     std::fs::write(directory.join(MARKER), b"not json").map_err(|error| error.to_string())?;
     expect("a malformed marker is ignored", pending(directory), None)
+}
+
+fn another_account_is_not_offered_the_marker(_: &Path) -> Result<(), String> {
+    let known = Pending {
+        since: 1,
+        owner: Some(7),
+    };
+    expect("the same account is asked", known.applies_to(7), true)?;
+    expect("another account is not", known.applies_to(8), false)?;
+    let unknown = Pending {
+        since: 1,
+        owner: None,
+    };
+    expect(
+        "after a locked session the next account is asked",
+        unknown.applies_to(8),
+        true,
+    )
 }
 
 fn authorization(hash: i64, current: bool, api_id: i32, created: i64) -> Authorization {

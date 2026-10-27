@@ -304,8 +304,9 @@ fn telegram_session_files_are_owner_only_and_older_installs_are_tightened() {
 /// offered after the next sign-in and which confirmations are accepted.
 #[test]
 fn session_revocation_journeys_offer_only_confirmable_older_sessions() {
-    const EXPECTED: [&str; 3] = [
+    const EXPECTED: [&str; 4] = [
         "unrevoked_sign_out_leaves_a_marker",
+        "another_account_is_not_offered_the_marker",
         "only_older_sessions_of_the_same_app_are_offered",
         "only_offered_sessions_can_be_confirmed",
     ];
