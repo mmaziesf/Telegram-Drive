@@ -111,6 +111,32 @@ pub async fn cmd_update_folder_order(
     .await
 }
 
+/// Longest group name, in characters, that the sidebar can show.
+const MAX_GROUP_NAME_CHARS: usize = 64;
+
+/// Checks a group name and colour before they are stored. The colour is used as
+/// a CSS `backgroundColor`, so only `#RRGGBB` is accepted.
+pub fn validate_group_fields(name: &str, color_hex: &str) -> Result<(), String> {
+    if name.trim().is_empty() {
+        return Err("Group name cannot be empty".to_string());
+    }
+    if name.chars().count() > MAX_GROUP_NAME_CHARS {
+        return Err(format!(
+            "Group name cannot be longer than {MAX_GROUP_NAME_CHARS} characters"
+        ));
+    }
+    if name.chars().any(char::is_control) {
+        return Err("Group name cannot contain control characters".to_string());
+    }
+    let valid_colour = color_hex
+        .strip_prefix('#')
+        .is_some_and(|hex| hex.len() == 6 && hex.bytes().all(|byte| byte.is_ascii_hexdigit()));
+    if !valid_colour {
+        return Err("Group colour must be a #RRGGBB hex colour".to_string());
+    }
+    Ok(())
+}
+
 #[tauri::command]
 pub async fn cmd_create_group(
     name: String,
@@ -126,6 +152,7 @@ pub(crate) fn create_group(
     name: &str,
     color_hex: &str,
 ) -> Result<i32, String> {
+    validate_group_fields(name, color_hex)?;
     {
         // Determine max display order to append new group
         let mut max_stmt = conn
@@ -169,6 +196,7 @@ pub async fn cmd_update_group(
     color_hex: String,
     db_pool: State<'_, DbConnection>,
 ) -> Result<(), String> {
+    validate_group_fields(&name, &color_hex)?;
     let database = db_pool.inner().clone();
     crate::db::with_connection(database, move |conn| {
         let mut stmt = conn

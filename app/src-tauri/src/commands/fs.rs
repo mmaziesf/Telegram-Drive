@@ -1,3 +1,6 @@
+//! File, folder and transfer commands.
+#![cfg_attr(not(test), deny(clippy::unwrap_used, clippy::expect_used))]
+
 use crate::bandwidth::{BandwidthManager, BandwidthReservation};
 use crate::commands::download_destination::{
     publish_download_file, skip_existing_download, DownloadCollisionPolicy, DownloadOutcome,
@@ -1545,7 +1548,7 @@ impl UploadCancellation {
         } else {
             get_upload_cancellations()
                 .lock()
-                .unwrap()
+                .unwrap_or_else(std::sync::PoisonError::into_inner)
                 .insert(transfer_id.to_string(), sender);
             None
         };
@@ -1564,7 +1567,7 @@ impl Drop for UploadCancellation {
         if !self.transfer_id.is_empty() {
             get_upload_cancellations()
                 .lock()
-                .unwrap()
+                .unwrap_or_else(std::sync::PoisonError::into_inner)
                 .remove(&self.transfer_id);
         }
     }
@@ -2192,7 +2195,7 @@ pub async fn cmd_cancel_transfer(
         .insert(transfer_id.clone());
     if let Some(tx) = get_upload_cancellations()
         .lock()
-        .unwrap()
+        .unwrap_or_else(std::sync::PoisonError::into_inner)
         .remove(&transfer_id)
     {
         let _ = tx.send(());
@@ -5632,41 +5635,74 @@ struct RemoteProgressPayload {
 const MAX_REMOTE_UPLOAD_BYTES: u64 = 2_147_483_648;
 const MAX_REMOTE_REDIRECTS: usize = 10;
 
-fn is_public_remote_ip(address: std::net::IpAddr) -> bool {
+/// Whether an outbound fetch may connect to `address`.
+///
+/// IPv4 refuses every block in the IANA special-purpose registry that is not
+/// globally reachable. IPv6 only allows global unicast (`2000::/3`), minus
+/// `2001::/23` (IETF protocol assignments, Teredo, benchmarking),
+/// `2001:db8::/32` and `3fff::/20` (documentation). Forms that carry an IPv4
+/// address are judged by that address: IPv4-mapped `::ffff:0:0/96`, NAT64
+/// `64:ff9b::/96` and 6to4 `2002::/16`. Everything else outside `2000::/3` is
+/// refused, including IPv4-compatible `::/96`, `::ffff:0:0:0/96`, local-use
+/// NAT64 `64:ff9b:1::/48`, discard `100::/64`, SRv6 `5f00::/16`, ULA, site- and
+/// link-local, and multicast.
+pub fn is_public_remote_ip(address: std::net::IpAddr) -> bool {
     match address {
-        std::net::IpAddr::V4(ip) => {
-            let octets = ip.octets();
-            !(ip.is_unspecified()
-                || ip.is_loopback()
-                || ip.is_private()
-                || ip.is_link_local()
-                || ip.is_multicast()
-                || ip.is_broadcast()
-                || octets[0] == 0
-                || (octets[0] == 100 && (64..=127).contains(&octets[1]))
-                || (octets[0] == 192 && octets[1] == 0 && octets[2] == 0)
-                || (octets[0] == 192 && octets[1] == 0 && octets[2] == 2)
-                || (octets[0] == 198 && (octets[1] == 18 || octets[1] == 19))
-                || (octets[0] == 198 && octets[1] == 51 && octets[2] == 100)
-                || (octets[0] == 203 && octets[1] == 0 && octets[2] == 113)
-                || octets[0] >= 240)
-        }
-        std::net::IpAddr::V6(ip) => {
-            if let Some(mapped) = ip.to_ipv4_mapped() {
-                return is_public_remote_ip(std::net::IpAddr::V4(mapped));
-            }
-            let segments = ip.segments();
-            !(ip.is_unspecified()
-                || ip.is_loopback()
-                || ip.is_unique_local()
-                || ip.is_unicast_link_local()
-                || ip.is_multicast()
-                || (segments[0] == 0x2001 && segments[1] == 0x0db8))
-        }
+        std::net::IpAddr::V4(ip) => is_public_remote_ipv4(ip),
+        std::net::IpAddr::V6(ip) => is_public_remote_ipv6(ip),
     }
 }
 
-fn validate_remote_url_syntax(url: &reqwest::Url) -> Result<(), String> {
+fn is_public_remote_ipv4(ip: std::net::Ipv4Addr) -> bool {
+    let [a, b, c, _] = ip.octets();
+    !(a == 0
+        || a == 10
+        || a == 127
+        || (a == 100 && (64..=127).contains(&b))
+        || (a == 169 && b == 254)
+        || (a == 172 && (16..=31).contains(&b))
+        || (a == 192 && b == 0 && c == 0)
+        || (a == 192 && b == 0 && c == 2)
+        || (a == 192 && b == 88 && c == 99)
+        || (a == 192 && b == 168)
+        || (a == 198 && (b == 18 || b == 19))
+        || (a == 198 && b == 51 && c == 100)
+        || (a == 203 && b == 0 && c == 113)
+        || a >= 224)
+}
+
+fn is_public_remote_ipv6(ip: std::net::Ipv6Addr) -> bool {
+    let s = ip.segments();
+    let embedded = |high: u16, low: u16| {
+        let [h1, h2] = high.to_be_bytes();
+        let [l1, l2] = low.to_be_bytes();
+        is_public_remote_ipv4(std::net::Ipv4Addr::new(h1, h2, l1, l2))
+    };
+    if s[..5] == [0, 0, 0, 0, 0] && s[5] == 0xffff {
+        return embedded(s[6], s[7]);
+    }
+    if s[..6] == [0x64, 0xff9b, 0, 0, 0, 0] {
+        return embedded(s[6], s[7]);
+    }
+    if s[0] == 0x2002 {
+        return embedded(s[1], s[2]);
+    }
+    (s[0] & 0xe000) == 0x2000
+        && !(s[0] == 0x2001 && s[1] < 0x0200)
+        && !(s[0] == 0x2001 && s[1] == 0x0db8)
+        && !(s[0] == 0x3fff && s[1] < 0x1000)
+}
+
+/// Checks an upload URL before any network use.
+///
+/// With a proxy active, the proxy resolves the hostname itself, so the
+/// resolved-address check in `resolve_public_remote_addrs` only covers what
+/// this machine's resolver returns. Names that are private by convention are
+/// therefore refused here, before they reach a proxy: `localhost`, single-label
+/// intranet names, and the local-use suffixes below. A proxy with a split-horizon
+/// resolver can still map a public-looking name to its own private network;
+/// that limit is documented in RT-14 of the red-team report.
+pub fn validate_remote_url_syntax(url: &reqwest::Url) -> Result<(), String> {
     if url.scheme() != "http" && url.scheme() != "https" {
         return Err("Only HTTP and HTTPS URLs can be uploaded".to_string());
     }
@@ -5676,20 +5712,34 @@ fn validate_remote_url_syntax(url: &reqwest::Url) -> Result<(), String> {
     let host = url
         .host_str()
         .ok_or_else(|| "The upload URL has no hostname".to_string())?;
-    let normalized = host.trim_end_matches('.').to_ascii_lowercase();
-    if normalized == "localhost"
-        || normalized.ends_with(".localhost")
-        || normalized.ends_with(".local")
-        || normalized.ends_with(".internal")
-        || normalized.ends_with(".lan")
-        || normalized.ends_with(".home")
-    {
-        return Err("Upload URLs cannot target local or private hosts".to_string());
-    }
-    if let Ok(address) = normalized.parse::<std::net::IpAddr>() {
-        if !is_public_remote_ip(address) {
-            return Err("Upload URLs cannot target private or reserved IP addresses".to_string());
+    // The URL parser canonicalizes IP hosts (including legacy IPv4 forms such
+    // as `0x7f.1`) and brackets IPv6 literals.
+    let literal = host
+        .strip_prefix('[')
+        .and_then(|inner| inner.strip_suffix(']'))
+        .unwrap_or(host);
+    let Ok(address) = literal.parse::<std::net::IpAddr>() else {
+        let name = host.trim_end_matches('.').to_ascii_lowercase();
+        let private_suffix = [
+            ".localhost",
+            ".local",
+            ".internal",
+            ".intranet",
+            ".corp",
+            ".private",
+            ".lan",
+            ".home",
+            ".home.arpa",
+        ]
+        .iter()
+        .any(|suffix| name.ends_with(suffix));
+        if name == "localhost" || !name.contains('.') || private_suffix {
+            return Err("Upload URLs cannot target local or private hosts".to_string());
         }
+        return Ok(());
+    };
+    if !is_public_remote_ip(address) {
+        return Err("Upload URLs cannot target private or reserved IP addresses".to_string());
     }
     Ok(())
 }
@@ -6395,7 +6445,7 @@ async fn cmd_upload_from_url_owned(
     #[cfg(any(target_os = "android", target_os = "ios"))]
     get_upload_cancellations()
         .lock()
-        .unwrap()
+        .unwrap_or_else(std::sync::PoisonError::into_inner)
         .insert(transfer_id.clone(), cancel_tx);
 
     let client_clone = client.clone();
@@ -6417,7 +6467,10 @@ async fn cmd_upload_from_url_owned(
         tokio::select! {
             res = &mut upload_task => {
                 #[cfg(any(target_os = "android", target_os = "ios"))]
-                get_upload_cancellations().lock().unwrap().remove(&transfer_id);
+                get_upload_cancellations()
+                    .lock()
+                    .unwrap_or_else(std::sync::PoisonError::into_inner)
+                    .remove(&transfer_id);
                 match res {
                     Ok(Ok(file)) => file,
                     Ok(Err(e)) => {

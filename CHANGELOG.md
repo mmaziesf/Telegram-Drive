@@ -13,6 +13,121 @@
 - Android sessions are unchanged in this release.
 - Bundle ceilings: the 21 new strings in 24 locales raise the locale ceilings to 1981377 bytes in total and 140733 bytes for the largest catalog (measured 1668504 and 117879), and the session check raises the initial JavaScript ceiling from 378375 to the measured 378523 bytes.
 
+### App npm advisories
+
+- Update Vite to 7.3.7 and source-map-js to 1.2.2, clearing six advisories reported by `npm audit` in the app: GHSA-68fv-2mgg-jv7q, GHSA-698v-4r3x-3vcv, GHSA-r825-w8mm-5pxw, GHSA-587h-7wmj-h5pm, GHSA-9jrq-w75r-8gcw and GHSA-rq7h-c2jc-7f22. These are development-server and build-time dependencies.
+- The app's npm advisories and licenses are now a CI gate in `Dependency assurance` (job `npm advisories and licenses`, run on the app only now that the supporter service is removed).
+
+### Removed unreachable frontend code
+
+- Deleted `src/services/localMediaServer.ts` (orphaned since the ad network was removed), `src/utils/drag.ts` (`createDragGhost`, never imported), the unused `withTimeout` helper and `TRANSCODE_CACHE_TIMEOUT_MS` constant, and three unused re-exports (`isZipFile`, `isRarFile`, `isSevenZFile`) from the `utils` barrel.
+
+### Product TypeScript is free of `any`
+
+- Removed the remaining `any` casts in product code: mp4box internals in `useAdaptiveStreaming.ts` now use mp4box's own `ISOFile` typings, `MoveToFolderModal` uses `TelegramFolder`, and `TouchFileList` reuses the typed `resolvePublicFolderUsername` helper. ESLint now rejects `no-explicit-any` under `src/` (except `MobileDashboard.tsx`, still pending its own cleanup).
+
+### Poisoned locks no longer crash network and upload commands
+
+- `vpn_optimizer` and the upload-cancellation registry in `commands/fs.rs` recover a poisoned lock with `PoisonError::into_inner` instead of panicking (one site ran inside `Drop`, where a panic during unwind aborts the app). Both modules now `deny(clippy::unwrap_used, clippy::expect_used)` outside tests so new unwraps fail CI.
+
+### Folder group names and colours are checked
+
+- Creating or editing a folder group now refuses an empty name, a name longer than 64 characters, or one with control characters. The colour must be a `#RRGGBB` hex value. It is used as a CSS colour in the sidebar, so values like `url(...)` or extra declarations are refused. The desktop name field is limited to 64 characters (RT-15).
+
+### Upload-from-URL refuses more reserved and local addresses
+
+- "Upload from URL" (and the crash reporter's endpoint check) now share one address guard. It refuses every IPv4 block in the IANA special-purpose registry that is not globally reachable, adding `192.88.99.0/24`. For IPv6 it only allows global unicast `2000::/3`, minus IETF assignments, Teredo and benchmarking (`2001::/23`) and documentation (`2001:db8::/32`, `3fff::/20`). IPv4-mapped, NAT64 `64:ff9b::/96` and 6to4 `2002::/16` addresses are judged by the IPv4 address inside them. IPv4-compatible `::/96`, local-use NAT64 `64:ff9b:1::/48`, `fec0::/10` site-local and SRv6 `5f00::/16` are refused.
+- IPv6 literals in URLs were compared with their brackets, so the literal check never matched; the resolved-address check still caught them. They are now checked before any lookup.
+- Single-label hostnames and the `.home.arpa`, `.intranet`, `.corp` and `.private` suffixes are refused before a request, including one sent through a proxy. With a proxy active the proxy resolves names itself, so a proxy with a split-horizon resolver remains outside this guard (RT-14).
+- New `input_guards` test target, run in desktop CI next to the crypto known-answer tests.
+
+### Sync folders cannot sit inside the app's own state
+
+- Previewing, adding or updating a sync mapping now refuses a local folder that is inside (or equal to) the app's data, local data, cache, config or log folder. Such a mapping would upload session and vault files to Telegram, or let remote files overwrite them. The check runs on the canonical path, so `..` tricks are caught.
+- Folders that *contain* the app's folders (for example the whole home folder) are still allowed. Excluding the app's folders during a sync is a separate change and is noted as open in RT-12.
+- A native E2E journey covers allowed and refused roots (RT-12 in the red-team report).
+
+### Proxy settings refuse malformed hosts and credentials
+
+- `cmd_apply_proxy_settings` now validates an enabled proxy before saving it. The type must be SOCKS5, HTTP or HTTPS. The host must be a hostname, an IPv4 address or a bracketed IPv6 address, with no `@`, `/`, `#`, `:` or whitespace. The port cannot be 0, and the username and password must be at most 255 bytes (the SOCKS5 field limit) without control characters. These values are inserted into `socks5://user:pass@host:port`, and before this check a malformed host was saved and silently changed that URL's structure. A disabled proxy is still saved as typed, apart from the password limit.
+- A native E2E journey covers accepted and refused values (RT-10 in the red-team report).
+
+### Share links refuse out-of-range metadata
+
+- `cmd_create_share` now checks the WebView-supplied file name, size and expiry before it contacts Telegram. Expiry must be 1 to 8,760 hours (one year). It is computed with checked arithmetic, so a huge value can no longer wrap the stored expiry in release builds or panic in debug builds. Zero or negative hours, which created links that were already expired, are refused too. File names must have 1 to 255 characters and no control characters, and the size cannot be negative.
+- A native E2E journey covers the accepted range and each refused case (RT-09 in the red-team report).
+
+### External links and WebView scripts narrowed
+
+- The shell `open` scope, which Rust enforces, now allows only HTTPS links to this fork's and the upstream GitHub repository, `telegram.org`, `core.telegram.org`, `my.telegram.org`, `ffmpeg.org` and `fragment.com` (including subdomains). It used to allow any `http`, `https` or `mailto` URL, so script injected into the WebView could send data to any site by opening a link.
+- Desktop no longer grants `opener:allow-open-url`, which it never used; it opens links through the shell scope. On Android the opener allows only five exact URLs: the fork repository, its privacy policy, the upstream repository, the Telegram API terms and the Telegram account self-destruction FAQ.
+- `script-src` no longer allows `blob:`. hls.js runs its worker under `worker-src 'self' blob:`, which is unchanged.
+- `check-app-security.cjs` tests the shell scope against every link constant in `projectLinks.ts` and a list of URLs it must refuse (http, other GitHub repositories, look-alike hosts, userinfo tricks, `mailto:`, `file:`). It also requires `script-src 'self'` only, no desktop opener URL permission, and exact Android opener URLs that sit inside the shell scope.
+
+### No referrers from local servers or the WebView; token risk documented
+
+- Every response from the streaming/share, REST API and WebDAV servers, including the 421 refusals, now carries `Referrer-Policy: no-referrer`. The WebView's `index.html` sets `<meta name="referrer" content="no-referrer">`, and `check-app-security.cjs` requires it. Stream URLs carry the session stream token in their query string, so no page may pass them on as a referrer.
+- Confirmed, with no change: the stream token is 16 random bytes generated in memory on each app start and never stored, so a restart rotates it. Nothing logs it. The log journey now also checks that a WebDAV capability path and a stream-token query are redacted.
+- `Docs/THREAT_MODEL.md` now explains why release builds keep accepting `Origin: null` (WebKit media requests; everything behind it still needs a token or key), and that removing it needs a macOS/Linux playback check. It also describes the remaining stream-token risk (the token sits in URLs, but loopback only, rotated on restart, no referrer, redacted from logs) and adds rows for DNS rebinding and share unlocks.
+
+### Local servers check the Host header; dev origin is debug-only
+
+- The streaming/share server, the REST API server and the WebDAV server now refuse with 421 any request whose `Host` is not `127.0.0.1:<port>` or `localhost:<port>` for the port they are bound to. They already bound loopback only, but a web page could point a domain it controls at 127.0.0.1 (DNS rebinding) and then talk to them as its own origin. The check runs before CORS, the API key check and routing. A native journey covers all three servers with a rebound name, a lookalike, the wrong port and a bare name.
+- The Vite dev-server origins (`http://localhost:1420`, `http://127.0.0.1:1420`) are trusted by CORS only in debug builds. `Origin: null` is still accepted: WebKit on macOS and Linux sends it for media fetches from `tauri://`, and v1.8.2 added it to fix playback there. Private routes still need the stream token or API key.
+
+### Stream token checked in constant time; derived keys wiped
+
+- The streaming server's `/stream`, `/hls` and `/fmp4` routes compared the session stream token with `==` and `!=`, which stop at the first differing byte. They now go through one check that hashes both values with SHA-256 and compares the digests with `constant_time_eq_32`. A native journey checks that near-miss tokens (one byte off, a prefix, an extension, empty) get 403 on every route. The API key and WebDAV token checks were already constant-time.
+- The Argon2id output buffer in `derive_passphrase_key`, and the HKDF buffers in `derive_domain_key_32` and `derive_file_wrapping_key`, are now `Zeroizing`, so the stack copies are wiped on success and on error. The key itself stays in `SecretKey`, which already zeroizes on drop.
+
+### Share-link unlocks are random and expire on the server
+
+- Entering a share password used to set a cookie equal to SHA-256 of the share token and the stored bcrypt hash. The value never changed, so anyone who copied it once, or who had the shares database, kept access, and the 30-minute lifetime existed only in the browser. Each unlock now gets 32 random bytes. The server keeps only a SHA-256 digest of it, together with the password hash it was issued under and a 30-minute expiry, and compares in constant time. Changing a share's password ends earlier unlocks. The store holds at most 8 unlocks per share and is capped at the same number of shares as the attempt limiter. Unlocks do not survive an app restart.
+
+### WebView file-system permissions removed
+
+- The desktop and Android capabilities no longer grant the WebView `fs:allow-read`/`fs:allow-write` (desktop: whole app directory via `fs:scope-app-recursive`; Android: `$APPDATA/**` and `$APPCACHE/**`). The frontend never imports `@tauri-apps/plugin-fs`; all file access goes through Rust commands. Before this change, script injected into the WebView could have read or overwritten the Telegram session and settings files in the app data directory. `scripts/check-app-security.cjs` now fails if any `fs:` permission comes back.
+
+### Rust advisory baseline refresh
+
+- A lockfile-only refresh moves plist 1.9.0 → 1.10.3 and wayland-scanner 0.31.10 → 0.31.11, which together replace quick-xml 0.39.4 (RUSTSEC-2026-0194, RUSTSEC-2026-0195) with quick-xml 0.41.0/0.42.0. It also moves the yanked chacha20 0.10.0 → 0.10.2 and adds base64 0.23.1 for plist. Those three exceptions come out of `deny.toml`, `.cargo/audit.toml` and `dependency-policy/rust-advisory-baseline.json`. `.cargo/audit.toml` also drops RUSTSEC-2026-0367/0368/0369: they were for zip 4 through tauri-plugin-updater, which is no longer in the graph, and the locked zip 9.1.2 is already patched. The other entries were rechecked against the latest crates.io releases and still have no compatible fix; the PR lists the reason for each.
+
+### Machine-translation notice
+
+- README "Languages" and Docs/LOCALIZATION_REVIEW.md now open with a visible warning that all 23 non-English locales are machine-translated and unreviewed, including the security and account-risk text, and that English is the reference. The app's strings are unchanged; native-speaker review is still needed.
+
+### Fuzz build note
+
+- `app/src-tauri/fuzz/README.md` now sets `CARGO_PROFILE_RELEASE_BUILD_OVERRIDE_DEBUG_ASSERTIONS=true` before `cargo fuzz run`. cargo-fuzz turns on debug assertions only for the fuzzed crates, so Tauri's build-time code generator omitted the debug-only `ResolvedCommand.referenced_by` field, and a clean build of the fuzz targets failed with E0063. With the variable set, the build passed on main 393aceb.
+
+### Settings sync buffers wiped after use
+
+- `commands/settings_sync.rs` now wraps the plaintext settings encoded before encryption and the settings decrypted from a backup in `Zeroizing`, so both buffers are overwritten when dropped. This is backed by code review only: no test can observe freed memory.
+
+### TDENC2 fuzz targets
+
+- Add `app/src-tauri/fuzz`, a cargo-fuzz research harness outside the app build, CI and release, with its own workspace and lockfile. `envelope_header` feeds arbitrary bytes to the header parser, metadata verification and decrypter setup; `envelope_decrypt` feeds forged ciphertext, in input-chosen fragments, behind a valid header and aborts if any of it authenticates. Local 10-minute smoke runs found no crash: `envelope_header` ran 112,243,538 inputs (seeded with the known-answer envelopes, which raised its coverage from 111 to 416 edges) and `envelope_decrypt` ran 10,765,974. The 24-hour run is still pending. TESTING.md, Docs/CRYPTO.md, Docs/TDENC2_FORMAT.md and Docs/RELEASE_ACCEPTANCE.md describe the harness and its status.
+
+### Upload concurrency limit
+
+- New installs now upload 2 files at a time instead of 6, and the setting goes up to 4 instead of 10 (the transfer engine accepted up to 32). The Telegram client sends each file over 10 MB with four parallel part workers, so 6 files meant about 24 concurrent part uploads on one account and 10 meant about 40; that is the kind of burst Telegram answers with FLOOD_WAIT and may flag as abuse. With 4 files the peak is 16. A higher value saved or synced by an older version is lowered to 4 when the settings load, by the desktop upload queue and by `cmd_transfer_set_limits`; synced settings still accept up to 32 so older devices can sync. Download limits are unchanged. `upload-concurrency.spec.ts` covers the default, the new maximum and the lowering of an old value.
+
+### Preview cache drop-order regression test
+
+- The lease a detached legacy preview hash holds is now built by `legacy_lease` in `workspace/assets.rs`, which documents why the legacy file claim must drop before the capacity, file and category guards (the race fixed in #14). The native test `legacy_hash_lease_releases_the_file_claim_before_the_category_guard` drops a lease built by that function and checks the release order; it fails with the pre-#14 order. It checks the order only; it does not replay the timing race. The README hardening row for #14 now names the test.
+
+### Inventory timer test flake
+
+- `an_api_consumer_cannot_consume_the_desktop_inventory_change_notification` failed on CI with `changedEvents` 0. The native test harness kept the watched folder for 2 s after the cold read, and its lifecycle spends 1 s asleep plus three reads before the change poll, so slow reads on a loaded runner evicted the folder; the API read then started a fresh entry that already held the rename, and the poll had nothing to report. The harness now keeps the folder for 4 s and waits that long before the eviction check. Production retention is unchanged. The new `slow_initial_inventory_reads_keep_the_watched_folder_until_the_change_poll` test slows the first two reads by 700 ms each and failed with the old window.
+
+### Telegram account risk notice
+
+- The first-run introduction has a fourth step, "Protect your Telegram account". It says that Telegram observes accounts using unofficial clients and bans flooding or spam, gives no storage guarantee, and deletes accounts offline longer than the self-destruct period, and it asks the user to set that period to the longest option and keep backups. It links the Telegram API Terms of Service and Telegram's self-destruction FAQ (opened in the system browser). The strings are in all 24 locales; the non-English ones are machine-drafted and unreviewed. The locale data grows by 16,562 bytes and stays under the existing budget. The README's first-time setup has the same notice. `telegram-api-disclosure.spec.ts` covers the step and both links.
+
+### Crypto known-answer tests
+
+- Add `tests/crypto_kat.rs`: three TDENC2 envelopes (empty, 100 bytes with metadata, two chunks) must match, byte for byte, the output of the new `scripts/generate-tdenc2-kat.py`, an independent Python encoder; HKDF-SHA-256 is checked against RFC 5869 test case 3; and decryption must reject a body whose length differs from the declared size and an edited declared size. CI runs it with the envelope suite, and TESTING.md and Docs/CRYPTO.md list it.
+
 ### Crypto test coverage
 
 - Add `tests/crypto_envelope.rs`, an in-memory suite that exercises the public envelope, key-slot and recovery-bundle API. It covers round-trips under random sizes, metadata and download fragmentation; rejection of every flipped bit, truncation, trailing bytes, reordered, dropped or cross-file records, and wrong keys; key-slot binding of the file identity, slot ID, kind and salt; nonce and file-identity uniqueness; and byte-identical resumed uploads. Property cases use `proptest` (a dev-dependency only).
@@ -91,6 +206,7 @@
 - Move the archive viewer and extractor to `zip` 9. Entry names that `zip` 9 cannot decode are refused with an error that names the entry index.
 - `zip` 4 remains only inside `tauri-plugin-updater` (2.14 still requires `zip` ^4). It only unpacks minisign-verified update archives, so RUSTSEC-2026-0367, -0368 and -0369 are recorded as reviewed exceptions in `deny.toml` and the advisory baseline, to be removed when the updater moves to `zip` 9.
 - Raise the supporter service's pinned `undici` override (used only by the `miniflare` test harness) from 7.29.1 to 7.30.1, fixing GHSA-4qv8-2p9j-2685, GHSA-f72v-6w45-q472 and GHSA-xjj6-f33q-929c.
+- Reset the design gallery's scroll container before its full-page snapshots. A click could leave it scrolled by a few pixels, which made the visual check on this pull request fail intermittently; 75 of 75 repeated runs now pass.
 
 ### Clearing the legacy preview cache no longer skips a file being hashed
 

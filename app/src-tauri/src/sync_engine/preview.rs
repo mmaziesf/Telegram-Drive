@@ -8,7 +8,7 @@ use crate::{db::DbConnection, workspace::AccountGuard};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::{
-    path::Path,
+    path::{Path, PathBuf},
     time::{Duration, Instant},
 };
 use tauri::Manager;
@@ -150,6 +150,32 @@ fn summarize_operations(
     (counts, entries)
 }
 
+/// A sync root inside the app's own state would upload session and vault files
+/// to Telegram, or let remote files overwrite them. `local` is canonical.
+pub(crate) fn refuse_app_state_root(local: &Path, app_dirs: &[PathBuf]) -> Result<(), String> {
+    for dir in app_dirs {
+        let dir = dir.canonicalize().unwrap_or_else(|_| dir.clone());
+        if local.starts_with(&dir) {
+            return Err("Choose a folder outside the app's own data and cache folders".into());
+        }
+    }
+    Ok(())
+}
+
+fn app_state_dirs(app: &tauri::AppHandle) -> Vec<PathBuf> {
+    let paths = app.path();
+    [
+        paths.app_data_dir(),
+        paths.app_cache_dir(),
+        paths.app_config_dir(),
+        paths.app_local_data_dir(),
+        paths.app_log_dir(),
+    ]
+    .into_iter()
+    .filter_map(Result::ok)
+    .collect()
+}
+
 pub async fn preview_pair(
     app: &tauri::AppHandle,
     db: &DbConnection,
@@ -157,6 +183,7 @@ pub async fn preview_pair(
     expected_owner: &str,
 ) -> Result<SyncPreview, String> {
     let request = request.normalized()?;
+    refuse_app_state_root(Path::new(&request.local_path), &app_state_dirs(app))?;
     let root = app
         .path()
         .app_data_dir()
@@ -309,6 +336,7 @@ pub fn consume_review(
     expected_owner: &str,
 ) -> Result<AccountGuard, String> {
     let token = token.ok_or("Preview this mapping before saving or activating it")?;
+    refuse_app_state_root(Path::new(&request.local_path), &app_state_dirs(app))?;
     let root = app
         .path()
         .app_data_dir()

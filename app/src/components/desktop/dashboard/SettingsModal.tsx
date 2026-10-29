@@ -5,6 +5,7 @@ import { X, RotateCcw, Download, Upload, Trash2, HardDrive, Globe, Key, Copy, Ch
 import { invoke } from '@tauri-apps/api/core';
 import { toast } from 'sonner';
 import { useSettings } from '../../../context/SettingsContext';
+import { MAX_CONCURRENT_UPLOADS, clampUploadConcurrency } from '../../../config/defaultSettings';
 import { useConfirm } from '../../../context/ConfirmContext';
 import { useTranslation } from 'react-i18next';
 import { LANGUAGES, type LanguagePreference } from '../../../i18n/languages';
@@ -718,7 +719,7 @@ function OwnedSettingsModal({ ownerId, isOpen, onClose, initialTab = 'general' }
                                     icon={<Upload className="h-4 w-4 text-telegram-subtext" />}
                                     title={t('settings.concurrent_uploads')}
                                     description={t('settings.max_uploads_desc')}
-                                    control={<SettingsStepper value={settings.maxConcurrentUploads} minimum={1} maximum={10} label={t('settings.concurrent_uploads')} onChange={value => updateSetting('maxConcurrentUploads', value)} />}
+                                    control={<SettingsStepper value={clampUploadConcurrency(settings.maxConcurrentUploads)} minimum={1} maximum={MAX_CONCURRENT_UPLOADS} label={t('settings.concurrent_uploads')} onChange={value => updateSetting('maxConcurrentUploads', value)} />}
                                 />
 
                                 <SettingsRow

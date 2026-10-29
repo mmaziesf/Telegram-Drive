@@ -18,23 +18,6 @@
     "clipboard-manager:allow-write-text",
     "dialog:allow-open",
     "dialog:allow-save",
-    "fs:allow-read",
-    "fs:allow-write",
-    "fs:scope-app-recursive",
-    {
-      "identifier": "opener:allow-open-url",
-      "allow": [
-        {
-          "url": "https://*"
-        },
-        {
-          "url": "http://*"
-        },
-        {
-          "url": "mailto:*"
-        }
-      ]
-    },
     "opener:allow-reveal-item-in-dir"
   ]
 }

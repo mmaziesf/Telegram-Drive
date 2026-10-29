@@ -776,6 +776,73 @@ async fn real_http_server_streams_owned_cache_and_revokes_it_after_account_switc
     assert!(cookie.contains("HttpOnly"));
     assert!(cookie.contains("SameSite=Strict"));
     assert!(cookie.contains("Path=/d/private"));
+    assert!(cookie.contains("Max-Age=1800"));
+    // Without a Telegram client an unlocked request gets past the password form
+    // and stops at 503, while a locked one gets the form (200).
+    let share_status = |cookie: String| {
+        let request = client
+            .get(format!("{url}/d/private"))
+            .header("Cookie", cookie);
+        async move { request.send().await.unwrap().status() }
+    };
+    let unlock = cookie.split(';').next().unwrap().to_string();
+    let value = unlock.strip_prefix("share_auth_private=").unwrap();
+    assert_eq!(value.len(), 64);
+    assert!(value.bytes().all(|byte| byte.is_ascii_hexdigit()));
+    assert_eq!(share_status(unlock.clone()).await, 503);
+    // The value earlier builds derived from the token and password hash alone
+    // is no longer a key, and neither is a guessed one of the same shape.
+    let derived = {
+        use sha2::Digest;
+        let digest = sha2::Sha256::digest(format!("private{password_hash}").as_bytes());
+        digest
+            .iter()
+            .map(|byte| format!("{byte:02x}"))
+            .collect::<String>()
+    };
+    assert_eq!(
+        share_status(format!("share_auth_private={derived}")).await,
+        200
+    );
+    assert_eq!(
+        share_status(format!("share_auth_private={}", "0".repeat(64))).await,
+        200
+    );
+    // Each unlock is random, and the 30-minute lifetime is enforced by the server.
+    let second = client
+        .post(format!("{url}/d/private/verify"))
+        .form(&[("password", "synthetic share password")])
+        .send()
+        .await
+        .unwrap();
+    let second = second.headers()["set-cookie"].to_str().unwrap();
+    let second = second.split(';').next().unwrap().to_string();
+    assert_ne!(second, unlock);
+    app.ok(json!({"command":"advance_share_unlock_clock","seconds":29 * 60}));
+    assert_eq!(share_status(unlock.clone()).await, 503);
+    app.ok(json!({"command":"advance_share_unlock_clock","seconds":2 * 60}));
+    assert_eq!(share_status(unlock).await, 200);
+    assert_eq!(share_status(second).await, 200);
+    // Changing the share password ends unlocks issued under the old one.
+    let third = client
+        .post(format!("{url}/d/private/verify"))
+        .form(&[("password", "synthetic share password")])
+        .send()
+        .await
+        .unwrap();
+    let third = third.headers()["set-cookie"].to_str().unwrap();
+    let third = third.split(';').next().unwrap().to_string();
+    assert_eq!(share_status(third.clone()).await, 503);
+    {
+        let db = sqlite::open(fixture.path("shares.db")).unwrap();
+        let changed = bcrypt::hash("a new share password", 4).unwrap();
+        let mut update = db
+            .prepare("UPDATE shared_links SET password_hash=? WHERE id='private'")
+            .unwrap();
+        update.bind((1, changed.as_str())).unwrap();
+        update.next().unwrap();
+    }
+    assert_eq!(share_status(third).await, 200);
     let missing = client.get(format!("{url}/d/missing")).send().await.unwrap();
     assert_eq!(missing.status(), 404);
     let token = "synthetic-e2e-stream-token";
@@ -796,6 +863,31 @@ async fn real_http_server_streams_owned_cache_and_revokes_it_after_account_switc
         b"synthetic owned media bytes"
     );
     let fmp4 = format!("{url}/fmp4/101_0_42/output.mp4?token={token}");
+    // Near misses (one byte off, a prefix, an extension, an empty value) are
+    // refused on every token-checked route.
+    let near_misses = [
+        "synthetic-e2e-stream-tokeN".to_owned(),
+        token[..token.len() - 1].to_owned(),
+        format!("{token}x"),
+        String::new(),
+    ];
+    for route in [
+        "/stream/home/1",
+        "/hls/101_0_42/480p/index.m3u8",
+        "/hls/101_0_42/480p/segment000.ts",
+        "/fmp4/101_0_42/output.mp4",
+    ] {
+        for candidate in &near_misses {
+            let status = client
+                .get(format!("{url}{route}"))
+                .query(&[("token", candidate)])
+                .send()
+                .await
+                .unwrap()
+                .status();
+            assert_eq!(status, 403, "{route} with {candidate:?}");
+        }
+    }
     assert_eq!(
         client
             .get(format!("{url}/fmp4/101_0_42/output.mp4"))
@@ -1315,7 +1407,15 @@ fn the_log_file_is_redacted_bounded_and_named_in_the_startup_failure_report() {
     )
         }
     ));
-    app.ok(json!({"command":"log_emit","level":"error","message":"two\nline failure api_hash=deadbeefcafe"}));
+    // A WebDAV capability path and an HLS segment URL with a stream token
+    // shaped like the per-run one (16 random bytes as hex).
+    let dav_token = "4f1c".repeat(16);
+    let stream_token = "9a3f".repeat(8);
+    app.ok(json!({
+        "command":"log_emit",
+        "level":"error",
+        "message":format!("two\nline failure api_hash=deadbeefcafe PROPFIND /dav/{dav_token}/Docs segment000.ts?token={stream_token}")
+    }));
     let log = String::from_utf8(fixture.read("logs/telegram-drive.log")).unwrap();
     let lines: Vec<&str> = log.lines().collect();
     assert_eq!(
@@ -1331,6 +1431,8 @@ fn the_log_file_is_redacted_bounded_and_named_in_the_startup_failure_report() {
         "credential=77",
         "deadbeefcafe",
         "0123456789abcdef0123456789abcdef0123",
+        dav_token.as_str(),
+        stream_token.as_str(),
         home.as_str(),
         "Holiday Photos",
     ] {
@@ -1984,6 +2086,100 @@ async fn rest_api_lists_search_and_reports_cover_the_whole_library_of_one_accoun
         assert_eq!(status, 503, "{path}");
         assert_eq!(body["error"]["code"], "NOT_CONNECTED", "{path}");
     }
+    app.stop();
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn local_servers_refuse_requests_addressed_to_another_host() {
+    let client = reqwest::Client::builder()
+        .redirect(reqwest::redirect::Policy::none())
+        .timeout(Duration::from_secs(10))
+        .build()
+        .unwrap();
+    let fixture = Fixture::new();
+    let mut app = Backend::start(&fixture.0);
+    app.ok(json!({"command":"database"}));
+    app.ok(json!({"command":"seed_account","owner":101}));
+    let dav_token = "a".repeat(64);
+    let started = |value: Value| value["url"].as_str().unwrap().to_string();
+    let servers = [
+        (
+            started(app.ok(json!({"command":"start_http"}))),
+            "/stream/home/1?token=synthetic-e2e-stream-token".to_owned(),
+        ),
+        (
+            started(app.ok(json!({"command":"start_api","key":"synthetic-e2e-api-key"}))),
+            "/api/v1/health".to_owned(),
+        ),
+        (
+            started(
+                app.ok(json!({"command":"start_webdav","token":dav_token,"writeEnabled":false})),
+            ),
+            format!("/dav/{dav_token}/"),
+        ),
+    ];
+    for (url, path) in &servers {
+        let port = url.rsplit_once(':').unwrap().1.trim_end_matches('/');
+        let other_port = if port == "1" { "2" } else { "1" };
+        // A DNS-rebound name, a lookalike, the right name on another port, and
+        // a bare name are all refused before any route runs.
+        for host in [
+            format!("attacker.example:{port}"),
+            format!("127.0.0.1.attacker.example:{port}"),
+            format!("127.0.0.1:{other_port}"),
+            "localhost".to_owned(),
+        ] {
+            let response = client
+                .get(format!("{url}{path}"))
+                .header("Host", &host)
+                .send()
+                .await
+                .unwrap();
+            assert_eq!(response.status(), 421, "{url}{path} as {host}");
+            assert_eq!(response.headers()["referrer-policy"], "no-referrer");
+        }
+        for host in [format!("127.0.0.1:{port}"), format!("LocalHost:{port}")] {
+            let response = client
+                .get(format!("{url}{path}"))
+                .header("Host", &host)
+                .send()
+                .await
+                .unwrap();
+            assert_ne!(response.status(), 421, "{url}{path} as {host}");
+            // Stream URLs carry the token in the query string; no response
+            // from a local server may let it travel on as a referrer.
+            assert_eq!(
+                response.headers()["referrer-policy"],
+                "no-referrer",
+                "{url}{path}"
+            );
+        }
+    }
+    let api = &servers[1].0;
+    let health = client
+        .get(format!("{api}/api/v1/health"))
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(health.status(), 200);
+    // Packaged WebView origins still pass CORS; foreign ones do not.
+    let preflight = |origin: &'static str| {
+        client
+            .request(reqwest::Method::OPTIONS, format!("{api}/api/v1/health"))
+            .header("Origin", origin)
+            .header("Access-Control-Request-Method", "GET")
+            .send()
+    };
+    let packaged = preflight("http://tauri.localhost").await.unwrap();
+    assert_eq!(
+        packaged.headers()["access-control-allow-origin"],
+        "http://tauri.localhost"
+    );
+    let foreign = preflight("https://attacker.example").await.unwrap();
+    assert!(foreign
+        .headers()
+        .get("access-control-allow-origin")
+        .is_none());
     app.stop();
 }
 
@@ -3730,6 +3926,63 @@ fn an_api_consumer_cannot_consume_the_desktop_inventory_change_notification() {
         "API read consumed the broadcast serial"
     );
     assert_eq!(result["changedName"], "Renamed elsewhere");
+    app.stop();
+}
+
+#[test]
+fn legacy_hash_lease_releases_the_file_claim_before_the_category_guard() {
+    // Regression for #14: a clear waiting on the category guard must not
+    // run while the legacy preview use still marks the file active.
+    let fixture = Fixture::new();
+    let mut app = Backend::start(&fixture.0);
+    let result = app.ok(json!({"command": "legacy_lease_drop_order"}));
+    assert_eq!(
+        result["order"],
+        json!(["legacy", "capacity", "file", "category"])
+    );
+    app.stop();
+}
+
+#[test]
+fn slow_initial_inventory_reads_keep_the_watched_folder_until_the_change_poll() {
+    // Regression for the CI flake in
+    // an_api_consumer_cannot_consume_the_desktop_inventory_change_notification:
+    // the retention window runs from the cold read's touch, so slow first
+    // reads must not evict the folder before the API read and change poll.
+    let fixture = Fixture::new();
+    for (path, name, delay) in [
+        ("initial.json", "Original", 700),
+        ("changed.json", "Renamed elsewhere", 0),
+        ("cold.json", "Idle", 0),
+    ] {
+        fixture.write(
+            path,
+            serde_json::to_vec(&json!({
+                "highwater": 1,
+                "rows": [{"id": 1, "name": name}],
+                "historyDelayMs": delay,
+            }))
+            .unwrap(),
+        );
+    }
+    let mut app = Backend::start(&fixture.0);
+    app.ok(json!({"command":"seed_account","owner":101}));
+    let result = app.ok(json!({
+        "command": "inventory_timer_lifecycle",
+        "owner": "101",
+        "initial": "initial.json",
+        "changed": "changed.json",
+        "cold": "cold.json",
+        "consumerBeforePoll": true,
+    }));
+    assert_eq!(result["unchangedEvents"], 0);
+    assert_eq!(
+        result["changedEvents"], 1,
+        "the folder was evicted before the change poll"
+    );
+    assert_eq!(result["changedName"], "Renamed elsewhere");
+    assert_eq!(result["coldName"], "Idle");
+    assert_eq!(result["coldLookupBatches"], 0);
     app.stop();
 }
 
@@ -9621,4 +9874,110 @@ fn video_upload_unused_prepared_preview_admission_is_released_when_main_upload_i
         assert_video_upload_scratch_empty(&fixture);
         app.stop();
     }
+}
+
+#[test]
+fn share_creation_rejects_unbounded_metadata_before_contacting_telegram() {
+    let fixture = Fixture::new();
+    let mut app = Backend::start(&fixture.0);
+    let check = |expiry: Value, name: &str, size: i64| json!({"command":"share_metadata_check","fileName":name,"fileSize":size,"expiryHours":expiry,"createdAt":1_000});
+    let accepted = app.ok(check(json!(168), "report.pdf", 10));
+    assert_eq!(accepted["expiresAt"], 1_000 + 168 * 3600);
+    assert_eq!(
+        app.ok(check(Value::Null, "report.pdf", 0))["expiresAt"],
+        Value::Null
+    );
+    // Overflowing hours previously wrapped (release) or panicked (debug) in
+    // `created_at + hours * 3600`; non-positive hours produced dead links.
+    for hours in [i64::MAX, 24 * 365 + 1, 0, -1] {
+        assert!(
+            app.failure(check(json!(hours), "report.pdf", 10))
+                .contains("Share expiry"),
+            "hours={hours}"
+        );
+    }
+    assert!(app
+        .failure(check(json!(1), &"n".repeat(256), 10))
+        .contains("file names"));
+    assert!(app
+        .failure(check(json!(1), "line\r\nbreak.pdf", 10))
+        .contains("file names"));
+    assert!(app.failure(check(json!(1), "", 10)).contains("file names"));
+    assert!(app
+        .failure(check(json!(1), "report.pdf", -1))
+        .contains("negative"));
+    app.stop();
+}
+
+#[test]
+fn proxy_settings_refuse_values_that_change_the_proxy_url_structure() {
+    let fixture = Fixture::new();
+    let mut app = Backend::start(&fixture.0);
+    let proxy = |kind: &str, host: &str, port: u64, user: &str| json!({"command":"proxy_settings_check","enabled":true,"proxyType":kind,"host":host,"port":port,"username":user,"password":""});
+    for (kind, host) in [
+        ("socks5", "proxy.example.net"),
+        ("http", "10.0.0.2"),
+        ("https", "[2001:db8::1]"),
+        ("socks5", "corp_proxy"),
+    ] {
+        app.ok(proxy(kind, host, 1080, "user"));
+    }
+    // A disabled proxy is stored inert, so partial input stays editable.
+    app.ok(json!({"command":"proxy_settings_check","enabled":false,"proxyType":"","host":"half typed/","port":0,"username":"","password":""}));
+    for host in [
+        "",
+        "attacker.example@proxy.example.net",
+        "proxy.example.net/path",
+        "proxy.example.net#frag",
+        "proxy.example.net:9050",
+        "2001:db8::1",
+        "[not-an-ip]",
+        " proxy.example.net",
+        &"a".repeat(254),
+    ] {
+        assert!(
+            app.failure(proxy("socks5", host, 1080, "user"))
+                .contains("Proxy host"),
+            "host={host:?}"
+        );
+    }
+    assert!(app
+        .failure(proxy("mtproto", "proxy.example.net", 1080, "user"))
+        .contains("SOCKS5"));
+    assert!(app
+        .failure(proxy("socks5", "proxy.example.net", 0, "user"))
+        .contains("port"));
+    assert!(app
+        .failure(proxy("socks5", "proxy.example.net", 1080, &"u".repeat(256)))
+        .contains("usernames"));
+    assert!(app
+        .failure(proxy("socks5", "proxy.example.net", 1080, "line\nbreak"))
+        .contains("usernames"));
+    let mut long_secret = proxy("socks5", "proxy.example.net", 1080, "user");
+    long_secret["password"] = json!("p".repeat(256));
+    assert!(app.failure(long_secret).contains("passwords"));
+    app.stop();
+}
+
+#[test]
+fn sync_roots_inside_the_apps_own_state_are_refused() {
+    let fixture = Fixture::new();
+    for dir in ["app-data/sessions", "app-cache/previews", "Documents"] {
+        std::fs::create_dir_all(fixture.path(dir)).unwrap();
+    }
+    let mut app = Backend::start(&fixture.0);
+    app.ok(json!({"command":"sync_root_check","local":"Documents"}));
+    for local in [
+        "app-data",
+        "app-data/sessions",
+        "app-cache/previews",
+        "Documents/../app-data",
+    ] {
+        assert!(
+            app.failure(json!({"command":"sync_root_check","local":local}))
+                .contains("outside the app's own data"),
+            "local={local}"
+        );
+    }
+    app.stop();
 }
