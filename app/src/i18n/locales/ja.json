@@ -424,7 +424,8 @@
     "hide_passphrase": "パスフレーズを隠す",
     "current_vault_passphrase": "現在の保管庫パスフレーズ",
     "videoFilenameCaption": "ファイル名のキャプション",
-    "videoFilenameCaptionDesc": "動画メッセージに元のファイル名を追加します。暗号化されたアップロードでは名前を公開しません。"
+    "videoFilenameCaptionDesc": "動画メッセージに元のファイル名を追加します。暗号化されたアップロードでは名前を公開しません。",
+    "standard_mode_warning": "新しいアップロードは暗号化されません。Telegram や、あなたの Telegram アカウントに入り込んだ人は内容を読めます。"
   },
   "files": {
     "download": "ダウンロード",
@@ -1310,7 +1311,9 @@
     "protect": "保存して保護",
     "protect_description": "設定済みの保護設定でアップロード前に暗号化します。",
     "reload_app": "アプリを再読み込み",
-    "load_failed": "アップロード設定を読み込めませんでした。再読み込みすると選択が取り消されます。再読み込み後にファイルを選び直してください。"
+    "load_failed": "アップロード設定を読み込めませんでした。再読み込みすると選択が取り消されます。再読み込み後にファイルを選び直してください。",
+    "recommended": "推奨",
+    "plain_warning": "暗号化なし：Telegram はこのファイルを読めます。"
   },
   "auth_copy": {
     "qr_title": "QRを優先する安全なサインイン",
@@ -1479,5 +1482,19 @@
     "failed": "一部のセッションを終了できませんでした。もう一度試すか、Telegram の設定から終了してください。",
     "unknown_device": "不明なデバイス",
     "unknown_app": "不明なアプリ"
+  },
+  "encryption_setup": {
+    "title": "アップロードを暗号化",
+    "body": "Telegram Drive はアップロード前にこのデバイス上でファイルを暗号化できます。Telegram やあなたのアカウントに入り込んだ人も内容を読めません。有効にするには保管庫のパスフレーズを作成してください。",
+    "existing_files": "すでにアップロードしたファイルは引き続き読めます。暗号化されるのは新しいアップロードだけです。",
+    "enable": "暗号化をオンにする（推奨）",
+    "keep_plain": "暗号化せずにアップロードする",
+    "later": "後で",
+    "back": "戻る",
+    "finish": "完了",
+    "plain_warning_title": "暗号化せずにアップロードしますか？",
+    "plain_warning_body": "新しいアップロードは暗号化されずに Telegram に保存されます。Telegram や、あなたの Telegram アカウントに入り込んだ人は内容を読めます。暗号化は後から設定でオンにできます。",
+    "confirm_plain": "暗号化しない",
+    "vault_created": "保管庫を作成しました。新しいアップロードは暗号化されます。アクセスを失わないよう復旧キットを保存してください。"
   }
 }

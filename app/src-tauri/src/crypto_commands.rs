@@ -59,7 +59,7 @@ pub struct CryptoInventory {
 /// Encryption settings (non-secret preferences only).
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EncryptionSettings {
-    pub default_mode: String, // "standard" | "vault"
+    pub default_mode: String, // "vault" (default) | "standard" | "passphrase" | "vault_and_passphrase"
     pub protect_metadata: bool,
     pub auto_lock_minutes: u32, // 0 = never (with warning)
     pub lock_on_sleep: bool,
@@ -70,7 +70,7 @@ pub struct EncryptionSettings {
 impl Default for EncryptionSettings {
     fn default() -> Self {
         Self {
-            default_mode: "standard".to_string(),
+            default_mode: "vault".to_string(),
             protect_metadata: true,
             auto_lock_minutes: 15,
             lock_on_sleep: true,

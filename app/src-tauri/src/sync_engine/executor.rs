@@ -369,7 +369,9 @@ fn inherited_protection_mode(app: &tauri::AppHandle) -> Result<Option<String>, S
         .pointer("/settings/encryptionDefaultMode")
         .or_else(|| value.get("encryptionDefaultMode"))
         .and_then(serde_json::Value::as_str)
-        .unwrap_or("standard");
+        // Uploads are protected by default; a missing preference must never
+        // silently downgrade folder sync to plaintext.
+        .unwrap_or("vault");
     match mode {
         "standard" => Ok(None),
         "vault" | "passphrase" | "vault_and_passphrase" => Ok(Some(mode.to_string())),

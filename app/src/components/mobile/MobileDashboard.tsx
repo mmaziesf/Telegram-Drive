@@ -13,6 +13,7 @@ import { BottomNavBar } from './BottomNavBar';
 import { TouchFileList } from './TouchFileList';
 import { ThemeToggle } from '../shared/ThemeToggle';
 import { DriveConceptTour } from '../desktop/dashboard/DriveConceptTour';
+import { useEncryptionSetupNeeded } from '../../hooks/useEncryptionSetupNeeded';
 import { ActionPopover, ActionItem } from './ActionPopover';
 import { ShareDialog } from '../desktop/dashboard/ShareDialog';
 import { RenameFolderSheet } from './RenameFolderSheet';
@@ -36,6 +37,7 @@ import { evaluateAndroidTransferPolicy, type AndroidTransferEnvironment } from '
 import { effectiveVideoUploadMode } from '../../services/videoUploadMode';
 import i18n from '../../i18n';
 
+const LazyEncryptionSetupPrompt = lazy(() => import('../shared/EncryptionSetupPrompt').then(module => ({ default: module.EncryptionSetupPrompt })));
 const LazyHelpCenterDialog = lazy(() => import('../desktop/dashboard/HelpCenterDialog').then((module) => ({ default: module.HelpCenterDialog })));
 const LazyMobileMediaPlayer = lazy(() => import('./MobileMediaPlayer').then((module) => ({ default: module.MobileMediaPlayer })));
 const LazyPdfViewer = lazy(() => import('../desktop/dashboard/PdfViewer').then((module) => ({ default: module.PdfViewer })));
@@ -79,6 +81,9 @@ export default function MobileDashboard({ onLogout }: { onLogout?: () => void })
   const { isAndroid, isTelevision } = usePlatform();
   const { theme } = useTheme();
   const { settings, updateSetting, isLoaded: settingsLoaded } = useSettings();
+  const encryptionSetupNeeded = useEncryptionSetupNeeded();
+  const [encryptionSetupDeferred, setEncryptionSetupDeferred] = useState(false);
+  const showEncryptionSetup = encryptionSetupNeeded && !encryptionSetupDeferred;
   const [showHelp, setShowHelp] = useState(false);
 
   // ── Android deep-link listener (https://t.me/ links) ──────────────────
@@ -1575,6 +1580,8 @@ export default function MobileDashboard({ onLogout }: { onLogout?: () => void })
           onOpenLink={url => void openUrl(url)}
         />
       )}
+
+      {showEncryptionSetup && <LazyFeatureBoundary><LazyEncryptionSetupPrompt onDefer={() => setEncryptionSetupDeferred(true)} /></LazyFeatureBoundary>}
 
       {showHelp && <LazyFeatureBoundary><LazyHelpCenterDialog onClose={() => setShowHelp(false)} /></LazyFeatureBoundary>}
 

@@ -32,6 +32,8 @@ export interface Settings {
   crashReportingConsentSeen: boolean;
   telegramSettingsSyncEnabled: boolean;
   driveTourSeen: boolean;
+  /** Per-device: the first-run encryption setup prompt has been answered. */
+  encryptionSetupSeen: boolean;
   vaultRecoveryDrillCompleted: boolean;
   /** Vault the completed drill was run against; empty for drills recorded before 4.0. */
   vaultRecoveryDrillVaultId: string;

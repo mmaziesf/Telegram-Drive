@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+### Encrypted uploads by default
+
+- New uploads now default to vault encryption with protected metadata. After the drive tour, a first-run dialog creates or unlocks the vault. Choosing plaintext uploads requires an explicit confirmation of what Telegram can read.
+- Existing installs keep their saved upload mode. The settings screen and the per-upload protection dialog describe plaintext uploads as readable by Telegram.
+- The setup dialog is lazy-loaded only when it is shown. The locale ceilings rise by the exact size of the 15 new strings (27176 bytes in total, 1844 in the largest catalog); the desktop route stays within its existing ceiling.
+
 ### Telegram session encrypted at rest
 
 - `telegram.session` is now sealed with XChaCha20-Poly1305. The 256-bit key is kept in the operating system's credential store (Secret Service on Linux, Keychain on macOS, Credential Manager on Windows). Header fields are authenticated, so a modified file is rejected instead of loaded.

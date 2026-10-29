@@ -425,7 +425,8 @@
     "encryption_experimental_inventory_many": "Hay {{count}} archivos cifrados experimentales indexados localmente. Sus textos cifrados se han conservado.",
     "current_vault_passphrase": "Contraseña actual de la bóveda",
     "videoFilenameCaption": "Nombres de archivo como subtítulos",
-    "videoFilenameCaptionDesc": "Añade el nombre original a los mensajes de vídeo. Las subidas cifradas lo mantienen privado."
+    "videoFilenameCaptionDesc": "Añade el nombre original a los mensajes de vídeo. Las subidas cifradas lo mantienen privado.",
+    "standard_mode_warning": "Las nuevas subidas no se cifran. Telegram, y cualquiera que acceda a tu cuenta de Telegram, puede leerlas."
   },
   "files": {
     "download": "Descargar",
@@ -1317,7 +1318,9 @@
     "protect": "Almacenar y proteger",
     "protect_description": "Cifra antes de subir con los ajustes de protección que has configurado.",
     "reload_app": "Recargar aplicación",
-    "load_failed": "No se pudieron cargar las opciones de subida. Al recargar se cancela esta selección. Vuelve a seleccionar tus archivos después."
+    "load_failed": "No se pudieron cargar las opciones de subida. Al recargar se cancela esta selección. Vuelve a seleccionar tus archivos después.",
+    "recommended": "Recomendado",
+    "plain_warning": "Sin cifrar: Telegram puede leer este archivo."
   },
   "auth_copy": {
     "qr_title": "Inicio de sesión seguro con QR",
@@ -1486,5 +1489,19 @@
     "failed": "No se pudieron finalizar algunas sesiones. Inténtalo de nuevo o finalízalas en los ajustes de Telegram.",
     "unknown_device": "Dispositivo desconocido",
     "unknown_app": "Aplicación desconocida"
+  },
+  "encryption_setup": {
+    "title": "Cifra tus subidas",
+    "body": "Telegram Drive puede cifrar los archivos en este dispositivo antes de subirlos, para que ni Telegram ni nadie que acceda a tu cuenta pueda leerlos. Crea una frase de contraseña de la bóveda para activarlo.",
+    "existing_files": "Los archivos que ya subiste siguen siendo legibles. Solo se cifran las nuevas subidas.",
+    "enable": "Activar el cifrado (recomendado)",
+    "keep_plain": "Mantener las subidas sin cifrar",
+    "later": "Ahora no",
+    "back": "Atrás",
+    "finish": "Finalizar",
+    "plain_warning_title": "¿Subir sin cifrar?",
+    "plain_warning_body": "Las nuevas subidas se guardarán en Telegram sin cifrar. Telegram, y cualquiera que acceda a tu cuenta de Telegram, podrá leerlas. Puedes activar el cifrado más tarde en Ajustes.",
+    "confirm_plain": "Mantener sin cifrar",
+    "vault_created": "Bóveda creada. Las nuevas subidas se cifran. Guarda un kit de recuperación para no perder nunca el acceso."
   }
 }

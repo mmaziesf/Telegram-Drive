@@ -424,7 +424,8 @@
     "hide_passphrase": "Parola ifadesini gizle",
     "current_vault_passphrase": "Geçerli kasa parolası",
     "videoFilenameCaption": "Dosya adı açıklamaları",
-    "videoFilenameCaptionDesc": "Video mesajlarına özgün dosya adını ekleyin. Şifreli yüklemelerde ad gizli kalır."
+    "videoFilenameCaptionDesc": "Video mesajlarına özgün dosya adını ekleyin. Şifreli yüklemelerde ad gizli kalır.",
+    "standard_mode_warning": "Yeni yüklemeler şifrelenmiyor. Telegram ve Telegram hesabınıza erişen herkes bunları okuyabilir."
   },
   "files": {
     "download": "İndir",
@@ -1310,7 +1311,9 @@
     "protect": "Sakla ve koru",
     "protect_description": "Yapılandırdığınız koruma ayarlarıyla yüklemeden önce şifreleyin.",
     "reload_app": "Uygulamayı yeniden yükle",
-    "load_failed": "Yükleme seçenekleri açılamadı. Yeniden yüklemek bu seçimi iptal eder. Uygulama yüklendikten sonra dosyaları yeniden seçin."
+    "load_failed": "Yükleme seçenekleri açılamadı. Yeniden yüklemek bu seçimi iptal eder. Uygulama yüklendikten sonra dosyaları yeniden seçin.",
+    "recommended": "Önerilir",
+    "plain_warning": "Şifrelenmemiş: Telegram bu dosyayı okuyabilir."
   },
   "auth_copy": {
     "qr_title": "QR ile güvenli giriş",
@@ -1479,5 +1482,19 @@
     "failed": "Bazı oturumlar sonlandırılamadı. Yeniden deneyin veya Telegram ayarlarından sonlandırın.",
     "unknown_device": "Bilinmeyen cihaz",
     "unknown_app": "Bilinmeyen uygulama"
+  },
+  "encryption_setup": {
+    "title": "Yüklemelerinizi şifreleyin",
+    "body": "Telegram Drive, dosyaları yüklemeden önce bu cihazda şifreleyebilir; böylece ne Telegram ne de hesabınıza erişen biri onları okuyabilir. Etkinleştirmek için bir kasa parolası oluşturun.",
+    "existing_files": "Daha önce yüklediğiniz dosyalar okunabilir kalır. Yalnızca yeni yüklemeler şifrelenir.",
+    "enable": "Şifrelemeyi aç (önerilir)",
+    "keep_plain": "Yüklemeleri şifresiz bırak",
+    "later": "Şimdi değil",
+    "back": "Geri",
+    "finish": "Bitir",
+    "plain_warning_title": "Şifrelemeden yüklensin mi?",
+    "plain_warning_body": "Yeni yüklemeler Telegram'da şifrelenmeden saklanacak. Telegram ve Telegram hesabınıza erişen herkes bunları okuyabilir. Şifrelemeyi daha sonra Ayarlar'dan açabilirsiniz.",
+    "confirm_plain": "Şifresiz bırak",
+    "vault_created": "Kasa oluşturuldu. Yeni yüklemeler şifreleniyor. Erişimi asla kaybetmemek için bir kurtarma kiti kaydedin."
   }
 }

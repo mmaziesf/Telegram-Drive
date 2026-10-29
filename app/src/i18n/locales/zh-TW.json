@@ -424,7 +424,8 @@
     "hide_passphrase": "隱藏密碼片語",
     "current_vault_passphrase": "目前保險庫通行片語",
     "videoFilenameCaption": "檔案名稱說明",
-    "videoFilenameCaptionDesc": "將原始檔案名稱加入影片訊息說明中。加密上傳會保護檔案名稱隱私。"
+    "videoFilenameCaptionDesc": "將原始檔案名稱加入影片訊息說明中。加密上傳會保護檔案名稱隱私。",
+    "standard_mode_warning": "新的上傳未加密。Telegram 以及進入你 Telegram 帳號的任何人都可以讀取。"
   },
   "files": {
     "download": "下載",
@@ -1310,7 +1311,9 @@
     "protect": "儲存並保護",
     "protect_description": "上傳前使用已設定的保護選項進行加密。",
     "reload_app": "重新載入應用程式",
-    "load_failed": "無法載入上傳選項。重新載入會取消此次選取。應用程式重新載入後，請再次選取檔案。"
+    "load_failed": "無法載入上傳選項。重新載入會取消此次選取。應用程式重新載入後，請再次選取檔案。",
+    "recommended": "建議",
+    "plain_warning": "未加密：Telegram 可以讀取此檔案。"
   },
   "auth_copy": {
     "qr_title": "優先使用 QR 安全登入",
@@ -1479,5 +1482,19 @@
     "failed": "部分工作階段未能結束。請再試一次，或在 Telegram 設定中結束。",
     "unknown_device": "未知裝置",
     "unknown_app": "未知應用程式"
+  },
+  "encryption_setup": {
+    "title": "加密你的上傳",
+    "body": "Telegram Drive 可以在上傳前於這部裝置上加密檔案，讓 Telegram 以及進入你帳號的任何人都無法讀取。建立保險庫密碼片語即可開啟。",
+    "existing_files": "已上傳的檔案仍可讀取。只有新的上傳會被加密。",
+    "enable": "開啟加密（建議）",
+    "keep_plain": "保持上傳不加密",
+    "later": "稍後再說",
+    "back": "返回",
+    "finish": "完成",
+    "plain_warning_title": "不加密上傳？",
+    "plain_warning_body": "新的上傳將以未加密形式儲存在 Telegram 上。Telegram 以及進入你 Telegram 帳號的任何人都可以讀取。你可以稍後在設定中開啟加密。",
+    "confirm_plain": "保持不加密",
+    "vault_created": "保險庫已建立。新的上傳會被加密。請儲存復原套件，以免失去存取權。"
   }
 }

@@ -38,6 +38,7 @@ import { RenameFileModal } from './dashboard/RenameFileModal';
 import { RemoteUploadModal } from './dashboard/RemoteUploadModal';
 import { KeyboardShortcutsDialog } from './dashboard/KeyboardShortcutsDialog';
 import { DriveConceptTour } from './dashboard/DriveConceptTour';
+import { useEncryptionSetupNeeded } from '../../hooks/useEncryptionSetupNeeded';
 import { open as openExternalUrl } from '@tauri-apps/plugin-shell';
 import { LazyFeatureBoundary } from '../shared/LazyFeatureBoundary';
 import { SyncDashboard } from './sync/SyncDashboard';
@@ -59,6 +60,7 @@ import { fileQueryKey, invalidateFolderFileQueries, refreshFolderFiles, updateFi
 import { getAdjacentPreview, previewFileKey, samePreviewFile as sameFile } from '../../services/previewNavigation';
 import i18n from '../../i18n';
 
+const LazyEncryptionSetupPrompt = lazy(() => import('../shared/EncryptionSetupPrompt').then(module => ({ default: module.EncryptionSetupPrompt })));
 const LazyShareDialog = lazy(() => import('./dashboard/ShareDialog').then(module => ({ default: module.ShareDialog })));
 const LazyPreviewModal = lazy(() => import('./dashboard/PreviewModal').then((module) => ({ default: module.PreviewModal })));
 const LazyMediaPlayer = lazy(() => import('./dashboard/MediaPlayer').then((module) => ({ default: module.MediaPlayer })));
@@ -102,6 +104,9 @@ export function Dashboard({ onLogout }: { onLogout: () => void }) {
     }, [accountId, queryClient]);
 
     const { settings, updateSetting, updateSettings, isLoaded: settingsLoaded } = useSettings();
+    const encryptionSetupNeeded = useEncryptionSetupNeeded();
+    const [encryptionSetupDeferred, setEncryptionSetupDeferred] = useState(false);
+    const showEncryptionSetup = encryptionSetupNeeded && !encryptionSetupDeferred;
     const captureMutationScope = useActionScope(accountId);
 
     useEffect(() => {
@@ -516,7 +521,7 @@ export function Dashboard({ onLogout }: { onLogout: () => void }) {
         enabled: !previewFile && !playingFile && !pdfFile && !archiveViewFile
             && !showMoveModal && !showSettings && !showShortcuts && !showHelp && workspaceKeys === null
             && !showRemoteUpload && !shareFile && !bulkShareLinks
-            && settings.driveTourSeen
+            && settings.driveTourSeen && !showEncryptionSetup
     });
 
     const handlePreview = (file: TelegramFile, orderedFiles?: TelegramFile[], localPath?: string) => {
@@ -1033,6 +1038,7 @@ export function Dashboard({ onLogout }: { onLogout: () => void }) {
                 />
             )}
 
+            {showEncryptionSetup && !showSettings && <LazyFeatureBoundary><LazyEncryptionSetupPrompt onDefer={() => setEncryptionSetupDeferred(true)} /></LazyFeatureBoundary>}
             {staleSessions.length > 0 && <LazyFeatureBoundary><LazyStaleSessionsDialog sessions={staleSessions} onClose={() => setStaleSessions([])} /></LazyFeatureBoundary>}
 
             {showHelp && <LazyFeatureBoundary><LazyHelpCenterDialog onClose={() => setShowHelp(false)} /></LazyFeatureBoundary>}

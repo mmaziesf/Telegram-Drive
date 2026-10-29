@@ -87,7 +87,7 @@ Telegram Drive uses Telegram's MTProto API for authentication and file operation
 - Telegram **channels** created or selected by the app can appear as folders.
 - Transfers move directly between the application and Telegram.
 - Desktop metadata, settings, queues, sync state, thumbnails, and preview caches stay on the local device.
-- Standard uploads are stored in Telegram in their normal form. Optional TDENC2 uploads are encrypted locally before transfer.
+- New uploads default to TDENC2 vault encryption, which encrypts them locally before transfer. Standard uploads are an explicit opt-out that shows a warning; they are stored in Telegram in their normal form.
 
 The application caps a Telegram object at exactly **2,000,000,000 bytes**. Encrypted files need additional envelope space, so their maximum original plaintext size is slightly lower.
 
@@ -190,7 +190,7 @@ Folder Sync is disabled until enabled in **Settings → Folder Sync**. Read the 
 
 See the [frozen format specification](Docs/TDENC2_FORMAT.md) and [recovery drill](Docs/ENCRYPTION_RECOVERY_DRILL.md).
 
-Telegram Drive includes opt-in encrypted transfers using the versioned **TDENC2** envelope. Standard uploads remain the default. Encryption can be selected as a default for future uploads or chosen for an individual upload.
+Telegram Drive encrypts transfers using the versioned **TDENC2** envelope. **Vault** is the default protection mode for new uploads, and first-run setup creates or unlocks the vault. Choosing **Standard** instead shows a "not encrypted" warning, and the mode can also be chosen for an individual upload. Files uploaded before encryption was turned on stay readable and are not re-encrypted.
 
 | Mode | Protection | Required to unlock |
 | --- | --- | --- |

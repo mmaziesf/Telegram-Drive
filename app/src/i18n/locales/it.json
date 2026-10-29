@@ -425,7 +425,8 @@
     "encryption_experimental_inventory_many": "{{count}} file crittografati sperimentali sono indicizzati localmente. I relativi testi cifrati sono stati conservati.",
     "current_vault_passphrase": "Passphrase attuale del deposito",
     "videoFilenameCaption": "Nomi dei file nelle didascalie",
-    "videoFilenameCaptionDesc": "Aggiungi il nome originale ai messaggi video. I caricamenti crittografati lo mantengono privato."
+    "videoFilenameCaptionDesc": "Aggiungi il nome originale ai messaggi video. I caricamenti crittografati lo mantengono privato.",
+    "standard_mode_warning": "I nuovi caricamenti non sono cifrati. Telegram, e chiunque acceda al tuo account Telegram, può leggerli."
   },
   "files": {
     "download": "Scarica",
@@ -1317,7 +1318,9 @@
     "protect": "Conserva e proteggi",
     "protect_description": "Cifra prima del caricamento con le impostazioni di protezione configurate.",
     "reload_app": "Ricarica app",
-    "load_failed": "Impossibile caricare le opzioni di invio. Ricaricare annulla questa selezione. Seleziona di nuovo i file dopo il ricaricamento."
+    "load_failed": "Impossibile caricare le opzioni di invio. Ricaricare annulla questa selezione. Seleziona di nuovo i file dopo il ricaricamento.",
+    "recommended": "Consigliato",
+    "plain_warning": "Non cifrato: Telegram può leggere questo file."
   },
   "auth_copy": {
     "qr_title": "Accesso sicuro tramite QR",
@@ -1486,5 +1489,19 @@
     "failed": "Non è stato possibile chiudere alcune sessioni. Riprova oppure chiudile dalle impostazioni di Telegram.",
     "unknown_device": "Dispositivo sconosciuto",
     "unknown_app": "App sconosciuta"
+  },
+  "encryption_setup": {
+    "title": "Cifra i tuoi caricamenti",
+    "body": "Telegram Drive può cifrare i file su questo dispositivo prima del caricamento, così né Telegram né chi accede al tuo account può leggerli. Crea una passphrase della cassaforte per attivarlo.",
+    "existing_files": "I file già caricati restano leggibili. Vengono cifrati solo i nuovi caricamenti.",
+    "enable": "Attiva la cifratura (consigliato)",
+    "keep_plain": "Mantieni i caricamenti non cifrati",
+    "later": "Non ora",
+    "back": "Indietro",
+    "finish": "Fine",
+    "plain_warning_title": "Caricare senza cifratura?",
+    "plain_warning_body": "I nuovi caricamenti verranno salvati su Telegram senza cifratura. Telegram, e chiunque acceda al tuo account Telegram, potrà leggerli. Puoi attivare la cifratura più tardi nelle Impostazioni.",
+    "confirm_plain": "Mantieni non cifrati",
+    "vault_created": "Cassaforte creata. I nuovi caricamenti sono cifrati. Salva un kit di recupero per non perdere mai l’accesso."
   }
 }

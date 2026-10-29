@@ -424,7 +424,8 @@
     "hide_passphrase": "Itago ang passphrase",
     "current_vault_passphrase": "Kasalukuyang passphrase ng vault",
     "videoFilenameCaption": "Pangalan ng file sa caption",
-    "videoFilenameCaptionDesc": "Idagdag ang orihinal na pangalan ng file sa mga video message. Nananatili itong pribado sa mga naka-encrypt na upload."
+    "videoFilenameCaptionDesc": "Idagdag ang orihinal na pangalan ng file sa mga video message. Nananatili itong pribado sa mga naka-encrypt na upload.",
+    "standard_mode_warning": "Hindi naka-encrypt ang mga bagong upload. Mababasa ito ng Telegram at ng sinumang makapasok sa iyong Telegram account."
   },
   "files": {
     "download": "I-download",
@@ -1310,7 +1311,9 @@
     "protect": "Iimbak at protektahan",
     "protect_description": "I-encrypt bago mag-upload gamit ang iyong itinakdang proteksyon.",
     "reload_app": "I-reload ang app",
-    "load_failed": "Hindi ma-load ang mga opsyon sa upload. Kakanselahin ng pag-reload ang piniling mga file. Piliin muli ang mga file pagkatapos."
+    "load_failed": "Hindi ma-load ang mga opsyon sa upload. Kakanselahin ng pag-reload ang piniling mga file. Piliin muli ang mga file pagkatapos.",
+    "recommended": "Inirerekomenda",
+    "plain_warning": "Hindi naka-encrypt: mababasa ng Telegram ang file na ito."
   },
   "auth_copy": {
     "qr_title": "Ligtas na pag-sign in gamit ang QR",
@@ -1479,5 +1482,19 @@
     "failed": "Hindi natapos ang ilang session. Subukang muli, o tapusin ang mga ito sa mga setting ng Telegram.",
     "unknown_device": "Hindi kilalang device",
     "unknown_app": "Hindi kilalang app"
+  },
+  "encryption_setup": {
+    "title": "I-encrypt ang iyong mga upload",
+    "body": "Kayang i-encrypt ng Telegram Drive ang mga file sa device na ito bago i-upload, kaya hindi ito mababasa ng Telegram o ng sinumang makapasok sa iyong account. Gumawa ng passphrase ng vault para i-on ito.",
+    "existing_files": "Mababasa pa rin ang mga file na na-upload mo na. Ang mga bagong upload lang ang ie-encrypt.",
+    "enable": "I-on ang encryption (inirerekomenda)",
+    "keep_plain": "Panatilihing hindi naka-encrypt ang mga upload",
+    "later": "Hindi muna",
+    "back": "Bumalik",
+    "finish": "Tapusin",
+    "plain_warning_title": "Mag-upload nang walang encryption?",
+    "plain_warning_body": "Ang mga bagong upload ay itatabi sa Telegram nang walang encryption. Mababasa ito ng Telegram at ng sinumang makapasok sa iyong Telegram account. Maaari mong i-on ang encryption mamaya sa Mga Setting.",
+    "confirm_plain": "Panatilihing hindi naka-encrypt",
+    "vault_created": "Nagawa ang vault. Naka-encrypt ang mga bagong upload. Mag-save ng recovery kit para hindi ka mawalan ng access."
   }
 }

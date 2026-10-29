@@ -424,7 +424,8 @@
     "hide_passphrase": "隐藏密码短语",
     "current_vault_passphrase": "当前保险库口令",
     "videoFilenameCaption": "文件名说明",
-    "videoFilenameCaptionDesc": "将原始文件名添加到视频消息说明中。加密上传会保护文件名隐私。"
+    "videoFilenameCaptionDesc": "将原始文件名添加到视频消息说明中。加密上传会保护文件名隐私。",
+    "standard_mode_warning": "新的上传未加密。Telegram 以及进入你 Telegram 账户的任何人都可以读取。"
   },
   "files": {
     "download": "下载",
@@ -1310,7 +1311,9 @@
     "protect": "存储并保护",
     "protect_description": "上传前使用已配置的保护设置进行加密。",
     "reload_app": "重新加载应用",
-    "load_failed": "无法加载上传选项。重新加载会取消此次选择。应用重新加载后，请再次选择文件。"
+    "load_failed": "无法加载上传选项。重新加载会取消此次选择。应用重新加载后，请再次选择文件。",
+    "recommended": "推荐",
+    "plain_warning": "未加密：Telegram 可以读取此文件。"
   },
   "auth_copy": {
     "qr_title": "优先使用 QR 安全登录",
@@ -1479,5 +1482,19 @@
     "failed": "部分会话未能结束。请重试，或在 Telegram 设置中结束它们。",
     "unknown_device": "未知设备",
     "unknown_app": "未知应用"
+  },
+  "encryption_setup": {
+    "title": "加密你的上传",
+    "body": "Telegram Drive 可以在上传前于本设备上加密文件，这样 Telegram 以及进入你账户的任何人都无法读取。创建保险库密码短语即可开启。",
+    "existing_files": "已上传的文件仍可读取。只有新的上传会被加密。",
+    "enable": "开启加密（推荐）",
+    "keep_plain": "保持上传不加密",
+    "later": "以后再说",
+    "back": "返回",
+    "finish": "完成",
+    "plain_warning_title": "不加密上传？",
+    "plain_warning_body": "新的上传将以未加密形式存储在 Telegram 上。Telegram 以及进入你 Telegram 账户的任何人都可以读取。你可以稍后在设置中开启加密。",
+    "confirm_plain": "保持不加密",
+    "vault_created": "保险库已创建。新的上传会被加密。请保存恢复套件，以免失去访问权限。"
   }
 }
