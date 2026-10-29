@@ -2098,9 +2098,8 @@ async fn serve_hls_file(
     token_data: &StreamTokenData,
 ) -> impl Responder {
     // Validate token
-    match &query.token {
-        Some(t) if t == &token_data.token => {}
-        _ => return HttpResponse::Forbidden().body("Invalid or missing stream token"),
+    if !token_data.accepts(query.token.as_deref()) {
+        return HttpResponse::Forbidden().body("Invalid or missing stream token");
     }
 
     let account = match manager.account_for_key(file_key) {
@@ -2181,9 +2180,8 @@ async fn hls_master_playlist(
     let file_key = path.into_inner();
 
     // Validate token
-    match &query.token {
-        Some(t) if t == &token_data.token => {}
-        _ => return HttpResponse::Forbidden().body("Invalid or missing stream token"),
+    if !token_data.accepts(query.token.as_deref()) {
+        return HttpResponse::Forbidden().body("Invalid or missing stream token");
     }
 
     let account = match manager.account_for_key(&file_key) {

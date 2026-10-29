@@ -30,6 +30,10 @@ use tokio::sync::{Mutex, RwLock};
 
 // Allow bounded source work while lifecycle journeys exercise notifications and retention.
 const INVENTORY_FIXTURE_RECONCILIATION: Duration = Duration::from_secs(30);
+// The timer lifecycle must keep its folder from the cold read through the
+// change poll (a 1 s sleep plus three reads), then evict it after one more
+// sleep. 4 s leaves 3 s for slow reads on loaded CI runners; 2 s left 1 s.
+const INVENTORY_TIMER_RETENTION: Duration = Duration::from_secs(4);
 
 fn error(error: impl std::fmt::Display) -> String {
     error.to_string()
@@ -1132,8 +1136,17 @@ impl Driver {
             | "database_mode"
             | "database"
             | "seed_account"
+            | "rewrite_session_owner"
+            | "session_store_journeys"
+            | "session_store_journey"
+            | "session_revocation_journeys"
+            | "session_revocation_journey"
             | "open_account_session"
             | "account_validation_status"
+            | "advance_share_unlock_clock"
+            | "share_metadata_check"
+            | "proxy_settings_check"
+            | "sync_root_check"
             | "capture_account"
             | "validate_account"
             | "save_collection"
@@ -1170,6 +1183,7 @@ impl Driver {
             | "inventory_watch_finish"
             | "inventory_timer_lifecycle"
             | "inventory_deadline"
+            | "legacy_lease_drop_order"
             | "legacy_inventory_write" => self.dispatch_inventory(request).await,
             "heic_pin_gate"
             | "heic_pin_start"
@@ -1514,6 +1528,44 @@ impl Driver {
                 })
                 .await
             }
+            "sync_root_check" => {
+                let local = self.root.join(text(&request, "local")?);
+                let local = local.canonicalize().map_err(error)?;
+                let app_dirs = [self.root.join("app-data"), self.root.join("app-cache")];
+                crate::sync_engine::preview::refuse_app_state_root(&local, &app_dirs)?;
+                Ok(json!({}))
+            }
+            "proxy_settings_check" => {
+                crate::commands::settings::validate_proxy_request(
+                    request["enabled"].as_bool().ok_or("enabled is required")?,
+                    text(&request, "proxyType")?,
+                    text(&request, "host")?,
+                    request["port"]
+                        .as_u64()
+                        .and_then(|port| u16::try_from(port).ok())
+                        .ok_or("port is required")?,
+                    text(&request, "username")?,
+                    text(&request, "password")?,
+                )?;
+                Ok(json!({}))
+            }
+            "share_metadata_check" => {
+                let checked = crate::commands::sharing::validate_share_metadata(
+                    request["fileName"].as_str().ok_or("fileName is required")?,
+                    request["fileSize"].as_i64().ok_or("fileSize is required")?,
+                    request["expiryHours"].as_i64(),
+                    request["createdAt"].as_i64().ok_or("createdAt is required")?,
+                )?;
+                Ok(json!({"expiresAt": checked}))
+            }
+            "advance_share_unlock_clock" => {
+                let seconds = request["seconds"]
+                    .as_i64()
+                    .filter(|value| *value > 0)
+                    .ok_or("Invalid clock advance")?;
+                crate::share_routes::advance_unlock_clock_for_e2e(seconds);
+                Ok(json!({}))
+            }
             "account_validation_status" => {
                 let counts = crate::workspace::test_account_validation_counts();
                 Ok(json!({"fallbackReads":counts.0,"validations":counts.1}))
@@ -1544,6 +1596,40 @@ impl Driver {
                 if prepared.is_err() {let _ = std::fs::remove_file(&staged);}
                 prepared?;
                 Ok(json!({"owner": crate::workspace::current_owner(&root)?}))
+            }
+            "rewrite_session_owner" => {
+                // Another process signs a different account into the saved
+                // session in place, as a second app instance would.
+                let owner = request["owner"]
+                    .as_i64()
+                    .filter(|value| *value > 0)
+                    .ok_or("Invalid fixture owner")?;
+                let session = crate::session_store::open(&self.root.join("telegram.session"))
+                    .map_err(error)?;
+                session.cache_peer(&PeerInfo::User {id:owner,auth:None,bot:Some(false),is_self:Some(true)});
+                Ok(json!({"written": session.flush()}))
+            }
+            "session_store_journeys" => Ok(json!(crate::session_store::journeys::JOURNEYS
+                .iter()
+                .map(|(name, _)| *name)
+                .collect::<Vec<_>>())),
+            "session_store_journey" => {
+                // Each journey gets a fresh directory inside the fixture.
+                let name = text(&request, "name")?;
+                let directory = child(&self.root, &format!("session-journey-{name}"))?;
+                crate::session_store::journeys::run(name, &directory)?;
+                Ok(json!({"passed": name}))
+            }
+            "session_revocation_journeys" => Ok(json!(crate::session_revocation::journeys::JOURNEYS
+                .iter()
+                .map(|(name, _)| *name)
+                .collect::<Vec<_>>())),
+            "session_revocation_journey" => {
+                let name = text(&request, "name")?;
+                let directory = child(&self.root, &format!("revocation-journey-{name}"))?;
+                std::fs::create_dir_all(&directory).map_err(error)?;
+                crate::session_revocation::journeys::run(name, &directory)?;
+                Ok(json!({"passed": name}))
             }
             "open_account_session" => {
                 // Open the saved session exactly as a starting runner does.
@@ -2402,7 +2488,7 @@ impl Driver {
                     poll: std::time::Duration::from_millis(30),
                     audit: std::time::Duration::from_millis(60),
                     reconciliation: INVENTORY_FIXTURE_RECONCILIATION,
-                    retention: std::time::Duration::from_secs(2),
+                    retention: INVENTORY_TIMER_RETENTION,
                     audit_window: std::time::Duration::from_secs(60),
                 };
                 let cache = InventoryCache::with_timing(timing);
@@ -2430,7 +2516,7 @@ impl Driver {
                         async move { Ok(source) }
                     })
                     .await;
-                tokio::time::sleep(std::time::Duration::from_millis(1500)).await;
+                tokio::time::sleep(INVENTORY_TIMER_RETENTION).await;
                 tokio::fs::copy(child(&self.root, text(&request, "cold")?)?, &live)
                     .await
                     .map_err(error)?;
@@ -2451,6 +2537,29 @@ impl Driver {
                         "coldLookupBatches":self.inventory_lookups.load(std::sync::atomic::Ordering::SeqCst)-before
                     }
                 ))
+            }
+            "legacy_lease_drop_order" => {
+                struct Release(&'static str, Arc<std::sync::Mutex<Vec<&'static str>>>);
+                impl Drop for Release {
+                    fn drop(&mut self) {
+                        self.1
+                            .lock()
+                            .unwrap_or_else(|error| error.into_inner())
+                            .push(self.0);
+                    }
+                }
+                let order = Arc::new(std::sync::Mutex::new(Vec::new()));
+                drop(crate::workspace::assets::legacy_lease(
+                    Release("legacy", order.clone()),
+                    Release("capacity", order.clone()),
+                    Release("file", order.clone()),
+                    Release("category", order.clone()),
+                ));
+                let order = order
+                    .lock()
+                    .unwrap_or_else(|error| error.into_inner())
+                    .clone();
+                Ok(json!({ "order": order }))
             }
             "inventory_deadline" => {
                 use crate::file_inventory::{InventoryCache, Timing};
@@ -4985,6 +5094,8 @@ pub async fn run() -> Result<(), String> {
     {
         return Err("Refusing to access a non-fixture directory".into());
     }
+    // Session keys stay inside the fixture instead of the desktop keychain.
+    crate::session_store::use_directory_key_store(root.join(".native-e2e-session-keys"));
     let mut initial_network = std::fs::read_to_string(root.join("network_settings.json"))
         .ok()
         .and_then(|bytes| {

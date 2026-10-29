@@ -6,9 +6,23 @@ async function openGallery(page: Page) {
   await page.evaluate(() => document.fonts.ready);
 }
 
+/**
+ * Scrolls the gallery's own scroll container back to the origin.
+ *
+ * `main` is an `overflow-y-auto` container, and Playwright's actionability
+ * checks can scroll it while clicking the toolbar. A full-page element
+ * screenshot then starts at that offset, which made the RTL snapshot flaky.
+ */
+async function resetGalleryScroll(page: Page) {
+  const main = page.locator('main');
+  await main.evaluate(element => element.scrollTo({ top: 0, left: 0, behavior: 'instant' }));
+  await expect.poll(() => main.evaluate(element => element.scrollTop)).toBe(0);
+}
+
 test('light comfortable LTR gallery', async ({ page }) => {
   await openGallery(page);
   await page.getByRole('group', { name: 'Theme preference' }).getByRole('button', { name: 'Light' }).click();
+  await resetGalleryScroll(page);
   await expect(page.locator('main[data-density="comfortable"]')).toHaveScreenshot('gallery-light-comfortable-ltr.png', { fullPage: true });
 });
 
@@ -17,6 +31,8 @@ test('dark compact RTL gallery', async ({ page }) => {
   await page.getByRole('group', { name: 'Theme preference' }).getByRole('button', { name: 'Dark' }).click();
   await page.getByRole('group', { name: 'Density' }).getByRole('button', { name: 'Compact' }).click();
   await page.getByRole('group', { name: 'Layout direction' }).getByRole('button', { name: 'RTL' }).click();
+  await expect(page.locator('main')).toHaveAttribute('dir', 'rtl');
+  await resetGalleryScroll(page);
   await expect(page.locator('main[data-density="compact"]')).toHaveScreenshot('gallery-dark-compact-rtl.png', { fullPage: true });
 });
 

@@ -109,6 +109,9 @@ pub mod mp4_utils;
 pub mod server;
 mod server_lifecycle;
 pub(crate) mod session_protection;
+pub(crate) mod session_revocation;
+#[cfg(not(any(target_os = "android", target_os = "ios")))]
+pub mod session_store;
 pub mod share_routes;
 pub mod sync_engine;
 pub mod transcode;
@@ -1379,6 +1382,10 @@ pub fn run() {
             upload_service::cmd_stop_foreground_service,
             upload_service::cmd_update_foreground_service,
             commands::cmd_connect,
+            #[cfg(not(any(target_os = "android", target_os = "ios")))]
+            commands::cmd_session_storage_status,
+            #[cfg(not(any(target_os = "android", target_os = "ios")))]
+            commands::cmd_unlock_session,
             commands::cmd_delete_file,
             commands::cmd_download_file,
             commands::cmd_move_files,
@@ -1397,6 +1404,9 @@ pub fn run() {
             commands::cmd_set_preview_cache_limit,
             commands::cmd_set_preview_pinned,
             commands::cmd_logout,
+            commands::cmd_stale_sessions,
+            commands::cmd_end_stale_sessions,
+            commands::cmd_dismiss_stale_sessions,
             commands::cmd_scan_folders,
             commands::cmd_search_global,
             commands::search::cmd_search_local,
@@ -1637,6 +1647,13 @@ pub fn run() {
                         if let Some(handle) = webdav_server.0.begin_shutdown() {
                             log::info!("Stopping WebDAV server...");
                             handle.stop(true).await;
+                        }
+                    }
+                    // Write session changes that were waiting to be batched.
+                    #[cfg(not(any(target_os = "android", target_os = "ios")))]
+                    if let Some(telegram) = app_handle.try_state::<TelegramState>() {
+                        if let Some(session) = telegram.session.lock().await.as_ref() {
+                            session.flush();
                         }
                     }
                     app_handle.exit(exit_code);

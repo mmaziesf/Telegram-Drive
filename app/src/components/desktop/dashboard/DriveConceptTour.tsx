@@ -1,22 +1,26 @@
 import i18n from '../../../i18n';
 import {useTranslation} from 'react-i18next';
 import { useRef, useState } from 'react';
-import { ArrowRight, FolderLock, HardDrive, ShieldCheck, X } from 'lucide-react';
+import { AlertTriangle, ArrowRight, FolderLock, HardDrive, ShieldCheck, X } from 'lucide-react';
 import { useModalFocus } from '../../../hooks/useModalFocus';
 import { TelegramApiNotice } from '../../shared/TelegramApiNotice';
+import { TELEGRAM_API_TERMS_URL, TELEGRAM_SELF_DESTRUCT_FAQ_URL } from '../../../services/projectLinks';
 
 const introductionSteps = [
   { id: 'drive', icon: HardDrive, titleKey: 'drive_intro.drive_title', bodyKey: 'drive_intro.drive_body' },
   { id: 'folders', icon: FolderLock, titleKey: 'drive_intro.folders_title', bodyKey: 'drive_intro.folders_body' },
   { id: 'protection', icon: ShieldCheck, titleKey: 'drive_intro.protection_title', bodyKey: 'drive_intro.protection_body' },
+  { id: 'account', icon: AlertTriangle, titleKey: 'drive_intro.account_title', bodyKey: 'drive_intro.account_body' },
 ];
 
 interface DriveConceptTourProps {
   onFinish: () => void;
   onOpenHelp: () => void;
+  /** Opens an external URL with the platform's opener. */
+  onOpenLink: (url: string) => void;
 }
 
-export function DriveConceptTour({ onFinish, onOpenHelp }: DriveConceptTourProps) {
+export function DriveConceptTour({ onFinish, onOpenHelp, onOpenLink }: DriveConceptTourProps) {
   const { t } = useTranslation();
   const [index, setIndex] = useState(0);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -35,6 +39,12 @@ export function DriveConceptTour({ onFinish, onOpenHelp }: DriveConceptTourProps
           <h2 id="drive-tour-title" className="mt-5 text-xl font-semibold text-app-text">{t(step.titleKey)}</h2>
           <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-app-text-secondary">{t(step.bodyKey)}</p>
           {index === 0 && <TelegramApiNotice className="mx-auto mt-3 max-w-md text-xs leading-5 text-app-text-secondary" />}
+          {step.id === 'account' && (
+            <div data-testid="telegram-account-risk-links" className="mt-3 flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs">
+              <button type="button" onClick={() => onOpenLink(TELEGRAM_API_TERMS_URL)} className="cursor-pointer text-app-accent underline-offset-2 hover:underline">{t('drive_intro.account_terms_link')}</button>
+              <button type="button" onClick={() => onOpenLink(TELEGRAM_SELF_DESTRUCT_FAQ_URL)} className="cursor-pointer text-app-accent underline-offset-2 hover:underline">{t('drive_intro.account_self_destruct_link')}</button>
+            </div>
+          )}
           <div className="mt-6 flex justify-center gap-2" aria-label={t('drive_intro.progress_label')}>{steps.map((_, stepIndex) => <span key={stepIndex} className={`h-1.5 rounded-full transition-all motion-reduce:transition-none ${stepIndex === index ? 'w-7 bg-app-accent' : 'w-1.5 bg-app-border'}`} />)}</div>
         </div>
         <footer className="flex items-center justify-between border-t border-app-border-subtle px-5 py-4"><button type="button" onClick={onOpenHelp} className="quiet-control px-3 py-2 text-xs font-medium text-app-text-secondary">{t('drive_intro.help')}</button><button type="button" onClick={() => isLastStep ? onFinish() : setIndex(value => value + 1)} className="quiet-control flex items-center gap-2 bg-app-accent px-4 py-2 text-sm font-semibold text-app-accent-contrast">{isLastStep ? i18n.t('ui_copy.finish') : i18n.t("workspace.next")}<ArrowRight className="h-4 w-4 rtl:rotate-180" /></button></footer>

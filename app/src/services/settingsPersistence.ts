@@ -1,5 +1,6 @@
 import { load } from '@tauri-apps/plugin-store';
 import type { Settings } from '../types/settings';
+import { clampUploadConcurrency } from '../config/defaultSettings';
 
 const SETTINGS_FILE = 'settings.json';
 const SETTINGS_KEY = 'settings';
@@ -40,6 +41,7 @@ export function settingsForPersistence(settings: Settings): Settings {
 export function mergeStoredSettings(defaults: Settings, stored?: Partial<Settings> | null): Settings {
   const merged = { ...defaults, ...stored };
   if ((merged.proxyType as string) === 'mtproto') merged.proxyType = 'socks5';
+  merged.maxConcurrentUploads = clampUploadConcurrency(merged.maxConcurrentUploads);
   return merged;
 }
 

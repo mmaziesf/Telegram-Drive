@@ -1,11 +1,25 @@
 import type { Settings } from '../types/settings';
 
+/**
+ * Most files the desktop uploads at once. Each file over 10 MB is sent by four
+ * parallel part workers in the Telegram client, so four files already mean up
+ * to sixteen concurrent part uploads on one account, the level past which
+ * FLOOD_WAIT replies and account flags become likely.
+ */
+export const MAX_CONCURRENT_UPLOADS = 4;
+
+/** Keep a stored or synced upload limit within 1..MAX_CONCURRENT_UPLOADS. */
+export function clampUploadConcurrency(value: unknown): number {
+  const number = typeof value === 'number' && Number.isFinite(value) ? Math.round(value) : 1;
+  return Math.min(MAX_CONCURRENT_UPLOADS, Math.max(1, number));
+}
+
 export const DEFAULT_SETTINGS: Settings = {
   viewMode: 'grid',
   fileSortField: 'name',
   fileSortDirection: 'asc',
   autoUpdate: true,
-  maxConcurrentUploads: 6,
+  maxConcurrentUploads: 2,
   maxConcurrentDownloads: 6,
   zipFolders: true,
   videoUploadMode: 'file',

@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { DropUploadResult, DroppedPathValidation, QueueItem, UploadProtectionIntent } from '../types';
 import { isAndroidPlatform, showFileDialogFallback, pickWithFallback } from '../utils';
 import { useSettings } from '../context/SettingsContext';
+import { clampUploadConcurrency } from '../config/defaultSettings';
 import type { Store } from '@tauri-apps/plugin-store';
 import { useTranslation } from 'react-i18next';
 import { useUploadChoice, type UploadChoice } from '../context/UploadChoiceContext';
@@ -256,7 +257,7 @@ export function useFileUpload(
     useEffect(() => {
         if (isAndroidPlatform) return;
         void configureDesktopTransferLimits(
-            settings.maxConcurrentUploads || 1,
+            clampUploadConcurrency(settings.maxConcurrentUploads),
             settings.maxConcurrentDownloads || 1,
         ).catch(error => console.error('[Transfer] Could not update concurrency limits:', error));
     }, [settings.maxConcurrentDownloads, settings.maxConcurrentUploads]);
@@ -293,7 +294,7 @@ export function useFileUpload(
         if (!isAndroidPlatform) return;
         if (isAndroidPlatform && !androidNetworkAvailable) return;
         if (isAndroidPlatform && (!store || !initialized)) return;
-        const maxConcurrent = settings.maxConcurrentUploads || 1;
+        const maxConcurrent = clampUploadConcurrency(settings.maxConcurrentUploads);
         const available = maxConcurrent - activeCountRef.current;
         if (available <= 0) return;
         const pendingItems = uploadQueue.filter(i => ownsItem(i) && i.status === 'pending').slice(0, available);

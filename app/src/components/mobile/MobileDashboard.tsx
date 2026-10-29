@@ -1577,6 +1577,7 @@ export default function MobileDashboard({ onLogout }: { onLogout?: () => void })
         <DriveConceptTour
           onFinish={() => updateSetting('driveTourSeen', true)}
           onOpenHelp={() => { updateSetting('driveTourSeen', true); setShowHelp(true); }}
+          onOpenLink={url => void openUrl(url)}
         />
       )}
 

@@ -223,30 +223,12 @@ pub async fn cmd_test_proxy_traffic(
         proxy_port
     );
 
-    // Create a temporary session in a temp directory
-    let temp_dir = crate::temp_artifacts::staging_root()
-        .map_err(|error| format!("Could not prepare private staging storage: {error}"))?
-        .join("telegram_drive_proxy_test");
-    let _ = std::fs::create_dir_all(&temp_dir);
-    let session_path = temp_dir.join("test.session");
-    let session_path_str = session_path.to_string_lossy().to_string();
-
-    // Remove any previous test session
-    let _ = std::fs::remove_file(&session_path);
-    let _ = std::fs::remove_file(format!("{}-wal", session_path_str));
-    let _ = std::fs::remove_file(format!("{}-shm", session_path_str));
-
     let result: Result<bool, String> = tokio::task::spawn_blocking(move || {
         let rt = tokio::runtime::Runtime::new().map_err(|e| e.to_string())?;
         rt.block_on(async {
-            // The probe performs a key exchange, so keep its key file private too.
-            if let Err(error) = crate::session_protection::prepare_session_file(&session_path) {
-                log::warn!("Could not restrict the proxy test session file: {error}");
-            }
-            // Open a fresh in-memory-ish SQLite session
-            let session = grammers_session::storages::SqliteSession::open(&session_path_str)
-                .map_err(|e| format!("Failed to open test session: {}", e))?;
-            let session = std::sync::Arc::new(session);
+            // The probe's throwaway authorization key never needs to outlive
+            // it, so keep the session in memory instead of writing it to disk.
+            let session = std::sync::Arc::new(grammers_session::storages::MemorySession::default());
 
             // Build connection params with proxy
             let conn_params = grammers_mtsender::ConnectionParams {
@@ -275,11 +257,6 @@ pub async fn cmd_test_proxy_traffic(
 
             // Abort runner regardless of outcome
             runner_handle.abort();
-
-            // Clean up test session files
-            let _ = std::fs::remove_file(&session_path_str);
-            let _ = std::fs::remove_file(format!("{}-wal", session_path_str));
-            let _ = std::fs::remove_file(format!("{}-shm", session_path_str));
 
             Ok(result)
         })

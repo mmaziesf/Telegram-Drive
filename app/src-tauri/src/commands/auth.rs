@@ -1,6 +1,7 @@
 use base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine as _};
 use grammers_client::Client;
 use grammers_mtsender::SenderPool;
+#[cfg(any(target_os = "android", target_os = "ios"))]
 use grammers_session::storages::SqliteSession;
 #[cfg(any(target_os = "android", target_os = "ios"))]
 use grammers_session::types::UpdateState;
@@ -23,15 +24,46 @@ use crate::TelegramState;
 use grammers_client::types::PasswordToken;
 use grammers_mtsender::InvocationError;
 
-fn open_client_session(root: &std::path::Path) -> sqlite::Result<Arc<SqliteSession>> {
+/// Why the saved session could not be opened, by what the caller should do.
+enum SessionOpenFailure {
+    /// May succeed on a retry, for example while an old runner shuts down.
+    Transient(String),
+    /// The file cannot be used; preserve it and start a new session.
+    Unreadable(String),
+    /// The user must act first, such as entering a passphrase.
+    Blocked(String),
+}
+
+impl SessionOpenFailure {
+    fn message(&self) -> &str {
+        match self {
+            Self::Transient(message) | Self::Unreadable(message) | Self::Blocked(message) => {
+                message
+            }
+        }
+    }
+}
+
+fn open_client_session(
+    root: &std::path::Path,
+) -> Result<Arc<crate::commands::ClientSession>, SessionOpenFailure> {
     #[cfg(not(any(target_os = "android", target_os = "ios")))]
     {
-        crate::workspace::open_session(root)
+        use crate::session_store::SessionOpenError;
+        crate::workspace::open_session(root).map_err(|error| match error {
+            SessionOpenError::Io(_) => SessionOpenFailure::Transient(error.to_string()),
+            SessionOpenError::Unreadable(_) => SessionOpenFailure::Unreadable(error.to_string()),
+            SessionOpenError::Locked { .. } | SessionOpenError::KeychainUnavailable(_) => {
+                SessionOpenFailure::Blocked(error.to_string())
+            }
+        })
     }
     #[cfg(any(target_os = "android", target_os = "ios"))]
     {
         crate::session_protection::prepare_account_session_or_warn(root);
-        SqliteSession::open(root.join("telegram.session")).map(Arc::new)
+        SqliteSession::open(root.join("telegram.session"))
+            .map(Arc::new)
+            .map_err(|error| SessionOpenFailure::Transient(error.to_string()))
     }
 }
 
@@ -66,6 +98,8 @@ fn quarantine_session_files(session_path: &Path) -> Result<String, String> {
         session_path.to_path_buf(),
         session_sidecar_path(session_path, "-wal"),
         session_sidecar_path(session_path, "-shm"),
+        session_sidecar_path(session_path, ".next"),
+        session_sidecar_path(session_path, ".migrating"),
     ];
     let mut moved = 0;
     for source in candidates.iter().filter(|path| path.exists()) {
@@ -152,26 +186,31 @@ pub async fn ensure_client_initialized(
     }
 
     let session_path = app_data_dir.join("telegram.session");
-    log::info!("Opening the local Telegram session database");
+    log::info!("Opening the local Telegram session");
 
     let mut session_open_result = open_client_session(&app_data_dir);
 
-    // Retry opening the session database up to 5 times (every 100ms)
-    // in case the database is temporarily locked by the old shutting down runner.
-    if session_open_result.is_err() {
-        for attempt in 1..=5 {
-            log::warn!("Failed to open session on attempt {} (database may be locked). Retrying in 100ms...", attempt);
-            tokio::time::sleep(Duration::from_millis(100)).await;
-            session_open_result = open_client_session(&app_data_dir);
-            if session_open_result.is_ok() {
-                break;
-            }
+    // Retry up to 5 times (every 100ms) in case the session is temporarily
+    // held by the old runner that is shutting down.
+    for attempt in 1..=5 {
+        if !matches!(session_open_result, Err(SessionOpenFailure::Transient(_))) {
+            break;
         }
+        log::warn!("Failed to open session on attempt {attempt}. Retrying in 100ms...");
+        tokio::time::sleep(Duration::from_millis(100)).await;
+        session_open_result = open_client_session(&app_data_dir);
     }
 
-    let session = match session_open_result.map_err(|e| e.to_string()) {
+    let session = match session_open_result {
         Ok(s) => s,
-        Err(e) => {
+        // A locked or unreachable key is not damage: keep the session intact.
+        Err(SessionOpenFailure::Blocked(e)) => return Err(e),
+        // On desktop a lasting file system error does not prove the session
+        // is unusable, so it is reported instead of being set aside.
+        #[cfg(not(any(target_os = "android", target_os = "ios")))]
+        Err(SessionOpenFailure::Transient(e)) => return Err(e),
+        #[cfg(any(target_os = "android", target_os = "ios"))]
+        Err(SessionOpenFailure::Transient(e) | SessionOpenFailure::Unreadable(e)) => {
             let quarantine_id = quarantine_session_files(&session_path).map_err(|error| {
                 format!("Session could not be opened after retries ({e}) and could not be preserved: {error}")
             })?;
@@ -180,8 +219,29 @@ pub async fn ensure_client_initialized(
                 quarantine_id
             );
 
-            open_client_session(&app_data_dir)
-                .map_err(|err| format!("Failed to open session after recreation: {}", err))?
+            open_client_session(&app_data_dir).map_err(|failure| {
+                format!(
+                    "Failed to open session after recreation: {}",
+                    failure.message()
+                )
+            })?
+        }
+        #[cfg(not(any(target_os = "android", target_os = "ios")))]
+        Err(SessionOpenFailure::Unreadable(e)) => {
+            let quarantine_id = quarantine_session_files(&session_path).map_err(|error| {
+                format!("Session could not be opened after retries ({e}) and could not be preserved: {error}")
+            })?;
+            log::warn!(
+                "Unreadable Telegram session preserved before recreation. Quarantine id: {}",
+                quarantine_id
+            );
+
+            open_client_session(&app_data_dir).map_err(|failure| {
+                format!(
+                    "Failed to open session after recreation: {}",
+                    failure.message()
+                )
+            })?
         }
     };
 
@@ -255,6 +315,40 @@ pub async fn cmd_connect(
     *state.api_id.lock().await = Some(api_id);
     ensure_client_initialized(&app_handle, &state, api_id).await?;
     Ok(true)
+}
+
+/// How the saved Telegram session is protected at rest, and whether a
+/// passphrase must be entered or chosen before connecting.
+#[cfg(not(any(target_os = "android", target_os = "ios")))]
+#[tauri::command]
+pub async fn cmd_session_storage_status(
+    app_handle: tauri::AppHandle,
+) -> Result<crate::session_store::StorageStatus, String> {
+    let path = app_handle
+        .path()
+        .app_data_dir()
+        .map_err(|error| error.to_string())?
+        .join("telegram.session");
+    tauri::async_runtime::spawn_blocking(move || crate::session_store::status(&path))
+        .await
+        .map_err(|error| error.to_string())
+}
+
+/// Unlock the saved session with its passphrase, or choose one for a new
+/// session when no credential store is available. The passphrase is kept in
+/// memory only until the app exits.
+#[cfg(not(any(target_os = "android", target_os = "ios")))]
+#[tauri::command]
+pub async fn cmd_unlock_session(
+    app_handle: tauri::AppHandle,
+    passphrase: String,
+) -> Result<(), String> {
+    let path = app_handle
+        .path()
+        .app_data_dir()
+        .map_err(|error| error.to_string())?
+        .join("telegram.session");
+    crate::session_store::unlock(path, passphrase).await
 }
 
 #[tauri::command]
@@ -437,10 +531,25 @@ pub async fn cmd_logout(
         }
     }
     let session_path = app_data_dir.join("telegram.session");
-    let _ = std::fs::remove_file(session_path);
-    let _ = std::fs::remove_file(app_data_dir.join("telegram.session-wal"));
-    let _ = std::fs::remove_file(app_data_dir.join("telegram.session-shm"));
-    let _ = std::fs::remove_file(app_data_dir.join("telegram.session-journal"));
+    // A session removed here without Telegram confirming the sign-out stays
+    // listed in the account; offer to end it after the next sign-in.
+    crate::session_revocation::after_sign_out(
+        &app_data_dir,
+        session_path.exists(),
+        remote_session_revoked,
+        chrono::Utc::now().timestamp(),
+        signing_out,
+    );
+    // Erase every copy of the session and remove its key.
+    #[cfg(not(any(target_os = "android", target_os = "ios")))]
+    crate::session_store::destroy(&session_path);
+    #[cfg(any(target_os = "android", target_os = "ios"))]
+    {
+        let _ = std::fs::remove_file(session_path);
+        let _ = std::fs::remove_file(app_data_dir.join("telegram.session-wal"));
+        let _ = std::fs::remove_file(app_data_dir.join("telegram.session-shm"));
+        let _ = std::fs::remove_file(app_data_dir.join("telegram.session-journal"));
+    }
 
     log::info!(
         "Logout complete. Vault locked. Remote session revoked: {}. Runner count: {}",
@@ -451,6 +560,150 @@ pub async fn cmd_logout(
         signed_out: true,
         remote_session_revoked,
     })
+}
+
+/// How long a request about the account's active sessions may take.
+const ACTIVE_SESSIONS_TIMEOUT: Duration = Duration::from_secs(20);
+
+fn authorization_from(entry: tl::enums::Authorization) -> crate::session_revocation::Authorization {
+    let tl::enums::Authorization::Authorization(entry) = entry;
+    crate::session_revocation::Authorization {
+        hash: entry.hash,
+        current: entry.current,
+        api_id: entry.api_id,
+        device_model: entry.device_model,
+        platform: entry.platform,
+        system_version: entry.system_version,
+        app_name: entry.app_name,
+        app_version: entry.app_version,
+        date_created: i64::from(entry.date_created),
+        date_active: i64::from(entry.date_active),
+    }
+}
+
+/// The account's sessions that the pending marker allows ending, with the
+/// marker's directory and the signed-in client. `None` when nothing is
+/// pending or nobody is signed in.
+async fn stale_session_context(
+    app_handle: &tauri::AppHandle,
+    state: &TelegramState,
+) -> Result<
+    Option<(
+        PathBuf,
+        Client,
+        Vec<crate::session_revocation::StaleSession>,
+    )>,
+    String,
+> {
+    let app_data_dir = app_handle
+        .path()
+        .app_data_dir()
+        .map_err(|e| e.to_string())?;
+    let Some(marker) = crate::session_revocation::pending(&app_data_dir) else {
+        return Ok(None);
+    };
+    let Some(client) = state.client.lock().await.clone() else {
+        return Ok(None);
+    };
+    let signed_in = timeout(ACTIVE_SESSIONS_TIMEOUT, client.get_me())
+        .await
+        .map_err(|_| "Telegram did not answer in time".to_string())?
+        .map_err(|error| error.to_string())?
+        .bare_id();
+    if !marker.applies_to(signed_in) {
+        return Ok(None);
+    }
+    let since = marker.since;
+    let Some(api_id) = *state.api_id.lock().await else {
+        return Ok(None);
+    };
+    let tl::enums::account::Authorizations::Authorizations(list) = timeout(
+        ACTIVE_SESSIONS_TIMEOUT,
+        client.invoke(&tl::functions::account::GetAuthorizations {}),
+    )
+    .await
+    .map_err(|_| "Telegram did not list the active sessions in time".to_string())?
+    .map_err(|error| format!("Telegram did not list the active sessions: {error}"))?;
+    let authorizations: Vec<_> = list
+        .authorizations
+        .into_iter()
+        .map(authorization_from)
+        .collect();
+    let sessions = crate::session_revocation::stale_sessions(&authorizations, api_id, since);
+    Ok(Some((app_data_dir, client, sessions)))
+}
+
+/// Sessions an earlier sign-out left active, for the user to review. Nothing
+/// is ended here. When none remain, the pending marker is removed.
+#[tauri::command]
+pub async fn cmd_stale_sessions(
+    app_handle: tauri::AppHandle,
+    state: State<'_, TelegramState>,
+) -> Result<Vec<crate::session_revocation::StaleSession>, String> {
+    let Some((app_data_dir, _, sessions)) = stale_session_context(&app_handle, &state).await?
+    else {
+        return Ok(Vec::new());
+    };
+    if sessions.is_empty() {
+        crate::session_revocation::clear(&app_data_dir);
+    }
+    Ok(sessions)
+}
+
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct EndStaleSessionsOutcome {
+    pub ended: Vec<String>,
+    pub failed: Vec<String>,
+}
+
+/// Ends the sessions the user selected and confirmed. Every ID must still be
+/// offered by `cmd_stale_sessions`; otherwise nothing is ended.
+#[tauri::command]
+pub async fn cmd_end_stale_sessions(
+    app_handle: tauri::AppHandle,
+    state: State<'_, TelegramState>,
+    ids: Vec<String>,
+) -> Result<EndStaleSessionsOutcome, String> {
+    let Some((app_data_dir, client, sessions)) = stale_session_context(&app_handle, &state).await?
+    else {
+        return Err("No session is waiting to be ended".to_string());
+    };
+    let hashes = crate::session_revocation::confirmed_hashes(&sessions, &ids)?;
+    let mut outcome = EndStaleSessionsOutcome {
+        ended: Vec::new(),
+        failed: Vec::new(),
+    };
+    for hash in hashes {
+        let result = timeout(
+            ACTIVE_SESSIONS_TIMEOUT,
+            client.invoke(&tl::functions::account::ResetAuthorization { hash }),
+        )
+        .await;
+        match result {
+            Ok(Ok(true)) => outcome.ended.push(hash.to_string()),
+            _ => outcome.failed.push(hash.to_string()),
+        }
+    }
+    log::info!(
+        "Ended {} of the sessions left by an earlier sign-out; {} failed",
+        outcome.ended.len(),
+        outcome.failed.len()
+    );
+    if outcome.failed.is_empty() && outcome.ended.len() == sessions.len() {
+        crate::session_revocation::clear(&app_data_dir);
+    }
+    Ok(outcome)
+}
+
+/// Keeps every listed session and stops offering them.
+#[tauri::command]
+pub fn cmd_dismiss_stale_sessions(app_handle: tauri::AppHandle) -> Result<(), String> {
+    let app_data_dir = app_handle
+        .path()
+        .app_data_dir()
+        .map_err(|e| e.to_string())?;
+    crate::session_revocation::clear(&app_data_dir);
+    Ok(())
 }
 
 fn normalize_phone_number(input: &str) -> Result<String, String> {

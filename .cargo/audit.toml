@@ -10,13 +10,4 @@ ignore = [
   # enabled, and moving to 0.26 needs a grammers update.
   "RUSTSEC-2026-0118",
   "RUSTSEC-2026-0119",
-  # quick-xml through the Tauri plist parser. It only parses repository-owned
-  # build metadata, never uploaded or remote XML.
-  "RUSTSEC-2026-0194",
-  "RUSTSEC-2026-0195",
-  # zip 4 is used only by tauri-plugin-updater, to unpack minisign-verified
-  # update archives.
-  "RUSTSEC-2026-0367",
-  "RUSTSEC-2026-0368",
-  "RUSTSEC-2026-0369",
 ]
