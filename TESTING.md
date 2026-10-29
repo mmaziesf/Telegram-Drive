@@ -23,9 +23,14 @@ Individual suites:
 | Browser | `npm run test:e2e --prefix app` | User journeys in Chromium, including existing visual/accessibility checks and full application flows; the Tauri/Telegram boundary is controlled by fixtures. |
 | Native | `cargo test --locked --manifest-path app/src-tauri/Cargo.toml --features native-e2e --test native_e2e` | Native child processes, real local storage, vault/envelope persistence and recovery drills, per-account folder layouts, sync planning and recorded results, resumable uploads, transfer retry policy, the redacted log file, private staging, download publication, and the loopback media, REST and WebDAV servers over real HTTP, using synthetic accounts and private temporary directories. |
 | Crypto | `cargo test --locked --manifest-path app/src-tauri/Cargo.toml --test crypto_envelope` | In-memory adversarial and property tests for the public `app_lib::crypto` API: envelope and metadata round-trips under random sizes and download fragmentation, rejection of every flipped bit, truncation, extension, record reordering and cross-file splicing, wrong keys, key-slot binding of every wrapped parameter, nonce and file-identity uniqueness, deterministic resume, and recovery-bundle passphrase and tamper checks. |
+| Crypto known answers | `cargo test --locked --manifest-path app/src-tauri/Cargo.toml --test crypto_kat` | TDENC2 envelopes that must match, byte for byte, the output of `scripts/generate-tdenc2-kat.py`, an independent Python encoder; HKDF-SHA-256 against RFC 5869 test case 3; and rejection of a body whose length differs from the size the header declares. |
 | Release tools | `node scripts/e2e/assurance.e2e.cjs` | Shipped SBOM/checksum CLI processes, generated artifacts, independent checksum verification, invalid-input rejection, the dependency-baseline expiry check, the Android publication guard against real Git repositories, and mandatory route/chunk budget enforcement against generated bundle artifacts. |
 
 `npm test` is an alias for `test:e2e` in both JavaScript projects. `visual:test` and `visual:update` remain browser tooling aliases. The native E2E driver is feature-gated and is excluded from normal application builds.
+
+## Fuzzing (research harness)
+
+`app/src-tauri/fuzz` holds cargo-fuzz targets for the TDENC2 header parser (`envelope_header`) and decrypter (`envelope_decrypt`). They are not part of CI or the release and need a nightly toolchain; `app/src-tauri/fuzz/README.md` gives the commands, including seeding the header target with the known-answer envelopes. Status: 10-minute local smoke runs of each target found no crash (112,243,538 and 10,765,974 inputs); the 24-hour run is pending. A crashing input should become a native regression test before the fix.
 
 ## Static checks and builds
 

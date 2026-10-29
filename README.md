@@ -70,6 +70,15 @@ Telegram requires third-party clients to use an application API ID and API hash.
 > [!WARNING]
 > Treat the API hash, Telegram login codes, session data, encryption credentials, REST keys, and WebDAV links as secrets. Do not paste them into issues, logs, screenshots, or support messages.
 
+### Protect your Telegram account
+
+The app's first-run introduction shows this warning too.
+
+- Telegram puts every account that signs in through an unofficial client under observation, and bans accounts that use the API for flooding or spam ([Telegram API Terms of Service](https://core.telegram.org/api/terms)). Uploading or downloading a very large number of files quickly can look like that to Telegram.
+- Telegram gives no storage guarantee or SLA. Files you keep only in Telegram can be lost with the account.
+- Telegram deletes accounts that stay offline longer than the self-destruct period set in **Settings → Privacy and Security** ([how account self-destruction works](https://telegram.org/faq#q-how-does-account-self-destruction-work)). Set it to the longest option and sign in regularly.
+- Keep your own backups of anything important.
+
 ## How it works
 
 Telegram Drive uses Telegram's MTProto API for authentication and file operations:
@@ -244,7 +253,7 @@ The fork owner decides what is merged. Grok Bot merges a pull request only with 
 | The fork uses its own app identifier with no data migration from the upstream one (the fork has never published a release, so there are no installs to migrate), has no auto-updater, releases only manually and does not publish to the original project's pages. | [#9](https://github.com/mmaziesf/Telegram-Drive/pull/9) | `tauri.conf.json`; `cargo tree` has no `tauri-plugin-updater`; `release.yml` triggers only on `workflow_dispatch`; the `zip` 4 advisory exceptions are removed from `deny.toml` |
 | `telegram.session` is encrypted at rest (XChaCha20-Poly1305). The key is kept in the OS credential store, or derived from a passphrase with Argon2id when no store is available. Existing plaintext sessions are migrated. | [#12](https://github.com/mmaziesf/Telegram-Drive/pull/12) | 23 journeys in `session_store/journeys.rs`, run by `session_store_journeys_cover_sealing_keys_migration_and_recovery` in `native_e2e.rs`; `app/tests/e2e/session-unlock.spec.ts` (5 tests) |
 | The app's npm advisories (`vite`, `source-map-js`) are fixed and the app's `npm audit` is a CI gate. | [#13](https://github.com/mmaziesf/Telegram-Drive/pull/13) | `node scripts/check-npm-audit.cjs app` exits 1 on the old lockfile and 0 on the new one; `dependency-assurance.yml` matrix includes `app` |
-| A drop-order race that let a preview cache clear skip a file being hashed is fixed. | [#14](https://github.com/mmaziesf/Telegram-Drive/pull/14) | `workspace/assets.rs` lease tuple order; reproduced and fixed with a temporary delay (no permanent regression test) |
+| A drop-order race that let a preview cache clear skip a file being hashed is fixed. | [#14](https://github.com/mmaziesf/Telegram-Drive/pull/14) | `workspace/assets.rs` `legacy_lease` order; reproduced with a temporary delay; `legacy_hash_lease_releases_the_file_claim_before_the_category_guard` checks the drop order ([#21](https://github.com/mmaziesf/Telegram-Drive/pull/21)) |
 | Pull requests build on Linux and Windows; macOS builds run on `main`, nightly and on demand. Superseded pull request runs are cancelled. | [#15](https://github.com/mmaziesf/Telegram-Drive/pull/15) | `desktop-sync-ci.yml` matrix; `scripts/check-workflow-pins.cjs` rejects any other matrix or a missing concurrency rule |
 | The full-history gitleaks scan passes again after the #6 squash merge put a flagged line into a new commit. | [#16](https://github.com/mmaziesf/Telegram-Drive/pull/16) | `gitleaks git --redact --exit-code 1 .` reports no leaks; the fingerprint and its reason are in `.gitleaksignore` |
 | The ad network, its DNS-over-HTTPS fallback and spoofed User-Agent, the $5 supporter licence, its payment service and the donation links are removed. Every feature was already free. | [#10](https://github.com/mmaziesf/Telegram-Drive/pull/10) | `native_e2e.rs` asserts the ad routes return 404; `frame-src 'none'` enforced by `check-app-security.cjs`; `scripts/check-no-ads.cjs` runs on every PR; `release-small-defects.spec.ts` |
@@ -265,6 +274,9 @@ Design notes: [threat model](Docs/THREAT_MODEL.md) and [cryptography overview](D
 - Translations added or changed by this fork were not reviewed by native speakers.
 
 ## Languages
+
+> [!WARNING]
+> **Machine-translated, unreviewed.** None of the 23 non-English locales has been reviewed by a native speaker, and the text this fork added in those languages was drafted by machine, including the Telegram account risk notice and the security, encryption and recovery messages. English is the reference text: if a translation is unclear, especially in a warning, switch the language to English in Settings before you act on it. Please report wrong or misleading translations in GitHub Issues. Review status is tracked in [Docs/LOCALIZATION_REVIEW.md](Docs/LOCALIZATION_REVIEW.md).
 
 Telegram Drive supports a **System** language preference and these 24 selectable locales:
 

@@ -51,6 +51,44 @@ fn validate_share_password(password: Option<String>) -> Result<Option<String>, S
     Ok(Some(password))
 }
 
+const MAX_SHARE_EXPIRY_HOURS: i64 = 24 * 365;
+const MAX_SHARE_FILE_NAME_CHARS: usize = 255;
+
+/// Bounds the WebView-supplied share metadata before any Telegram or database
+/// work. Returns the absolute expiry, computed without integer overflow.
+pub(crate) fn validate_share_metadata(
+    file_name: &str,
+    file_size: i64,
+    expiry_hours: Option<i64>,
+    created_at: i64,
+) -> Result<Option<i64>, String> {
+    let name_chars = file_name.chars().count();
+    if name_chars == 0
+        || name_chars > MAX_SHARE_FILE_NAME_CHARS
+        || file_name.chars().any(char::is_control)
+    {
+        return Err(format!(
+            "Shared file names must contain 1 to {MAX_SHARE_FILE_NAME_CHARS} printable characters"
+        ));
+    }
+    if file_size < 0 {
+        return Err("Shared file size cannot be negative".to_string());
+    }
+    let Some(hours) = expiry_hours else {
+        return Ok(None);
+    };
+    if !(1..=MAX_SHARE_EXPIRY_HOURS).contains(&hours) {
+        return Err(format!(
+            "Share expiry must be between 1 and {MAX_SHARE_EXPIRY_HOURS} hours"
+        ));
+    }
+    hours
+        .checked_mul(3600)
+        .and_then(|seconds| created_at.checked_add(seconds))
+        .map(Some)
+        .ok_or_else(|| "Share expiry is out of range".to_string())
+}
+
 #[tauri::command]
 #[allow(clippy::too_many_arguments)] // Tauri injects app/state; keep the existing IPC fields compatible.
 pub async fn cmd_create_share(
@@ -65,6 +103,8 @@ pub async fn cmd_create_share(
     db_pool: State<'_, DbConnection>,
     state: State<'_, TelegramState>,
 ) -> Result<ShareInfo, String> {
+    let created_at = chrono::Utc::now().timestamp();
+    let expires_at = validate_share_metadata(&file_name, file_size, expiry_hours, created_at)?;
     let root = app
         .path()
         .app_data_dir()
@@ -113,8 +153,6 @@ pub async fn cmd_create_share(
     }
     account.validate()?;
     let token = generate_share_token();
-    let created_at = chrono::Utc::now().timestamp();
-    let expires_at = expiry_hours.map(|hours| created_at + hours * 3600);
     let password = validate_share_password(password)?;
     // Bcrypt is deliberately completed on a blocking worker before the SQLite
     // connection is acquired, so expensive password work cannot hold the DB lock.

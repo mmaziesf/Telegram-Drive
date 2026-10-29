@@ -3,11 +3,12 @@
 //! Stores runtime network configuration that all network operations read from.
 //! When vpnMode is off, helpers return hardcoded defaults (zero behaviour change).
 //! When vpnMode is on, helpers return user-configured values.
+#![cfg_attr(not(test), deny(clippy::unwrap_used, clippy::expect_used))]
 
 use serde::{Deserialize, Serialize};
 use std::fmt;
 use std::io::Write;
-use std::sync::RwLock;
+use std::sync::{PoisonError, RwLock};
 use tauri::Manager;
 
 /// Proxy configuration received from the frontend
@@ -263,13 +264,21 @@ impl NetworkConfig {
 
     pub fn snapshot(&self) -> NetworkConfigSnapshot {
         NetworkConfigSnapshot {
-            proxy: self.proxy.read().unwrap().clone(),
-            vpn: self.vpn.read().unwrap().clone(),
+            proxy: self
+                .proxy
+                .read()
+                .unwrap_or_else(PoisonError::into_inner)
+                .clone(),
+            vpn: self
+                .vpn
+                .read()
+                .unwrap_or_else(PoisonError::into_inner)
+                .clone(),
         }
     }
 
     pub fn effective_proxy_url(&self) -> Option<String> {
-        let proxy = self.proxy.read().unwrap();
+        let proxy = self.proxy.read().unwrap_or_else(PoisonError::into_inner);
         if !proxy.enabled || proxy.host.is_empty() {
             return None;
         }
@@ -285,7 +294,10 @@ impl NetworkConfig {
                 Some(format!("socks5://{}:{}", proxy.host, proxy.port))
             }
         } else if proxy.proxy_type == "http" || proxy.proxy_type == "https" {
-            let guard = self.bridge_handle.lock().unwrap();
+            let guard = self
+                .bridge_handle
+                .lock()
+                .unwrap_or_else(PoisonError::into_inner);
             if let Some((port, _)) = &*guard {
                 Some(format!("socks5://127.0.0.1:{}", port))
             } else {
@@ -300,7 +312,7 @@ impl NetworkConfig {
         self.stop_http_bridge();
 
         let (enabled, proxy_type, host, port, scheme, user, pass) = {
-            let proxy = self.proxy.read().unwrap();
+            let proxy = self.proxy.read().unwrap_or_else(PoisonError::into_inner);
             (
                 proxy.enabled,
                 proxy.proxy_type.clone(),
@@ -318,7 +330,10 @@ impl NetworkConfig {
 
         match crate::socks5_bridge::start_bridge(host, port, scheme, user, pass).await {
             Ok((local_port, handle)) => {
-                let mut guard = self.bridge_handle.lock().unwrap();
+                let mut guard = self
+                    .bridge_handle
+                    .lock()
+                    .unwrap_or_else(PoisonError::into_inner);
                 *guard = Some((local_port, handle));
                 Ok(())
             }
@@ -327,7 +342,10 @@ impl NetworkConfig {
     }
 
     pub fn stop_http_bridge(&self) {
-        let mut guard = self.bridge_handle.lock().unwrap();
+        let mut guard = self
+            .bridge_handle
+            .lock()
+            .unwrap_or_else(PoisonError::into_inner);
         if let Some((_, handle)) = guard.take() {
             handle.abort();
             log::info!("SOCKS5 bridge stopped.");
@@ -338,7 +356,7 @@ impl NetworkConfig {
 
     /// Network connect timeout in seconds. Default 5s, multiplied when VPN mode on.
     pub fn connect_timeout_secs(&self) -> u64 {
-        let vpn = self.vpn.read().unwrap();
+        let vpn = self.vpn.read().unwrap_or_else(PoisonError::into_inner);
         if vpn.enabled {
             5 * vpn.timeout_multiplier as u64
         } else {
@@ -348,7 +366,7 @@ impl NetworkConfig {
 
     /// How many retry attempts for API calls. Default 0 (no retry) when VPN off.
     pub fn retry_attempts(&self) -> u32 {
-        let vpn = self.vpn.read().unwrap();
+        let vpn = self.vpn.read().unwrap_or_else(PoisonError::into_inner);
         // One reliability retry is always available so mandatory Telegram
         // FLOOD_WAIT cooling periods can resume even when VPN tuning is off.
         if vpn.enabled {
@@ -360,7 +378,7 @@ impl NetworkConfig {
 
     /// Base backoff duration in milliseconds for retries.
     pub fn retry_base_backoff_ms(&self) -> u64 {
-        let vpn = self.vpn.read().unwrap();
+        let vpn = self.vpn.read().unwrap_or_else(PoisonError::into_inner);
         if vpn.enabled {
             vpn.retry_base_backoff_ms
         } else {
@@ -370,7 +388,7 @@ impl NetworkConfig {
 
     /// Max backoff duration in milliseconds for retries.
     pub fn retry_max_backoff_ms(&self) -> u64 {
-        let vpn = self.vpn.read().unwrap();
+        let vpn = self.vpn.read().unwrap_or_else(PoisonError::into_inner);
         if vpn.enabled {
             vpn.retry_max_backoff_ms
         } else {
@@ -380,7 +398,7 @@ impl NetworkConfig {
 
     /// Whether to automatically sleep on FLOOD_WAIT errors.
     pub fn should_respect_flood_wait(&self) -> bool {
-        let vpn = self.vpn.read().unwrap();
+        let vpn = self.vpn.read().unwrap_or_else(PoisonError::into_inner);
         // Telegram rate limits must be honored on every network. The setting
         // remains an advanced override while VPN mode is active.
         if vpn.enabled {
@@ -392,13 +410,13 @@ impl NetworkConfig {
 
     /// Whether proxy is active and has a valid host.
     pub fn is_proxy_active(&self) -> bool {
-        let proxy = self.proxy.read().unwrap();
+        let proxy = self.proxy.read().unwrap_or_else(PoisonError::into_inner);
         proxy.enabled && !proxy.host.is_empty()
     }
 
     /// Get proxy address as "host:port" if active.
     pub fn proxy_addr(&self) -> Option<String> {
-        let proxy = self.proxy.read().unwrap();
+        let proxy = self.proxy.read().unwrap_or_else(PoisonError::into_inner);
         if proxy.enabled && !proxy.host.is_empty() {
             Some(format!("{}:{}", proxy.host, proxy.port))
         } else {
@@ -408,7 +426,7 @@ impl NetworkConfig {
 
     /// Download bandwidth limit in bytes/sec. 0 = unlimited.
     pub fn download_limit_bytes_per_sec(&self) -> u64 {
-        let vpn = self.vpn.read().unwrap();
+        let vpn = self.vpn.read().unwrap_or_else(PoisonError::into_inner);
         if vpn.bandwidth_limit_down_kbs > 0 {
             vpn.bandwidth_limit_down_kbs as u64 * 1024
         } else {
@@ -418,7 +436,7 @@ impl NetworkConfig {
 
     /// Chunk size in bytes for transfers.
     pub fn chunk_size_bytes(&self) -> usize {
-        let vpn = self.vpn.read().unwrap();
+        let vpn = self.vpn.read().unwrap_or_else(PoisonError::into_inner);
         if vpn.enabled {
             (vpn.chunk_size_kb as usize) * 1024
         } else {
@@ -428,7 +446,7 @@ impl NetworkConfig {
 
     /// Keep-alive ping interval in seconds. 0 = disabled.
     pub fn keep_alive_interval_sec(&self) -> u32 {
-        let vpn = self.vpn.read().unwrap();
+        let vpn = self.vpn.read().unwrap_or_else(PoisonError::into_inner);
         if vpn.enabled {
             vpn.keep_alive_interval_sec
         } else {
@@ -439,7 +457,7 @@ impl NetworkConfig {
     /// Maximum total uncompressed bytes for a single bulk archive (API).
     /// 0 = unlimited.
     pub fn archive_max_bytes(&self) -> u64 {
-        let vpn = self.vpn.read().unwrap();
+        let vpn = self.vpn.read().unwrap_or_else(PoisonError::into_inner);
         if vpn.enabled {
             vpn.archive_max_bytes // 0 = unlimited when VPN is on
         } else {

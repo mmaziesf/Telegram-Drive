@@ -14,6 +14,62 @@ pub struct ProxySettingsRequest {
     password: String,
 }
 
+const MAX_PROXY_HOST_BYTES: usize = 253;
+// SOCKS5 username/password authentication carries each field in one length byte.
+const MAX_PROXY_CREDENTIAL_BYTES: usize = 255;
+
+fn valid_proxy_host(host: &str) -> bool {
+    if host.is_empty() || host.len() > MAX_PROXY_HOST_BYTES {
+        return false;
+    }
+    if let Some(inner) = host
+        .strip_prefix('[')
+        .and_then(|rest| rest.strip_suffix(']'))
+    {
+        return inner.parse::<std::net::Ipv6Addr>().is_ok();
+    }
+    host.chars()
+        .all(|ch| ch.is_ascii_alphanumeric() || matches!(ch, '.' | '-' | '_'))
+}
+
+/// An enabled proxy is interpolated into `socks5://user:pass@host:port` and
+/// `host:port`, so refuse values that would change the URL's structure.
+pub(crate) fn validate_proxy_request(
+    enabled: bool,
+    proxy_type: &str,
+    host: &str,
+    port: u16,
+    username: &str,
+    password: &str,
+) -> Result<(), String> {
+    if password.len() > MAX_PROXY_CREDENTIAL_BYTES || password.chars().any(char::is_control) {
+        return Err(format!(
+            "Proxy passwords must be at most {MAX_PROXY_CREDENTIAL_BYTES} bytes without control characters"
+        ));
+    }
+    if !enabled {
+        return Ok(());
+    }
+    if !matches!(proxy_type, "socks5" | "http" | "https") {
+        return Err("Choose a SOCKS5, HTTP or HTTPS proxy".to_string());
+    }
+    if !valid_proxy_host(host) {
+        return Err(
+            "Proxy host must be a hostname, an IPv4 address or a bracketed IPv6 address"
+                .to_string(),
+        );
+    }
+    if port == 0 {
+        return Err("Proxy port must be between 1 and 65535".to_string());
+    }
+    if username.len() > MAX_PROXY_CREDENTIAL_BYTES || username.chars().any(char::is_control) {
+        return Err(format!(
+            "Proxy usernames must be at most {MAX_PROXY_CREDENTIAL_BYTES} bytes without control characters"
+        ));
+    }
+    Ok(())
+}
+
 /// Apply proxy settings from the frontend.
 /// Stores the config in global state so network operations can read it.
 #[tauri::command]
@@ -22,6 +78,14 @@ pub async fn cmd_apply_proxy_settings(
     net_config: State<'_, std::sync::Arc<NetworkConfig>>,
     app: tauri::AppHandle,
 ) -> Result<String, String> {
+    validate_proxy_request(
+        req.enabled,
+        &req.proxy_type,
+        &req.host,
+        req.port,
+        &req.username,
+        &req.password,
+    )?;
     let change = (!req.password.is_empty()).then_some(Some(req.password));
     net_config.update_credentials(
         &app,
