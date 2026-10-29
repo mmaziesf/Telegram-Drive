@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+### App npm advisories
+
+- Update Vite to 7.3.7 and source-map-js to 1.2.2, clearing six advisories reported by `npm audit` in the app: GHSA-68fv-2mgg-jv7q, GHSA-698v-4r3x-3vcv, GHSA-r825-w8mm-5pxw, GHSA-587h-7wmj-h5pm, GHSA-9jrq-w75r-8gcw and GHSA-rq7h-c2jc-7f22. These are development-server and build-time dependencies.
+- The app's npm advisories and licenses are now a CI gate in `Dependency assurance` (job `npm advisories and licenses`, run on the app only now that the supporter service is removed).
+
 ### Removed unreachable frontend code
 
 - Deleted `src/services/localMediaServer.ts` (orphaned since the ad network was removed), `src/utils/drag.ts` (`createDragGhost`, never imported), the unused `withTimeout` helper and `TRANSCODE_CACHE_TIMEOUT_MS` constant, and three unused re-exports (`isZipFile`, `isRarFile`, `isSevenZFile`) from the `utils` barrel.

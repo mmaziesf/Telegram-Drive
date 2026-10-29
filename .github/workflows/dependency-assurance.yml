@@ -47,6 +47,27 @@ jobs:
           node-version: 22
       - run: node scripts/check-baseline-expiry.cjs --warn-days 14
 
+  node-assurance:
+    name: npm advisories and licenses
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        # The app is this repository's only npm project. New advisories or
+        # licenses fail the job unless reviewed in dependency-policy/ with a
+        # written rationale.
+        project: [app]
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: ${{ matrix.project }}/package-lock.json
+      - run: npm ci --ignore-scripts
+        working-directory: ${{ matrix.project }}
+      - run: node scripts/check-npm-audit.cjs ${{ matrix.project }}
+      - run: node scripts/check-node-licenses.cjs ${{ matrix.project }}
+
   assurance-cli-e2e:
     name: Release assurance CLI end-to-end
     runs-on: ubuntu-22.04
