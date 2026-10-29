@@ -14,11 +14,14 @@ use serde::Deserialize;
 use sha2::{Digest, Sha256};
 use std::collections::{HashMap, VecDeque};
 use std::sync::{Arc, LazyLock, Mutex};
+use zeroize::Zeroize;
 
 const SHARE_PASSWORD_ATTEMPT_LIMIT: usize = 5;
 const SHARE_PASSWORD_WINDOW_SECONDS: i64 = 5 * 60;
 const SHARE_PASSWORD_COOLDOWN_SECONDS: i64 = 30;
 const MAX_TRACKED_SHARE_TOKENS: usize = 1_024;
+const SHARE_UNLOCK_SECONDS: i64 = 30 * 60;
+const MAX_UNLOCKS_PER_SHARE: usize = 8;
 const MAX_SHARE_PASSWORD_CHARS: usize = 128;
 const MAX_SHARE_PASSWORD_BYTES: usize = 512;
 const SHARE_VERIFY_FORM_LIMIT_BYTES: usize = 1_024;
@@ -162,11 +165,105 @@ fn verify_password(password: &str, hash: &str) -> bool {
     bcrypt::verify(password, hash).unwrap_or(false)
 }
 
-fn generate_cookie_val(token: &str, password_hash: &str) -> String {
-    let mut hasher = Sha256::new();
-    hasher.update(token.as_bytes());
-    hasher.update(password_hash.as_bytes());
-    format!("{:x}", hasher.finalize())
+/// One successful password entry. The cookie carries a random secret; only its
+/// digest is kept, bound to the password hash in force when it was issued, so a
+/// password change or the server-side expiry ends every earlier unlock.
+struct ShareUnlock {
+    secret_digest: [u8; 32],
+    password_digest: [u8; 32],
+    expires_at: i64,
+}
+
+#[derive(Default)]
+struct ShareUnlockStore {
+    by_share: HashMap<[u8; 32], Vec<ShareUnlock>>,
+}
+
+impl ShareUnlockStore {
+    fn issue(&mut self, share_key: [u8; 32], password_hash: &str, now: i64) -> String {
+        self.prune(now);
+        if !self.by_share.contains_key(&share_key)
+            && self.by_share.len() >= MAX_TRACKED_SHARE_TOKENS
+        {
+            let soonest = self
+                .by_share
+                .iter()
+                .min_by_key(|(_, unlocks)| unlocks.iter().map(|unlock| unlock.expires_at).max())
+                .map(|(key, _)| *key);
+            if let Some(key) = soonest {
+                self.by_share.remove(&key);
+            }
+        }
+        let mut secret: [u8; 32] = rand::random();
+        let value: String = secret.iter().map(|byte| format!("{byte:02x}")).collect();
+        secret.zeroize();
+        let unlocks = self.by_share.entry(share_key).or_default();
+        if unlocks.len() >= MAX_UNLOCKS_PER_SHARE {
+            unlocks.remove(0);
+        }
+        unlocks.push(ShareUnlock {
+            secret_digest: Sha256::digest(value.as_bytes()).into(),
+            password_digest: Sha256::digest(password_hash.as_bytes()).into(),
+            expires_at: now + SHARE_UNLOCK_SECONDS,
+        });
+        value
+    }
+
+    fn accepts(
+        &mut self,
+        share_key: &[u8; 32],
+        password_hash: &str,
+        presented: &str,
+        now: i64,
+    ) -> bool {
+        self.prune(now);
+        let Some(unlocks) = self.by_share.get(share_key) else {
+            return false;
+        };
+        let presented: [u8; 32] = Sha256::digest(presented.as_bytes()).into();
+        let password: [u8; 32] = Sha256::digest(password_hash.as_bytes()).into();
+        unlocks.iter().fold(false, |accepted, unlock| {
+            let secret_matches =
+                constant_time_eq::constant_time_eq_32(&unlock.secret_digest, &presented);
+            let password_matches =
+                constant_time_eq::constant_time_eq_32(&unlock.password_digest, &password);
+            accepted | (secret_matches & password_matches)
+        })
+    }
+
+    fn prune(&mut self, now: i64) {
+        self.by_share.retain(|_, unlocks| {
+            unlocks.retain(|unlock| unlock.expires_at > now);
+            !unlocks.is_empty()
+        });
+    }
+}
+
+static SHARE_UNLOCKS: LazyLock<Mutex<ShareUnlockStore>> =
+    LazyLock::new(|| Mutex::new(ShareUnlockStore::default()));
+
+fn with_share_unlocks<T>(operation: impl FnOnce(&mut ShareUnlockStore) -> T) -> T {
+    let mut store = SHARE_UNLOCKS
+        .lock()
+        .unwrap_or_else(|poisoned| poisoned.into_inner());
+    operation(&mut store)
+}
+
+#[cfg(feature = "native-e2e")]
+static UNLOCK_CLOCK_OFFSET_SECONDS: std::sync::atomic::AtomicI64 =
+    std::sync::atomic::AtomicI64::new(0);
+
+/// Lets native journeys move the unlock clock past the server-side expiry.
+#[cfg(feature = "native-e2e")]
+pub fn advance_unlock_clock_for_e2e(seconds: i64) {
+    UNLOCK_CLOCK_OFFSET_SECONDS.fetch_add(seconds, std::sync::atomic::Ordering::SeqCst);
+}
+
+fn unlock_now() -> i64 {
+    let now = chrono::Utc::now().timestamp();
+    #[cfg(feature = "native-e2e")]
+    let now = now + UNLOCK_CLOCK_OFFSET_SECONDS.load(std::sync::atomic::Ordering::SeqCst);
+    now
 }
 
 async fn get_share_by_token(
@@ -534,10 +631,10 @@ async fn get_shared_file(
     if let Some(hash) = &row.password_hash {
         let mut authenticated = false;
         if let Some(cookie) = req.cookie(&format!("share_auth_{}", token)) {
-            let expected = generate_cookie_val(&token, hash);
-            if cookie.value() == expected {
-                authenticated = true;
-            }
+            let share_key = token_attempt_key(&token);
+            authenticated = with_share_unlocks(|store| {
+                store.accepts(&share_key, hash, cookie.value(), unlock_now())
+            });
         }
 
         if !authenticated {
@@ -712,12 +809,12 @@ async fn verify_shared_file_password(
     }
     if verified {
         with_password_attempt_limiter(|limiter| limiter.clear(&token_key));
-        // Set session cookie (30 min).
+        // Set session cookie (30 min, also enforced server-side).
         // NOTE: The streaming share server is loopback-only and uses plain HTTP,
         // so the cookie cannot use `.secure(true)` without becoming unusable locally.
         // The cookie is protected by `.http_only(true)` and `.same_site(Strict)`
         // to mitigate XSS and CSRF within the constraints of this local service.
-        let val = generate_cookie_val(&token, hash);
+        let val = with_share_unlocks(|store| store.issue(token_key, hash, unlock_now()));
         let cookie = Cookie::build(format!("share_auth_{}", token), val)
             .path(format!("/d/{}", token))
             .http_only(true)

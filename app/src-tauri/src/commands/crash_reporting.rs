@@ -1,4 +1,4 @@
-use std::net::{IpAddr, SocketAddr};
+use std::net::SocketAddr;
 use std::time::Duration;
 
 use serde::{Deserialize, Serialize};
@@ -13,26 +13,6 @@ pub struct CrashReportInput {
     frames: Vec<String>,
     platform: String,
     occurred_at: String,
-}
-
-fn is_public_ip(ip: IpAddr) -> bool {
-    match ip {
-        IpAddr::V4(address) => {
-            !address.is_private()
-                && !address.is_loopback()
-                && !address.is_link_local()
-                && !address.is_broadcast()
-                && !address.is_unspecified()
-                && !address.is_multicast()
-        }
-        IpAddr::V6(address) => {
-            !address.is_loopback()
-                && !address.is_unspecified()
-                && !address.is_multicast()
-                && !address.is_unique_local()
-                && !address.is_unicast_link_local()
-        }
-    }
 }
 
 fn validate_report(report: &CrashReportInput) -> Result<(), String> {
@@ -76,7 +56,7 @@ pub async fn cmd_submit_crash_report(report: CrashReportInput) -> Result<(), Str
     let addresses: Vec<SocketAddr> = tokio::net::lookup_host((host, port))
         .await
         .map_err(|error| error.to_string())?
-        .filter(|address| is_public_ip(address.ip()))
+        .filter(|address| super::fs::is_public_remote_ip(address.ip()))
         .collect();
     if addresses.is_empty() {
         return Err("Crash report endpoint did not resolve to a public address".to_string());

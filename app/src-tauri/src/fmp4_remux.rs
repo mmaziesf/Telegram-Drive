@@ -448,9 +448,8 @@ async fn serve_fmp4(
     let file_key = path.into_inner();
 
     // Validate token
-    match &query.token {
-        Some(t) if t == &token_data.token => {}
-        _ => return HttpResponse::Forbidden().body("Invalid or missing stream token"),
+    if !token_data.accepts(query.token.as_deref()) {
+        return HttpResponse::Forbidden().body("Invalid or missing stream token");
     }
 
     // Sanitize file_key to prevent path traversal

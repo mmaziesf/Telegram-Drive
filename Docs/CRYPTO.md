@@ -49,6 +49,16 @@ The adversarial and property suite is `app/src-tauri/tests/crypto_envelope.rs` (
 | Key slots bind the UUID, slot ID, slot kind, salt and key | `key_slots_round_trip_and_bind_every_parameter` |
 | Recovery bundles reject wrong passphrases and tampering | `recovery_bundles_round_trip_and_reject_wrong_passphrases_and_tampering` |
 
+Known-answer tests are in `app/src-tauri/tests/crypto_kat.rs`; run them with `cargo test --locked --test crypto_kat`.
+
+| Claim | Test |
+| --- | --- |
+| The header layout and authenticator, metadata encryption, chunk nonces (prefix plus little-endian record index), chunk and final-record AAD and the final record match an independent encoder (`scripts/generate-tdenc2-kat.py`, Python `cryptography` plus its own HChaCha20 checked against draft-irtf-cfrg-xchacha-03 section 2.2.1) | `reference_encoder_vectors_match_byte_for_byte`, `reference_encoder_vectors_decrypt_to_their_inputs` |
+| HKDF-SHA-256 matches RFC 5869 | `hkdf_sha256_matches_rfc_5869_test_case_3` |
+| A body longer or shorter than the declared size is rejected, as is an edited declared size | `a_body_that_differs_from_the_declared_size_is_rejected`, `an_edited_declared_size_is_rejected` |
+
+The vectors use a fixed key slot whose wrapped DEK is opaque bytes, so they do not cover DEK wrapping; `key_slots_round_trip_and_bind_every_parameter` covers that. The header parser and decrypter have libFuzzer targets in `app/src-tauri/fuzz`; only 10-minute local smoke runs have been done, and a 24-hour run is pending.
+
 ## What is not encrypted by the app
 
 - **Standard-mode uploads** go to Telegram unencrypted. From PR #1 onward, new uploads default to vault mode. Files uploaded before that stay as they are.

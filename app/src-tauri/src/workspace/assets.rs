@@ -1232,6 +1232,19 @@ pub(crate) async fn remote_thumbnail_at(
     .await
 }
 
+/// Builds the lease a detached legacy hash holds. Tuple fields drop in
+/// order: the legacy use must end before the category guard is released, or
+/// a waiting clear sees the file as still in use, skips it and reports
+/// success.
+pub(crate) fn legacy_lease<L, C, F, G>(
+    legacy: L,
+    capacity: C,
+    file_guard: F,
+    category_guard: G,
+) -> (L, C, F, G) {
+    (legacy, capacity, file_guard, category_guard)
+}
+
 pub(crate) async fn asset_at<F, Fut>(
     cache: PathBuf,
     account: AccountGuard,
@@ -1308,10 +1321,7 @@ where
             // Retain admission/category guards through the full digest. Clear
             // invalidates the request before it waits for the same category.
             let legacy = Arc::new(crate::commands::preview::LegacyPreviewUse::new(&path));
-            // Tuple fields drop in order. The legacy use must end before the
-            // category guard is released, or a waiting clear sees the file as
-            // still in use, skips it and reports success.
-            let lease = (
+            let lease = legacy_lease(
                 legacy.clone(),
                 capacity.clone(),
                 file_guard.clone(),

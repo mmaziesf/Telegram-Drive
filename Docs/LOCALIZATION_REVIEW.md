@@ -1,5 +1,8 @@
 # Localization review required
 
+> [!WARNING]
+> **Machine-translated, unreviewed.** Every non-English string in the app is machine-translated, and no native speaker has reviewed any locale. This applies to the strings listed below and to everything this fork added later (for example the Telegram account risk notice and the encryption, recovery and session messages). Treat English as the reference text until a locale is marked as reviewed here.
+
 > **Historical record.** This document records upstream work before this fork removed the advertising network, the supporter licence and its payment service (see the CHANGELOG). References to them below describe that earlier code, not the fork's current behaviour.
 
 These translations and added plural forms require owner-arranged native-language review. Structural, interpolation, browser and layout checks do not establish linguistic quality. No entry below is approved by a native reviewer. The protected $5.00 USD one-time lifetime ad-free promise, three-device allowance, recovery, offline grace and no-subscription meaning must remain intact.

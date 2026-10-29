@@ -2397,6 +2397,10 @@ pub fn serve(
             })
             // Preflight requests carry no key; CORS answers them first.
             .wrap(cors)
+            // Outermost: a rebound host name is refused before CORS or auth.
+            .wrap(actix_web::middleware::from_fn(
+                crate::local_cors::guard_loopback_request,
+            ))
             // Malformed input is reported in the same shape as every other error.
             .app_data(web::JsonConfig::default().error_handler(|error, _| {
                 let response = json_error("INVALID_BODY", &error.to_string(), 400);
