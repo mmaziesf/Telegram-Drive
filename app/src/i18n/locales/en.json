@@ -1443,5 +1443,41 @@
     "this_device": "uploaded by this device",
     "other_device": "uploaded by another device",
     "none": "No encrypted settings backup was found in the latest 1,000 Saved Messages."
+  },
+  "session_lock": {
+    "title_enter": "Unlock your Telegram session",
+    "title_setup": "Protect your Telegram session",
+    "detail_enter": "No system credential store was available, so your saved Telegram session is encrypted with a passphrase. Enter it to continue.",
+    "detail_setup": "No system credential store is available, so your Telegram session will be encrypted with a passphrase of at least {{min}} characters. It cannot be recovered if you forget it.",
+    "passphrase": "Passphrase",
+    "confirm": "Confirm passphrase",
+    "mismatch": "The passphrases do not match.",
+    "too_short": "Use at least {{min}} characters.",
+    "incorrect": "The passphrase is incorrect.",
+    "failed": "The session could not be unlocked. Try again.",
+    "submit_enter": "Unlock",
+    "submit_setup": "Protect session",
+    "working": "Unlocking…",
+    "keychain_title": "System credential store unavailable",
+    "keychain_detail": "Your Telegram session is encrypted with a key kept in the system credential store, which cannot be reached right now. Unlock your keyring or credential manager, then try again.",
+    "retry": "Try again",
+    "keychain_remove": "Remove saved session and sign in again",
+    "keychain_remove_detail": "The saved session will be deleted from this device and you will need to sign in again. If the credential store is still unavailable, you will choose a passphrase to protect the new session. This device stays listed in Telegram's active sessions until you end it from another device.",
+    "forgot": "Forgot your passphrase?",
+    "remove_detail": "The saved session will be deleted from this device and you will need to sign in again. This device stays listed in Telegram's active sessions until you end it from another device.",
+    "remove_confirm": "Delete session"
+  },
+  "stale_sessions": {
+    "title": "Sessions still signed in",
+    "intro": "An earlier sign-out could not end these Telegram sessions. Choose any you want to end. This device's session is not listed.",
+    "confirm": "These sessions will be signed out of Telegram. This cannot be undone.",
+    "last_active": "Last active {{date}}",
+    "end_selected": "End selected sessions",
+    "confirm_end": "End sessions",
+    "back": "Back",
+    "keep": "Keep these sessions",
+    "failed": "Some sessions could not be ended. Try again, or end them in Telegram's settings.",
+    "unknown_device": "Unknown device",
+    "unknown_app": "Unknown app"
   }
 }

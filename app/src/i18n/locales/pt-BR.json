@@ -1450,5 +1450,41 @@
     "this_device": "enviado por este dispositivo",
     "other_device": "enviado por outro dispositivo",
     "none": "Nenhum backup criptografado de configurações nas últimas 1,000 Mensagens salvas."
+  },
+  "session_lock": {
+    "title_enter": "Desbloqueie sua sessão do Telegram",
+    "title_setup": "Proteja sua sessão do Telegram",
+    "detail_enter": "Nenhum armazenamento de credenciais do sistema estava disponível, então sua sessão do Telegram salva está criptografada com uma frase secreta. Digite-a para continuar.",
+    "detail_setup": "Nenhum armazenamento de credenciais do sistema está disponível, então sua sessão do Telegram será criptografada com uma frase secreta de pelo menos {{min}} caracteres. Ela não pode ser recuperada se você esquecê-la.",
+    "passphrase": "Frase secreta",
+    "confirm": "Confirmar frase secreta",
+    "mismatch": "As frases secretas não coincidem.",
+    "too_short": "Use pelo menos {{min}} caracteres.",
+    "incorrect": "A frase secreta está incorreta.",
+    "failed": "Não foi possível desbloquear a sessão. Tente novamente.",
+    "submit_enter": "Desbloquear",
+    "submit_setup": "Proteger sessão",
+    "working": "Desbloqueando…",
+    "keychain_title": "Armazenamento de credenciais indisponível",
+    "keychain_detail": "Sua sessão do Telegram está criptografada com uma chave guardada no armazenamento de credenciais do sistema, que não pode ser acessado agora. Desbloqueie seu chaveiro ou gerenciador de credenciais e tente novamente.",
+    "retry": "Tentar novamente",
+    "keychain_remove": "Remover a sessão salva e entrar novamente",
+    "keychain_remove_detail": "A sessão salva será excluída deste dispositivo e você precisará entrar novamente. Se o armazenamento de credenciais continuar indisponível, você escolherá uma frase secreta para proteger a nova sessão. Este dispositivo continua listado nas sessões ativas do Telegram até que você a encerre em outro dispositivo.",
+    "forgot": "Esqueceu sua frase secreta?",
+    "remove_detail": "A sessão salva será excluída deste dispositivo e você precisará entrar novamente. Este dispositivo continuará listado nas sessões ativas do Telegram até que você o encerre em outro dispositivo.",
+    "remove_confirm": "Excluir sessão"
+  },
+  "stale_sessions": {
+    "title": "Sessões ainda conectadas",
+    "intro": "Uma saída anterior não conseguiu encerrar estas sessões do Telegram. Escolha as que deseja encerrar. A sessão deste dispositivo não aparece na lista.",
+    "confirm": "Estas sessões serão desconectadas do Telegram. Isso não pode ser desfeito.",
+    "last_active": "Última atividade em {{date}}",
+    "end_selected": "Encerrar sessões selecionadas",
+    "confirm_end": "Encerrar sessões",
+    "back": "Voltar",
+    "keep": "Manter estas sessões",
+    "failed": "Não foi possível encerrar algumas sessões. Tente novamente ou encerre-as nas configurações do Telegram.",
+    "unknown_device": "Dispositivo desconhecido",
+    "unknown_app": "Aplicativo desconhecido"
   }
 }

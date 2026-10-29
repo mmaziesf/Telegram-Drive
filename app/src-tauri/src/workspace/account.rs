@@ -1,8 +1,8 @@
-use grammers_session::{
-    storages::SqliteSession,
-    types::{PeerId, PeerInfo},
-    Session,
-};
+#[cfg(not(any(target_os = "android", target_os = "ios")))]
+use crate::{commands::ClientSession, session_store::SessionOpenError};
+#[cfg(any(target_os = "android", target_os = "ios"))]
+use grammers_session::{storages::SqliteSession, types::PeerId};
+use grammers_session::{types::PeerInfo, Session};
 #[cfg(not(any(target_os = "android", target_os = "ios")))]
 use std::{
     collections::HashMap,
@@ -33,7 +33,7 @@ static LIFECYCLE: WorkspaceLifecycle = WorkspaceLifecycle {
 
 #[cfg(not(any(target_os = "android", target_os = "ios")))]
 struct RegisteredSession {
-    session: Weak<SqliteSession>,
+    session: Weak<ClientSession>,
     identity: Option<(u64, u64)>,
     generation: u64,
     ready: bool,
@@ -43,16 +43,17 @@ struct RegisteredSession {
 static LIVE_SESSIONS: LazyLock<Mutex<HashMap<PathBuf, RegisteredSession>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
 
-/// Opening the library's storage can migrate its schema. Serialize that work
-/// against pre-registration readers too; no runner writes until registration.
+/// Opening the session can migrate a plaintext one to encrypted storage.
+/// Serialize that work against pre-registration readers too; no runner writes
+/// until registration.
 #[cfg(not(any(target_os = "android", target_os = "ios")))]
-pub(crate) fn open_session(root: &Path) -> sqlite::Result<Arc<SqliteSession>> {
+pub(crate) fn open_session(root: &Path) -> Result<Arc<ClientSession>, SessionOpenError> {
     let mut sessions = LIVE_SESSIONS
         .lock()
         .unwrap_or_else(|error| error.into_inner());
     let generation = LIFECYCLE.generation.load(Ordering::SeqCst);
-    // Create or tighten the database before SQLite touches it, so neither it
-    // nor its sidecars are ever readable by other local users.
+    // Create or tighten the session file before it is opened, so neither it
+    // nor any leftover SQLite sidecar is ever readable by other local users.
     crate::session_protection::prepare_account_session_or_warn(root);
     let path = root.join("telegram.session");
     let before = session_file_identity(&path).ok();
@@ -62,14 +63,14 @@ pub(crate) fn open_session(root: &Path) -> sqlite::Result<Arc<SqliteSession>> {
             .flatten()
     }) {
         // Reconnect may still have an older client winding down. Keep its
-        // shared SQLite mutex rather than opening another competing writer.
+        // shared session rather than opening another competing writer.
         return Ok(session);
     }
-    let session = Arc::new(SqliteSession::open(&path)?);
+    let session = Arc::new(crate::session_store::open(&path)?);
     crate::session_protection::restrict_session_files_or_warn(&path);
-    let identity = session_file_identity(&path)
-        .ok()
-        .filter(|after| before.is_none_or(|before| before == *after));
+    // Migrating a plaintext session replaces the file, so its identity is
+    // taken after opening. Later writes rewrite it in place and keep it.
+    let identity = session_file_identity(&path).ok();
     sessions.retain(|_, registered| registered.session.strong_count() > 0);
     sessions.insert(
         root.into(),
@@ -109,10 +110,10 @@ pub(crate) fn session_file_identity(path: &Path) -> std::io::Result<(u64, u64)> 
     ))
 }
 
-/// Register before starting the runner so ownership reads share the session's
-/// mutex with Telegram's writes instead of opening a competing connection.
+/// Register before starting the runner so ownership reads use the session's
+/// own state instead of decrypting the file again.
 #[cfg(not(any(target_os = "android", target_os = "ios")))]
-pub(crate) fn register_session(root: &Path, session: &Arc<SqliteSession>) -> Result<(), String> {
+pub(crate) fn register_session(root: &Path, session: &Arc<ClientSession>) -> Result<(), String> {
     let mut sessions = LIVE_SESSIONS
         .lock()
         .unwrap_or_else(|error| error.into_inner());
@@ -130,15 +131,8 @@ pub(crate) fn register_session(root: &Path, session: &Arc<SqliteSession>) -> Res
     {
         return Err("ACCOUNT_CHANGED: The saved session has been replaced".into());
     }
-    if registered.ready {
-        return Ok(());
-    }
-    // Before any runner writes, verify the supported layout, including sessions
-    // created for a new login that do not have a self peer yet.
-    read_session_identity(&path)?;
-    if !same_file() || registered.generation != LIFECYCLE.generation.load(Ordering::SeqCst) {
-        return Err("ACCOUNT_CHANGED: The saved session has been replaced".into());
-    }
+    // Opening the session already authenticated it and rejected an ambiguous
+    // owner, including for a new login that has no self peer yet.
     registered.ready = true;
     Ok(())
 }
@@ -147,7 +141,7 @@ pub(crate) fn register_session(root: &Path, session: &Arc<SqliteSession>) -> Res
 #[cfg(not(any(target_os = "android", target_os = "ios")))]
 pub(crate) struct AuthenticationSession {
     root: PathBuf,
-    session: Arc<SqliteSession>,
+    session: Arc<ClientSession>,
     generation: u64,
 }
 
@@ -156,7 +150,7 @@ impl AuthenticationSession {
     fn capture_in(
         sessions: &HashMap<PathBuf, RegisteredSession>,
         lifecycle: &WorkspaceLifecycle,
-        session: &Arc<SqliteSession>,
+        session: &Arc<ClientSession>,
     ) -> Result<Self, String> {
         let root = sessions
             .iter()
@@ -173,7 +167,7 @@ impl AuthenticationSession {
         Ok(captured)
     }
 
-    pub(crate) fn capture(session: &Arc<SqliteSession>) -> Result<Self, String> {
+    pub(crate) fn capture(session: &Arc<ClientSession>) -> Result<Self, String> {
         let sessions = LIVE_SESSIONS
             .lock()
             .unwrap_or_else(|error| error.into_inner());
@@ -295,7 +289,7 @@ pub fn current_owner(root: &Path) -> Result<i64, String> {
     {
         let generation = LIFECYCLE.generation.load(Ordering::SeqCst);
         // Keep fallback reads serialized with registration. Once a runner is
-        // active, all checks use its own connection and SQLite mutex.
+        // active, all checks use its session's state in memory.
         let sessions = LIVE_SESSIONS
             .lock()
             .unwrap_or_else(|error| error.into_inner());
@@ -317,21 +311,11 @@ pub fn current_owner(root: &Path) -> Result<i64, String> {
                     "ACCOUNT_UNAVAILABLE: The saved account is temporarily unavailable".into(),
                 );
             }
-            let peer = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-                session.peer(PeerId::self_user())
-            }))
-            .map_err(|_| "ACCOUNT_UNAVAILABLE: The saved account is temporarily unavailable")?;
+            let owner = session.owner();
             if !same_file() {
                 return Err("ACCOUNT_CHANGED: The saved session has been replaced".into());
             }
-            match peer {
-                Some(PeerInfo::User {
-                    id,
-                    is_self: Some(true),
-                    ..
-                }) if (1..=0xffffffffff).contains(&id) => Some(id),
-                _ => None,
-            }
+            owner.filter(|id| (1..=0xffffffffff).contains(id))
         } else {
             read_session_identity(&path)?
         };
@@ -369,49 +353,19 @@ pub(crate) fn test_account_validation_counts() -> (u64, u64) {
     )
 }
 
+/// Read the owner from the saved session without a live runner. User peer
+/// IDs are positive Bot API IDs in 1..=0xffffffffff; anything else, an
+/// ambiguous owner or a session that cannot be read is reported as
+/// unavailable rather than guessed.
 #[cfg(not(any(target_os = "android", target_os = "ios")))]
 fn read_session_identity(path: &Path) -> Result<Option<i64>, String> {
     #[cfg(feature = "native-e2e")]
     FALLBACK_READS.fetch_add(1, Ordering::SeqCst);
     const UNAVAILABLE: &str = "ACCOUNT_UNAVAILABLE: The saved account is temporarily unavailable";
-    let unsupported = || sqlite::Error {
-        code: None,
-        message: Some("Unsupported session identity layout".into()),
-    };
-    let read = || -> sqlite::Result<Option<i64>> {
-        let mut connection =
-            sqlite::Connection::open_with_flags(path, sqlite::OpenFlags::new().with_read_only())?;
-        // Telegram updates its peer cache on a separate connection. A short
-        // writer lock must not become a missing account or a grammers panic.
-        connection.set_busy_timeout(250)?;
-        connection.execute("BEGIN")?;
-        let mut version = connection.prepare("PRAGMA user_version")?;
-        if version.next()? != sqlite::State::Row || version.read::<i64, _>(0)? != 1 {
-            return Err(unsupported());
-        }
-        drop(version);
-
-        // Read only identity metadata from the pinned grammers d07f96f v1
-        // schema. Its self-user subtype is 1 (or 3 for a bot), and user peer IDs
-        // are positive Bot API IDs in 1..=0xffffffffff. No auth key/hash is read.
-        // Reject a future layout, invalid ID, or ambiguous self rows instead of
-        // guessing an owner. Fixtures below are written by SqliteSession itself.
-        let mut peer = connection
-            .prepare("SELECT peer_id, subtype FROM peer_info WHERE subtype & 1 != 0 LIMIT 2")?;
-        if peer.next()? != sqlite::State::Row {
-            return Ok(None);
-        }
-        let owner = peer.read::<i64, _>(0)?;
-        let subtype = peer.read::<i64, _>(1)?;
-        if !(1..=0xffffffffff).contains(&owner)
-            || !matches!(subtype, 1 | 3)
-            || peer.next()? != sqlite::State::Done
-        {
-            return Err(unsupported());
-        }
-        Ok(Some(owner))
-    };
-    read().map_err(|_| UNAVAILABLE.to_string())
+    match crate::session_store::read_owner(path) {
+        Ok(owner) if owner.is_none_or(|id| (1..=0xffffffffff).contains(&id)) => Ok(owner),
+        _ => Err(UNAVAILABLE.to_string()),
+    }
 }
 
 #[derive(Clone)]

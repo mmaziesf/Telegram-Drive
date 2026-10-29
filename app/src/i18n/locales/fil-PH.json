@@ -1443,5 +1443,41 @@
     "this_device": "na-upload ng device na ito",
     "other_device": "na-upload ng ibang device",
     "none": "Walang naka-encrypt na settings backup sa pinakabagong 1,000 Saved Messages."
+  },
+  "session_lock": {
+    "title_enter": "I-unlock ang iyong Telegram session",
+    "title_setup": "Protektahan ang iyong Telegram session",
+    "detail_enter": "Walang available na credential store ng system, kaya naka-encrypt gamit ang passphrase ang naka-save mong Telegram session. Ilagay ito para magpatuloy.",
+    "detail_setup": "Walang available na credential store ng system, kaya ie-encrypt ang iyong Telegram session gamit ang passphrase na hindi bababa sa {{min}} character. Hindi na ito mababawi kapag nakalimutan mo.",
+    "passphrase": "Passphrase",
+    "confirm": "Kumpirmahin ang passphrase",
+    "mismatch": "Hindi tugma ang mga passphrase.",
+    "too_short": "Gumamit ng hindi bababa sa {{min}} character.",
+    "incorrect": "Mali ang passphrase.",
+    "failed": "Hindi ma-unlock ang session. Subukang muli.",
+    "submit_enter": "I-unlock",
+    "submit_setup": "Protektahan ang session",
+    "working": "Ina-unlock…",
+    "keychain_title": "Hindi available ang credential store",
+    "keychain_detail": "Naka-encrypt ang iyong Telegram session gamit ang key na nasa credential store ng system, na hindi maabot ngayon. I-unlock ang iyong keyring o credential manager, saka subukang muli.",
+    "retry": "Subukang muli",
+    "keychain_remove": "Alisin ang naka-save na session at mag-sign in muli",
+    "keychain_remove_detail": "Buburahin ang naka-save na session sa device na ito at kailangan mong mag-sign in muli. Kung hindi pa rin available ang credential store, pipili ka ng passphrase para protektahan ang bagong session. Mananatiling nakalista ang device na ito sa mga aktibong session ng Telegram hangga't hindi mo ito tinatapos mula sa ibang device.",
+    "forgot": "Nakalimutan ang passphrase?",
+    "remove_detail": "Buburahin ang naka-save na session sa device na ito at kailangan mong mag-sign in muli. Mananatiling nakalista ang device na ito sa mga aktibong session ng Telegram hanggang tapusin mo ito mula sa ibang device.",
+    "remove_confirm": "Burahin ang session"
+  },
+  "stale_sessions": {
+    "title": "Mga session na naka-sign in pa",
+    "intro": "Hindi natapos ng naunang pag-sign out ang mga Telegram session na ito. Piliin ang mga gusto mong tapusin. Hindi nakalista ang session ng device na ito.",
+    "confirm": "Masa-sign out sa Telegram ang mga session na ito. Hindi na ito maibabalik.",
+    "last_active": "Huling aktibo {{date}}",
+    "end_selected": "Tapusin ang mga napiling session",
+    "confirm_end": "Tapusin ang mga session",
+    "back": "Bumalik",
+    "keep": "Panatilihin ang mga session na ito",
+    "failed": "Hindi natapos ang ilang session. Subukang muli, o tapusin ang mga ito sa mga setting ng Telegram.",
+    "unknown_device": "Hindi kilalang device",
+    "unknown_app": "Hindi kilalang app"
   }
 }

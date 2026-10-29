@@ -1,5 +1,18 @@
 ## [Unreleased]
 
+### Telegram session encrypted at rest
+
+- `telegram.session` is now sealed with XChaCha20-Poly1305. The 256-bit key is kept in the operating system's credential store (Secret Service on Linux, Keychain on macOS, Credential Manager on Windows). Header fields are authenticated, so a modified file is rejected instead of loaded.
+- When no credential store is reachable, the app asks for a passphrase (at least 12 characters) and derives the key with Argon2id. The passphrase stays in memory only.
+- A plaintext session from an earlier release is imported, sealed and its old file overwritten before removal. Overwriting is best effort on SSDs and copy-on-write file systems.
+- A "forgot passphrase" option deletes only the local session; the device stays listed in Telegram's active sessions until it is ended from another device.
+- If a sign-out cannot end the session on Telegram, the app keeps a marker holding the time and, when known, the Telegram user ID. After the next sign-in to that account (or to any account, if the session was locked and its account unknown) it lists the older sessions of the same API ID by device, app and last activity. Nothing is selected and nothing ends automatically. Only sessions the user selects and then confirms are ended. The backend re-checks each one against a fresh list from Telegram, so the current session can never be ended. "Keep these sessions" clears the marker; closing the dialog asks again after the next sign-in. The 11 new strings fit within the existing bundle ceilings.
+- When the credential store is unreachable, the unlock screen also offers to remove the saved session after confirmation. The next sign-in then asks for a passphrase if the store is still unavailable. A failed removal shows a generic error and keeps the session.
+- A key that cannot be deleted from the credential store (because the store is locked or unreachable) is recorded by name only in `.orphaned-keys` and deleted on a later start. A key still named by a session file is never deleted.
+- Bundle ceiling: the removal option adds 2 strings in 24 locales (within the locale ceilings) and 270 bytes of initial JavaScript; that ceiling rises from 378523 to the measured 378793 bytes.
+- Android sessions are unchanged in this release.
+- Bundle ceilings: the 21 new strings in 24 locales raise the locale ceilings to 1981377 bytes in total and 140733 bytes for the largest catalog (measured 1668504 and 117879), and the session check raises the initial JavaScript ceiling from 378375 to the measured 378523 bytes.
+
 ### App npm advisories
 
 - Update Vite to 7.3.7 and source-map-js to 1.2.2, clearing six advisories reported by `npm audit` in the app: GHSA-68fv-2mgg-jv7q, GHSA-698v-4r3x-3vcv, GHSA-r825-w8mm-5pxw, GHSA-587h-7wmj-h5pm, GHSA-9jrq-w75r-8gcw and GHSA-rq7h-c2jc-7f22. These are development-server and build-time dependencies.

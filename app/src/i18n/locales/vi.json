@@ -1443,5 +1443,41 @@
     "this_device": "được tải lên bởi thiết bị này",
     "other_device": "được tải lên bởi thiết bị khác",
     "none": "Không tìm thấy bản sao lưu cài đặt mã hóa trong 1,000 Tin nhắn đã lưu gần nhất."
+  },
+  "session_lock": {
+    "title_enter": "Mở khóa phiên Telegram của bạn",
+    "title_setup": "Bảo vệ phiên Telegram của bạn",
+    "detail_enter": "Không có kho thông tin xác thực của hệ thống, vì vậy phiên Telegram đã lưu của bạn được mã hóa bằng cụm mật khẩu. Hãy nhập cụm mật khẩu để tiếp tục.",
+    "detail_setup": "Không có kho thông tin xác thực của hệ thống, vì vậy phiên Telegram của bạn sẽ được mã hóa bằng cụm mật khẩu có ít nhất {{min}} ký tự. Nếu quên, bạn không thể khôi phục.",
+    "passphrase": "Cụm mật khẩu",
+    "confirm": "Xác nhận cụm mật khẩu",
+    "mismatch": "Các cụm mật khẩu không khớp.",
+    "too_short": "Hãy dùng ít nhất {{min}} ký tự.",
+    "incorrect": "Cụm mật khẩu không đúng.",
+    "failed": "Không thể mở khóa phiên. Hãy thử lại.",
+    "submit_enter": "Mở khóa",
+    "submit_setup": "Bảo vệ phiên",
+    "working": "Đang mở khóa…",
+    "keychain_title": "Kho thông tin xác thực không khả dụng",
+    "keychain_detail": "Phiên Telegram của bạn được mã hóa bằng khóa lưu trong kho thông tin xác thực của hệ thống, hiện không truy cập được. Hãy mở khóa keyring hoặc trình quản lý thông tin xác thực rồi thử lại.",
+    "retry": "Thử lại",
+    "keychain_remove": "Xóa phiên đã lưu và đăng nhập lại",
+    "keychain_remove_detail": "Phiên đã lưu sẽ bị xóa khỏi thiết bị này và bạn cần đăng nhập lại. Nếu kho thông tin xác thực vẫn không khả dụng, bạn sẽ chọn một cụm mật khẩu để bảo vệ phiên mới. Thiết bị này vẫn hiển thị trong các phiên hoạt động của Telegram cho đến khi bạn kết thúc nó từ thiết bị khác.",
+    "forgot": "Quên cụm mật khẩu?",
+    "remove_detail": "Phiên đã lưu sẽ bị xóa khỏi thiết bị này và bạn cần đăng nhập lại. Thiết bị này vẫn xuất hiện trong các phiên đang hoạt động của Telegram cho đến khi bạn kết thúc nó từ thiết bị khác.",
+    "remove_confirm": "Xóa phiên"
+  },
+  "stale_sessions": {
+    "title": "Các phiên vẫn đang đăng nhập",
+    "intro": "Một lần đăng xuất trước đó không thể kết thúc các phiên Telegram này. Hãy chọn những phiên bạn muốn kết thúc. Phiên của thiết bị này không có trong danh sách.",
+    "confirm": "Các phiên này sẽ bị đăng xuất khỏi Telegram. Không thể hoàn tác thao tác này.",
+    "last_active": "Hoạt động lần cuối {{date}}",
+    "end_selected": "Kết thúc các phiên đã chọn",
+    "confirm_end": "Kết thúc phiên",
+    "back": "Quay lại",
+    "keep": "Giữ các phiên này",
+    "failed": "Không thể kết thúc một số phiên. Hãy thử lại hoặc kết thúc chúng trong phần cài đặt của Telegram.",
+    "unknown_device": "Thiết bị không xác định",
+    "unknown_app": "Ứng dụng không xác định"
   }
 }

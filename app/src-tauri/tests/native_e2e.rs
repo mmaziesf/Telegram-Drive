@@ -253,6 +253,12 @@ fn telegram_session_files_are_owner_only_and_older_installs_are_tightened() {
     let database = account.join("telegram.session");
     assert_eq!(file_mode(&account), 0o700);
     assert_eq!(file_mode(&database), 0o600);
+    // The seeded plaintext session was moved to encrypted storage on open.
+    let sealed = std::fs::read(&database).unwrap();
+    assert!(sealed.starts_with(b"TDSESS\0\x01"));
+    assert!(!sealed
+        .windows(15)
+        .any(|window| window == b"SQLite format 3"));
     app.stop();
 
     // A session written by an earlier release with default modes, including
@@ -294,8 +300,81 @@ fn telegram_session_files_are_owner_only_and_older_installs_are_tightened() {
     assert_eq!(std::fs::read(&outside).unwrap(), b"not a session");
 }
 
+/// Sessions a sign-out could not end: the pending marker, which sessions are
+/// offered after the next sign-in and which confirmations are accepted.
 #[test]
-fn account_isolation_survives_restart_contention_and_account_switch() {
+fn session_revocation_journeys_offer_only_confirmable_older_sessions() {
+    const EXPECTED: [&str; 4] = [
+        "unrevoked_sign_out_leaves_a_marker",
+        "another_account_is_not_offered_the_marker",
+        "only_older_sessions_of_the_same_app_are_offered",
+        "only_offered_sessions_can_be_confirmed",
+    ];
+    let fixture = Fixture::new();
+    let mut app = Backend::start(&fixture.0);
+    assert_eq!(
+        app.ok(json!({"command":"session_revocation_journeys"})),
+        json!(EXPECTED)
+    );
+    for name in EXPECTED {
+        assert_eq!(
+            app.ok(json!({"command":"session_revocation_journey","name":name}))["passed"],
+            name
+        );
+    }
+    app.failure(json!({"command":"session_revocation_journey","name":"no_such_journey"}));
+    app.stop();
+}
+
+/// Every behavior of the encrypted session store: the sealed format and its
+/// tamper checks, keychain and passphrase keys, plaintext migration, torn
+/// writes and sign-out. The journeys run inside the native driver.
+#[test]
+fn session_store_journeys_cover_sealing_keys_migration_and_recovery() {
+    const EXPECTED: [&str; 24] = [
+        "sealed_round_trip_hides_plaintext",
+        "every_write_uses_a_fresh_nonce",
+        "wrong_key_is_rejected",
+        "any_modified_byte_is_rejected",
+        "truncated_files_are_rejected",
+        "contents_are_classified_without_a_key",
+        "self_identity_survives_a_peer_refresh",
+        "out_of_range_peers_are_ignored",
+        "update_state_follows_memory_session",
+        "snapshots_round_trip_and_reject_ambiguity",
+        "keychain_keys_are_random_cached_and_reloaded",
+        "passphrase_keys_are_derived_on_demand",
+        "unreachable_keychain_is_reported",
+        "new_session_is_sealed_and_reopens",
+        "deferred_changes_are_written_on_drop",
+        "passphrase_is_chosen_then_required",
+        "plaintext_session_is_migrated_and_erased",
+        "interrupted_migration_completes_or_rolls_back",
+        "torn_write_is_recovered_from_the_journal",
+        "modified_session_is_rejected",
+        "missing_or_unreachable_keys_are_distinct",
+        "signed_out_session_stops_writing",
+        "destroy_removes_every_copy_and_the_key",
+        "unremovable_keys_are_removed_on_a_later_start",
+    ];
+    let fixture = Fixture::new();
+    let mut app = Backend::start(&fixture.0);
+    assert_eq!(
+        app.ok(json!({"command":"session_store_journeys"})),
+        json!(EXPECTED)
+    );
+    for name in EXPECTED {
+        assert_eq!(
+            app.ok(json!({"command":"session_store_journey","name":name}))["passed"],
+            name
+        );
+    }
+    app.failure(json!({"command":"session_store_journey","name":"no_such_journey"}));
+    app.stop();
+}
+
+#[test]
+fn account_isolation_survives_restart_and_account_switch() {
     let fixture = Fixture::new();
     let mut app = Backend::start(&fixture.0);
     app.ok(json!({"command":"seed_account","owner":101}));
@@ -308,16 +387,13 @@ fn account_isolation_survives_restart_contention_and_account_switch() {
         "Account A private collection"
     );
     app.ok(json!({"command":"capture_account","owner":"101"}));
-    // Hold the writer until the reader reports its bounded failure; no sleeps decide ordering.
-    let writer = sqlite::open(fixture.path("telegram.session")).unwrap();
-    writer
-        .execute("BEGIN EXCLUSIVE; UPDATE peer_info SET peer_id=202 WHERE subtype=1")
-        .unwrap();
-    assert!(app
-        .failure(json!({"command":"validate_account"}))
-        .starts_with("ACCOUNT_UNAVAILABLE:"));
-    writer.execute("COMMIT").unwrap();
-    drop(writer);
+    // The session is encrypted at rest, so it can only change through the store.
+    assert_eq!(
+        app.ok(json!({"command":"rewrite_session_owner","owner":202}))["written"],
+        true
+    );
+    let sealed = std::fs::read(fixture.path("telegram.session")).unwrap();
+    assert!(sealed.starts_with(b"TDSESS\0\x01"));
     assert!(app
         .failure(json!({"command":"validate_account"}))
         .starts_with("ACCOUNT_CHANGED:"));

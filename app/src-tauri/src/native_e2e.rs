@@ -1136,6 +1136,11 @@ impl Driver {
             | "database_mode"
             | "database"
             | "seed_account"
+            | "rewrite_session_owner"
+            | "session_store_journeys"
+            | "session_store_journey"
+            | "session_revocation_journeys"
+            | "session_revocation_journey"
             | "open_account_session"
             | "account_validation_status"
             | "advance_share_unlock_clock"
@@ -1591,6 +1596,40 @@ impl Driver {
                 if prepared.is_err() {let _ = std::fs::remove_file(&staged);}
                 prepared?;
                 Ok(json!({"owner": crate::workspace::current_owner(&root)?}))
+            }
+            "rewrite_session_owner" => {
+                // Another process signs a different account into the saved
+                // session in place, as a second app instance would.
+                let owner = request["owner"]
+                    .as_i64()
+                    .filter(|value| *value > 0)
+                    .ok_or("Invalid fixture owner")?;
+                let session = crate::session_store::open(&self.root.join("telegram.session"))
+                    .map_err(error)?;
+                session.cache_peer(&PeerInfo::User {id:owner,auth:None,bot:Some(false),is_self:Some(true)});
+                Ok(json!({"written": session.flush()}))
+            }
+            "session_store_journeys" => Ok(json!(crate::session_store::journeys::JOURNEYS
+                .iter()
+                .map(|(name, _)| *name)
+                .collect::<Vec<_>>())),
+            "session_store_journey" => {
+                // Each journey gets a fresh directory inside the fixture.
+                let name = text(&request, "name")?;
+                let directory = child(&self.root, &format!("session-journey-{name}"))?;
+                crate::session_store::journeys::run(name, &directory)?;
+                Ok(json!({"passed": name}))
+            }
+            "session_revocation_journeys" => Ok(json!(crate::session_revocation::journeys::JOURNEYS
+                .iter()
+                .map(|(name, _)| *name)
+                .collect::<Vec<_>>())),
+            "session_revocation_journey" => {
+                let name = text(&request, "name")?;
+                let directory = child(&self.root, &format!("revocation-journey-{name}"))?;
+                std::fs::create_dir_all(&directory).map_err(error)?;
+                crate::session_revocation::journeys::run(name, &directory)?;
+                Ok(json!({"passed": name}))
             }
             "open_account_session" => {
                 // Open the saved session exactly as a starting runner does.
@@ -5055,6 +5094,8 @@ pub async fn run() -> Result<(), String> {
     {
         return Err("Refusing to access a non-fixture directory".into());
     }
+    // Session keys stay inside the fixture instead of the desktop keychain.
+    crate::session_store::use_directory_key_store(root.join(".native-e2e-session-keys"));
     let mut initial_network = std::fs::read_to_string(root.join("network_settings.json"))
         .ok()
         .and_then(|bytes| {
