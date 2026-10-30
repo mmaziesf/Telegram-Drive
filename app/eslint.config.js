@@ -30,8 +30,8 @@ export default tseslint.config(
             // Best-effort browser APIs (storage, media playback) may throw;
             // an empty catch documents that the failure is deliberately ignored.
             'no-empty': ['error', { allowEmptyCatch: true }],
-            // Not yet enforced repo-wide. Tests and MobileDashboard.tsx still
-            // use `any` (product code is enforced below), and 43 hook
+            // Not yet enforced repo-wide. Tests still use `any`
+            // (product code is enforced below), and 43 hook
             // dependency lists are incomplete. Changing hook dependencies can
             // alter effect timing, so each one needs its own reviewed change.
             // These rules stay off until that cleanup is done.
@@ -40,10 +40,8 @@ export default tseslint.config(
         },
     },
     {
-        // Product code is free of `any`; keep it that way. MobileDashboard.tsx
-        // is still excluded from `tsc` and has its own pending cleanup.
+        // Product code is free of `any`; keep it that way.
         files: ['src/**/*.{ts,tsx}'],
-        ignores: ['src/components/mobile/MobileDashboard.tsx'],
         rules: { '@typescript-eslint/no-explicit-any': 'error' },
     },
 );

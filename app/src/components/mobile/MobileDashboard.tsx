@@ -28,7 +28,9 @@ import { useTheme } from '../../context/ThemeContext';
 import { TelegramFile, TelegramFolder, ShareInfo, BandwidthStats } from '../../types';
 import { useSettings } from '../../context/SettingsContext';
 import { version as appVersion } from '../../../package.json';
-import { LANGUAGES } from '../../i18n/languages';
+import { LANGUAGES, type LanguagePreference } from '../../i18n/languages';
+import { resolvePublicFolderUsername } from '../desktop/dashboard/fileActionDescriptors';
+import type { FolderLoadChunk } from '../../services/fileListRefresh';
 import { useTranslation } from 'react-i18next';
 import { useConfirm } from '../../context/ConfirmContext';
 import { BandwidthWidget } from '../desktop/dashboard/BandwidthWidget';
@@ -171,7 +173,8 @@ export default function MobileDashboard({ onLogout }: { onLogout?: () => void })
   const {
     store, folders, activeFolderId, setActiveFolderId, isSyncing, isConnected,
     handleLogout, handleSyncFolders, handleCreateFolder, handleFolderDelete,
-    handleFolderRename, handleFolderToggleVisibility, handleExportFolderInvite
+    handleFolderRename, handleFolderToggleVisibility, handleExportFolderInvite,
+    accountId,
   } = useTelegramConnection(logoutHandler);
 
   const { data: androidTransferEnvironment } = useQuery({
@@ -221,10 +224,10 @@ export default function MobileDashboard({ onLogout }: { onLogout?: () => void })
   ]);
 
   const {
-    uploadQueue, setUploadQueue, handleManualUpload, clearFinished: clearUploads,
+    uploadQueue, enqueueUploadItems, handleManualUpload, clearFinished: clearUploads,
     cancelAll: cancelUploads, pauseAll: pauseUploads, resumeAll: resumeUploads,
     cancelItem: cancelUpload, retryItem: retryUpload,
-  } = useFileUpload(activeFolderId, store, transferAllowed, transferWaitingReason);
+  } = useFileUpload(activeFolderId, store, transferAllowed, transferWaitingReason, accountId ?? undefined);
   const {
     downloadQueue, queueDownload, queueBulkDownload, clearFinished: clearDownloads,
     cancelAll: cancelDownloads, pauseAll: pauseDownloads, resumeAll: resumeDownloads,
@@ -459,8 +462,10 @@ export default function MobileDashboard({ onLogout }: { onLogout?: () => void })
     setUploadingCacheFiles(prev => new Set(prev).add(entry.cached_path));
     try {
       const stagedPath = await invoke<string>('cmd_stage_android_upload', { path: entry.cached_path });
-      setUploadQueue(queue => [...queue, {
+      if (!accountId) throw new Error('No active account');
+      await enqueueUploadItems([{
         id: tid,
+        ownerId: accountId,
         path: stagedPath,
         folderId: activeFolderId,
         status: 'pending',
@@ -480,7 +485,7 @@ export default function MobileDashboard({ onLogout }: { onLogout?: () => void })
         return next;
       });
     }
-  }, [activeFolderId, refetchCachedFiles, setUploadQueue, settings.videoUploadMode]);
+  }, [accountId, activeFolderId, enqueueUploadItems, refetchCachedFiles, settings.videoUploadMode]);
 
   const handleClearCachedFiles = useCallback(async () => {
     try {
@@ -498,13 +503,13 @@ export default function MobileDashboard({ onLogout }: { onLogout?: () => void })
   const { data: allFiles = [], isLoading } = useQuery({
     queryKey: ['files', activeFolderId],
     queryFn: async () => {
-      let accumulatedFiles: any[] = [];
+      let accumulatedFiles: TelegramFile[] = [];
       queryClient.setQueryData(['files', activeFolderId], []);
 
-      const unlisten = await listen<any>('folder-load-chunk', (event) => {
+      const unlisten = await listen<FolderLoadChunk>('folder-load-chunk', (event) => {
         const payload = event.payload;
         if (payload.folderId === activeFolderId) {
-          const newChunk = payload.files.map((f: any) => ({
+          const newChunk = payload.files.map((f) => ({
             ...f,
             sizeStr: formatBytes(f.size),
             type: f.icon_type || (f.name.endsWith('/') ? 'folder' : 'file')
@@ -752,8 +757,7 @@ export default function MobileDashboard({ onLogout }: { onLogout?: () => void })
 
   // ── Copy Telegram native t.me link ────────────────────────────────────
   const handleCopyTelegramLink = useCallback((file: TelegramFile) => {
-    const folder = folders.find(f => f.id === file.folder_id) || folders.find(f => f.id === activeFolderId);
-    const username = folder?.username || (folder as any)?.chat?.username || (folder as any)?.channel?.username;
+    const username = resolvePublicFolderUsername(file, folders, activeFolderId);
     if (!username) {
       toast.error(i18n.t('navigation_copy.public_only'));
       return;
@@ -1002,7 +1006,7 @@ export default function MobileDashboard({ onLogout }: { onLogout?: () => void })
                 <div className="relative">
                   <select
                     value={settings.language}
-                    onChange={e => updateSetting('language', e.target.value as any)}
+                    onChange={e => updateSetting('language', e.target.value as LanguagePreference)}
                     className="appearance-none bg-telegram-bg border border-telegram-border rounded-lg pl-2.5 pr-7 py-1.5 text-xs text-telegram-text focus:outline-none focus:border-telegram-primary/50 transition cursor-pointer"
                   >
                     {LANGUAGES.map(lang => (
@@ -1564,8 +1568,9 @@ export default function MobileDashboard({ onLogout }: { onLogout?: () => void })
         </LazyFeatureBoundary>
       )}
 
-      {shareFile && (
+      {shareFile && accountId && (
         <ShareDialog
+          ownerId={accountId}
           file={shareFile}
           onClose={() => setShareFile(null)}
           folders={folders}
