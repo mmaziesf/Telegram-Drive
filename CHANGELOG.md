@@ -35,7 +35,7 @@
 ### Poisoned locks no longer crash network and upload commands
 
 - `vpn_optimizer` and the upload-cancellation registry in `commands/fs.rs` recover a poisoned lock with `PoisonError::into_inner` instead of panicking (one site ran inside `Drop`, where a panic during unwind aborts the app). Both modules now `deny(clippy::unwrap_used, clippy::expect_used)` outside tests so new unwraps fail CI.
-- Sign-in, reconnect and sign-out (`commands/auth.rs`) and the startup proxy check in `lib.rs` also recover a poisoned lock instead of panicking. The network runner's shutdown sender is taken and signalled through one helper, so a poisoned lock no longer skips stopping the old runner (tests in `runner_shutdown_tests`). The REST API and WebDAV start-up threads hand their result back without `Option::unwrap`. `commands/auth.rs` carries the same module-level guard; every function in `lib.rs` carries it per item, because a `#![...]` guard in the crate root would cover the whole crate. Five redundant clones in `run()` were dropped.
+- Sign-in, reconnect and sign-out (`commands/auth.rs`) and the startup proxy check in `lib.rs` also recover a poisoned lock instead of panicking. The network runner's shutdown sender is taken and signalled through one helper, so a poisoned lock no longer skips stopping the old runner. The REST API and WebDAV start-up threads hand their result back without `Option::unwrap`. `commands/auth.rs` carries the same module-level guard; every function in `lib.rs` carries it per item, because a `#![...]` guard in the crate root would cover the whole crate. Five redundant clones in `run()` were dropped.
 
 ### Folder group names and colours are checked
 
