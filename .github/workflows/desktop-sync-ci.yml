@@ -1,7 +1,11 @@
 name: Desktop sync CI
 
+# Cost policy: pull requests and main pushes build Linux only. Add the
+# 'ci:windows' label to a PR to include Windows. The full Windows + 2x macOS
+# matrix runs only on workflow_dispatch and on release tags (v*).
 on:
   pull_request:
+    types: [opened, synchronize, reopened, labeled]
     paths:
       - "app/**"
       - "scripts/check-test-policy.cjs"
@@ -15,7 +19,9 @@ on:
       - ".github/workflows/desktop-sync-ci.yml"
       - ".github/workflows/release.yml"
   push:
-    branches: [main, develop]
+    branches: [main]
+    # Path filters are not evaluated for tag pushes, so v* tags always run.
+    tags: ['v*']
     paths:
       - "app/**"
       - "scripts/check-test-policy.cjs"
@@ -28,16 +34,13 @@ on:
       - "dependency-policy/android-publication-review.json"
       - ".github/workflows/desktop-sync-ci.yml"
       - ".github/workflows/release.yml"
-  schedule:
-    # Nightly full matrix, including both macOS targets.
-    - cron: "17 10 * * *"
   workflow_dispatch:
 
-# A newer push to the same pull request supersedes the running checks.
+# A newer push to any non-main ref supersedes the running checks.
 # Runs on main are never cancelled, so every main commit keeps a full result.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 permissions:
   contents: read
@@ -48,14 +51,16 @@ env:
 jobs:
   native-desktop:
     name: ${{ matrix.name }}
+    # A 'labeled' event only matters when the label is ci:windows.
+    if: github.event.action != 'labeled' || github.event.label.name == 'ci:windows'
     strategy:
       fail-fast: false
       matrix:
-        # Pull requests build Windows and Linux. macOS runners are scarce, so
-        # both macOS targets run on pushes to main, nightly and on dispatch.
-        include: ${{ fromJSON(github.event_name == 'pull_request' && '[{"name":"Windows","os":"windows-latest"},{"name":"Linux","os":"ubuntu-22.04"}]' || '[{"name":"Windows","os":"windows-latest"},{"name":"Linux","os":"ubuntu-22.04"},{"name":"macOS","os":"macos-latest","target":"aarch64-apple-darwin"},{"name":"macOS Intel","os":"macos-latest","target":"x86_64-apple-darwin"}]') }}
+        # Full matrix: workflow_dispatch or v* tag. PR with 'ci:windows' label:
+        # Windows + Linux. Everything else: Linux only.
+        include: ${{ fromJSON((github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/v')) && '[{"name":"Windows","os":"windows-latest"},{"name":"Linux","os":"ubuntu-22.04"},{"name":"macOS","os":"macos-latest","target":"aarch64-apple-darwin"},{"name":"macOS Intel","os":"macos-latest","target":"x86_64-apple-darwin"}]' || (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'ci:windows')) && '[{"name":"Windows","os":"windows-latest"},{"name":"Linux","os":"ubuntu-22.04"}]' || '[{"name":"Linux","os":"ubuntu-22.04"}]') }}
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 90
+    timeout-minutes: 45
 
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -143,6 +148,7 @@ jobs:
 
   desktop-ui-e2e:
     name: Desktop UI end-to-end
+    if: github.event.action != 'labeled'
     runs-on: ubuntu-22.04
     timeout-minutes: 30
     steps:

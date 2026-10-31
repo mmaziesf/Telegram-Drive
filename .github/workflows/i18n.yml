@@ -2,22 +2,32 @@ name: i18n Validation
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main]
+    paths:
+      - 'app/src/i18n/**'
+      - 'app/scripts/*i18n*'
+      - '.github/workflows/i18n.yml'
   pull_request:
-    branches: [ main, develop ]
+    branches: [main]
+    paths:
+      - 'app/src/i18n/**'
+      - 'app/scripts/*i18n*'
+      - '.github/workflows/i18n.yml'
+  workflow_dispatch:
 
-# A newer push to the same pull request supersedes the running checks.
+# A newer push to any non-main ref supersedes the running checks.
 # Runs on main are never cancelled, so every main commit keeps a full result.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 permissions:
   contents: read
 
 jobs:
   i18n-check:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
