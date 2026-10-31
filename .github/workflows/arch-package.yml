@@ -26,11 +26,11 @@ on:
       - 'app/src/hooks/useUpdateCheck.ts'
   workflow_dispatch:
 
-# A newer push to the same pull request supersedes the running checks.
+# A newer push to any non-main ref supersedes the running checks.
 # Runs on main are never cancelled, so every main commit keeps a full result.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 permissions:
   contents: read
@@ -40,7 +40,7 @@ jobs:
   # commit, never against a binary downloaded from another project's releases.
   build-deb:
     runs-on: ubuntu-22.04
-    timeout-minutes: 60
+    timeout-minutes: 30
     outputs:
       version: ${{ steps.version.outputs.version }}
     steps:
