@@ -423,7 +423,6 @@ dependencies = [
  "async-stream",
  "base64 0.22.1",
  "bcrypt",
- "bitflags 2.10.0",
  "bytes",
  "chacha20poly1305",
  "chrono",
@@ -443,11 +442,9 @@ dependencies = [
  "keyring",
  "libc",
  "log",
- "minisign-verify",
  "mp4parse",
  "ndk-context",
  "notify-debouncer-full",
- "path-clean",
  "proptest",
  "rand 0.9.4",
  "reqwest 0.12.28",
@@ -3717,12 +3714,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "minisign-verify"
-version = "0.2.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "22f9645cb765ea72b8111f36c522475d2daa0d22c957a9826437e97534bc4e9e"
-
-[[package]]
 name = "miniz_oxide"
 version = "0.8.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4403,12 +4394,6 @@ dependencies = [
  "rand_core 0.6.4",
  "subtle",
 ]
-
-[[package]]
-name = "path-clean"
-version = "1.0.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "17359afc20d7ab31fdb42bb844c8b3bb1dabd7dcf7e68428492da7f16966fcef"
 
 [[package]]
 name = "pathdiff"
