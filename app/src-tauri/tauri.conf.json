@@ -6,7 +6,7 @@
     }
   },
   "productName": "Unofficial Telegram Drive",
-  "version": "4.1.2",
+  "version": "4.2.0",
   "identifier": "io.github.mmaziesf.unofficialtelegramdrive",
   "build": {
     "beforeDevCommand": "npm run dev",

@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+## [4.2.0] - 2026-10-31
+
 ### Encrypted uploads by default
 
 - New uploads now default to vault encryption with protected metadata. After the drive tour, a first-run dialog creates or unlocks the vault. Choosing plaintext uploads requires an explicit confirmation of what Telegram can read.
