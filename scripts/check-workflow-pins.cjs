@@ -13,20 +13,23 @@ const assurance = fs.readFileSync(path.join(root, 'dependency-assurance.yml'), '
 if (!/\n  schedule:/.test(assurance) || !/\n  baseline-expiry:/.test(assurance)) throw new Error('Scheduled baseline-expiry gate must remain');
 const release = fs.readFileSync(path.join(root, 'release.yml'), 'utf8');
 for (const platform of ['macos', 'windows']) if (!release.includes(`if: env.PLATFORM_SIGNING == '${platform}'`)) throw new Error(`Missing conditional ${platform} signature gate`);
-// Pull requests skip macOS to save scarce runners, so macOS must still gate
-// pushes to main and the nightly run, and superseded main runs must never be
-// cancelled.
+// Cost policy: Linux-only by default, Windows on the 'ci:windows' PR label,
+// full matrix only on workflow_dispatch or v* tags; no nightly desktop cron;
+// superseded non-main runs are cancelled, main runs never are.
 const desktop = fs.readFileSync(path.join(root, 'desktop-sync-ci.yml'), 'utf8');
-const matrix = desktop.match(/^        include: \$\{\{ fromJSON\(github\.event_name == 'pull_request' && '(\[.*?\])' \|\| '(\[.*?\])'\) \}\}$/m);
-if (!matrix) throw new Error('Desktop matrix must choose its platforms from the event name');
+const matrix = desktop.match(/^        include: \$\{\{ fromJSON\(\(github\.event_name == 'workflow_dispatch' \|\| startsWith\(github\.ref, 'refs\/tags\/v'\)\) && '(\[.*?\])' \|\| \(github\.event_name == 'pull_request' && contains\(github\.event\.pull_request\.labels\.\*\.name, 'ci:windows'\)\) && '(\[.*?\])' \|\| '(\[.*?\])'\) \}\}$/m);
+if (!matrix) throw new Error('Desktop matrix must follow the cost policy (dispatch/tag full, ci:windows label, else Linux)');
 const names = json => JSON.parse(json).map(entry => entry.name).sort().join(',');
-if (names(matrix[1]) !== 'Linux,Windows') throw new Error('Pull requests must build Linux and Windows');
-if (names(matrix[2]) !== 'Linux,Windows,macOS,macOS Intel') throw new Error('Pushes, nightly and dispatch runs must build every desktop platform');
-if (!/^  push:\n    branches: \[main/m.test(desktop) || !/^  schedule:\n(?:    #.*\n)?    - cron: /m.test(desktop)) throw new Error('Desktop CI must run on pushes to main and nightly');
+if (names(matrix[1]) !== 'Linux,Windows,macOS,macOS Intel') throw new Error('Dispatch and release tags must build every desktop platform');
+if (names(matrix[2]) !== 'Linux,Windows') throw new Error('ci:windows label must add Windows');
+if (names(matrix[3]) !== 'Linux') throw new Error('Default desktop build must be Linux only');
+if (/^  schedule:/m.test(desktop)) throw new Error('Desktop CI must not run on a schedule');
 for (const name of fs.readdirSync(root).filter(name => /\.ya?ml$/.test(name))) {
   const text = fs.readFileSync(path.join(root, name), 'utf8');
+  if (/develop/.test(text.split('\njobs:')[0])) throw new Error(`${name}: there is no develop branch`);
+  if (/workflow_run:/.test(text)) throw new Error(`${name}: workflow_run chains are not allowed`);
   if (!/^  pull_request:/m.test(text)) continue;
-  if (!/^concurrency:\n  group: \$\{\{ github\.workflow \}\}-\$\{\{ github\.ref \}\}\n  cancel-in-progress: \$\{\{ github\.event_name == 'pull_request' \}\}$/m.test(text)) throw new Error(`${name}: pull request workflows must cancel superseded pull request runs only`);
+  if (!/^concurrency:\n  group: \$\{\{ github\.workflow \}\}-\$\{\{ github\.ref \}\}\n  cancel-in-progress: \$\{\{ github\.ref != 'refs\/heads\/main' \}\}$/m.test(text)) throw new Error(`${name}: must cancel superseded non-main runs only`);
 }
 // This fork publishes no releases and no product site: a tag push must not
 // start the release pipeline, and no workflow may deploy GitHub Pages.

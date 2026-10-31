@@ -11,11 +11,11 @@ on:
       - '.github/workflows/visual-regression.yml'
   workflow_dispatch:
 
-# A newer push to the same pull request supersedes the running checks.
+# A newer push to any non-main ref supersedes the running checks.
 # Runs on main are never cancelled, so every main commit keeps a full result.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 permissions:
   contents: read
@@ -23,6 +23,7 @@ permissions:
 jobs:
   design-gallery:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     defaults:
       run:
         working-directory: app

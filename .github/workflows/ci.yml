@@ -1,22 +1,32 @@
 name: CI
 
-# Runs on every pull request to main and every push to main. There are no
-# path filters, so this workflow can be used as the required status check.
+# Runs on pull requests and pushes to main, skipping docs/markdown/locale-only
+# changes to save Actions minutes.
 on:
   pull_request:
     branches: [main]
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
+      - 'app/src/i18n/locales/**'
+      - 'LICENSE*'
   push:
     branches: [main]
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
+      - 'app/src/i18n/locales/**'
+      - 'LICENSE*'
   workflow_dispatch:
 
 permissions:
   contents: read
 
-# A newer push to the same pull request supersedes the running checks.
+# A newer push to any non-main ref supersedes the running checks.
 # Runs on main are never cancelled, so every main commit keeps a full result.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 env:
   CARGO_TERM_COLOR: always
@@ -61,7 +71,7 @@ jobs:
   rust:
     name: Rust fmt, clippy and tests
     runs-on: ubuntu-22.04
-    timeout-minutes: 60
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
