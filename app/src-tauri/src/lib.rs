@@ -28,6 +28,7 @@ mod network_keepalive;
 /// must explicitly init COM as MTA to avoid OLE_E_WRONGCOMPOBJ / RPC_E_CHANGED_MODE
 /// errors during startup and teardown.
 #[cfg(target_os = "windows")]
+#[cfg_attr(not(test), deny(clippy::unwrap_used, clippy::expect_used))]
 fn init_com_on_worker_thread() {
     extern "system" {
         fn CoInitializeEx(reserved: *const std::ffi::c_void, coinit: u32) -> i32;
@@ -120,6 +121,10 @@ pub mod upload_service;
 pub mod webdav;
 pub mod workspace;
 
+// Every function in this file carries
+// `#[cfg_attr(not(test), deny(clippy::unwrap_used, clippy::expect_used))]`.
+// It is set per item because a `#![...]` here would apply to the whole crate.
+
 /// Single source of truth for the Actix streaming server port.
 /// Referenced in lib.rs (server startup) and exposed to the frontend
 /// via cmd_get_stream_info so no component ever hardcodes the port.
@@ -131,15 +136,18 @@ static ACTIVE_STREAM_PORT: std::sync::atomic::AtomicU16 =
     std::sync::atomic::AtomicU16::new(STREAM_PORT);
 
 /// The loopback port serving streams and share pages.
+#[cfg_attr(not(test), deny(clippy::unwrap_used, clippy::expect_used))]
 pub fn stream_port() -> u16 {
     ACTIVE_STREAM_PORT.load(std::sync::atomic::Ordering::Relaxed)
 }
 
+#[cfg_attr(not(test), deny(clippy::unwrap_used, clippy::expect_used))]
 pub(crate) fn set_stream_port(port: u16) {
     ACTIVE_STREAM_PORT.store(port, std::sync::atomic::Ordering::Relaxed);
 }
 
 /// Generate a random 32-character hex token for streaming server auth
+#[cfg_attr(not(test), deny(clippy::unwrap_used, clippy::expect_used))]
 fn generate_stream_token() -> String {
     let mut rng = rand::rng();
     let bytes: Vec<u8> = (0..16).map(|_| rng.random()).collect();
@@ -159,6 +167,7 @@ pub struct WebDavServerLifecycle(pub Arc<server_lifecycle::LocalServerLifecycle>
 /// Restart (or stop) the API server based on current settings.
 /// Called from Tauri commands when the user changes API settings.
 #[cfg(not(target_os = "android"))]
+#[cfg_attr(not(test), deny(clippy::unwrap_used, clippy::expect_used))]
 pub async fn restart_api_server(app: &tauri::AppHandle) -> Result<(), String> {
     let lifecycle = app.state::<ApiServerLifecycle>().0.clone();
     let generation = lifecycle.request_restart();
@@ -219,7 +228,6 @@ pub async fn restart_api_server(app: &tauri::AppHandle) -> Result<(), String> {
         init_com_on_worker_thread();
         let sys = actix_rt::System::new();
         sys.block_on(async move {
-            let mut startup_sender = Some(startup_sender);
             log::info!("Starting REST API server on port {}", api_port);
             let listener = match server_lifecycle::bind_loopback_with_retry(
                 api_port,
@@ -230,14 +238,14 @@ pub async fn restart_api_server(app: &tauri::AppHandle) -> Result<(), String> {
             {
                 Ok(Some(listener)) => listener,
                 Ok(None) => {
-                    let _ = startup_sender.take().unwrap().send(Ok(()));
+                    let _ = startup_sender.send(Ok(()));
                     return;
                 }
                 Err(error) => {
                     let message = format!("Could not start REST API on port {api_port}: {error}");
                     log::error!("{message}");
                     lifecycle_for_thread.set_error(generation, message.clone());
-                    let _ = startup_sender.take().unwrap().send(Err(message));
+                    let _ = startup_sender.send(Err(message));
                     return;
                 }
             };
@@ -262,18 +270,18 @@ pub async fn restart_api_server(app: &tauri::AppHandle) -> Result<(), String> {
                     let message = format!("Could not start REST API on port {api_port}: {error}");
                     log::error!("{message}");
                     lifecycle_for_thread.set_error(generation, message.clone());
-                    let _ = startup_sender.take().unwrap().send(Err(message));
+                    let _ = startup_sender.send(Err(message));
                     return;
                 }
             };
             if !lifecycle_for_thread.install_handle(generation, server.handle()) {
                 server.handle().stop(false).await;
-                let _ = startup_sender.take().unwrap().send(Ok(()));
+                let _ = startup_sender.send(Ok(()));
                 let _ = server.await;
                 return;
             }
             log::info!("REST API server started on http://127.0.0.1:{}", api_port);
-            let _ = startup_sender.take().unwrap().send(Ok(()));
+            let _ = startup_sender.send(Ok(()));
             let result = server.await;
             let error = result
                 .err()
@@ -295,6 +303,7 @@ pub async fn restart_api_server(app: &tauri::AppHandle) -> Result<(), String> {
 /// Restart (or stop) the API server based on current settings.
 /// Called from Tauri commands when the user changes API settings.
 #[cfg(target_os = "android")]
+#[cfg_attr(not(test), deny(clippy::unwrap_used, clippy::expect_used))]
 pub async fn restart_api_server(_app: &tauri::AppHandle) -> Result<(), String> {
     log::info!("REST API disabled on mobile.");
     Ok(())
@@ -302,6 +311,7 @@ pub async fn restart_api_server(_app: &tauri::AppHandle) -> Result<(), String> {
 
 /// Restart (or stop) the loopback-only WebDAV server using persisted settings.
 #[cfg(not(any(target_os = "android", target_os = "ios")))]
+#[cfg_attr(not(test), deny(clippy::unwrap_used, clippy::expect_used))]
 pub async fn restart_webdav_server(app: &tauri::AppHandle) -> Result<(), String> {
     let lifecycle = app.state::<WebDavServerLifecycle>().0.clone();
     let generation = lifecycle.request_restart();
@@ -361,12 +371,11 @@ pub async fn restart_webdav_server(app: &tauri::AppHandle) -> Result<(), String>
         init_com_on_worker_thread();
         let system = actix_rt::System::new();
         system.block_on(async move {
-            let mut startup_sender = Some(startup_sender);
             if let Err(error) = tokio::fs::create_dir_all(&staging_dir).await {
                 let message = format!("Could not create the WebDAV staging directory: {error}");
                 log::error!("{message}");
                 lifecycle_for_thread.set_error(generation, message.clone());
-                let _ = startup_sender.take().unwrap().send(Err(message));
+                let _ = startup_sender.send(Err(message));
                 return;
             }
             if let Ok(mut entries) = tokio::fs::read_dir(&staging_dir).await {
@@ -399,14 +408,14 @@ pub async fn restart_webdav_server(app: &tauri::AppHandle) -> Result<(), String>
             {
                 Ok(Some(listener)) => listener,
                 Ok(None) => {
-                    let _ = startup_sender.take().unwrap().send(Ok(()));
+                    let _ = startup_sender.send(Ok(()));
                     return;
                 }
                 Err(error) => {
                     let message = format!("Could not start WebDAV on port {port}: {error}");
                     log::error!("{message}");
                     lifecycle_for_thread.set_error(generation, message.clone());
-                    let _ = startup_sender.take().unwrap().send(Err(message));
+                    let _ = startup_sender.send(Err(message));
                     return;
                 }
             };
@@ -417,18 +426,18 @@ pub async fn restart_webdav_server(app: &tauri::AppHandle) -> Result<(), String>
                     let message = format!("Could not start WebDAV on port {port}: {error}");
                     log::error!("{message}");
                     lifecycle_for_thread.set_error(generation, message.clone());
-                    let _ = startup_sender.take().unwrap().send(Err(message));
+                    let _ = startup_sender.send(Err(message));
                     return;
                 }
             };
             if !lifecycle_for_thread.install_handle(generation, server.handle()) {
                 server.handle().stop(false).await;
-                let _ = startup_sender.take().unwrap().send(Ok(()));
+                let _ = startup_sender.send(Ok(()));
                 let _ = server.await;
                 return;
             }
             log::info!("WebDAV server started on http://127.0.0.1:{port}");
-            let _ = startup_sender.take().unwrap().send(Ok(()));
+            let _ = startup_sender.send(Ok(()));
             let result = server.await;
             let error = result
                 .err()
@@ -448,12 +457,14 @@ pub async fn restart_webdav_server(app: &tauri::AppHandle) -> Result<(), String>
 }
 
 #[cfg(any(target_os = "android", target_os = "ios"))]
+#[cfg_attr(not(test), deny(clippy::unwrap_used, clippy::expect_used))]
 pub async fn restart_webdav_server(_app: &tauri::AppHandle) -> Result<(), String> {
     log::info!("WebDAV hosting is disabled on mobile platforms.");
     Ok(())
 }
 
 #[tauri::command]
+#[cfg_attr(not(test), deny(clippy::unwrap_used, clippy::expect_used))]
 async fn cmd_open_file_externally(
     path: String,
     _app_handle: tauri::AppHandle,
@@ -556,6 +567,7 @@ async fn cmd_open_file_externally(
 }
 
 #[tauri::command]
+#[cfg_attr(not(test), deny(clippy::unwrap_used, clippy::expect_used))]
 fn cmd_open_android_stream_player(
     stream_url: String,
     title: String,
@@ -630,6 +642,7 @@ struct AndroidPlaybackHistoryEntry {
 }
 
 #[tauri::command]
+#[cfg_attr(not(test), deny(clippy::unwrap_used, clippy::expect_used))]
 fn cmd_get_android_playback_history() -> Result<Vec<AndroidPlaybackHistoryEntry>, String> {
     #[cfg(target_os = "android")]
     {
@@ -666,6 +679,7 @@ fn cmd_get_android_playback_history() -> Result<Vec<AndroidPlaybackHistoryEntry>
 /// (cold start). Returns the count of pending shared files and resets the counter.
 #[cfg(target_os = "android")]
 #[tauri::command]
+#[cfg_attr(not(test), deny(clippy::unwrap_used, clippy::expect_used))]
 fn cmd_get_pending_share_count() -> Result<i32, String> {
     let ctx = ndk_context::android_context();
     let vm = unsafe { jni::JavaVM::from_raw(ctx.vm().cast()) }
@@ -689,12 +703,14 @@ fn cmd_get_pending_share_count() -> Result<i32, String> {
 
 #[cfg(not(target_os = "android"))]
 #[tauri::command]
+#[cfg_attr(not(test), deny(clippy::unwrap_used, clippy::expect_used))]
 fn cmd_get_pending_share_count() -> Result<i32, String> {
     Ok(0) // Share intents are Android-only
 }
 
 #[cfg(target_os = "android")]
 #[tauri::command]
+#[cfg_attr(not(test), deny(clippy::unwrap_used, clippy::expect_used))]
 fn cmd_get_pending_android_transfer_action() -> Result<String, String> {
     let ctx = ndk_context::android_context();
     let vm = unsafe { jni::JavaVM::from_raw(ctx.vm().cast()) }
@@ -720,6 +736,7 @@ fn cmd_get_pending_android_transfer_action() -> Result<String, String> {
 
 #[cfg(not(target_os = "android"))]
 #[tauri::command]
+#[cfg_attr(not(test), deny(clippy::unwrap_used, clippy::expect_used))]
 fn cmd_get_pending_android_transfer_action() -> Result<String, String> {
     Ok(String::new())
 }
@@ -736,6 +753,7 @@ struct CachedFileEntry {
 
 #[cfg(target_os = "android")]
 #[tauri::command]
+#[cfg_attr(not(test), deny(clippy::unwrap_used, clippy::expect_used))]
 fn cmd_list_cached_files() -> Result<Vec<CachedFileEntry>, String> {
     let ctx = ndk_context::android_context();
     let vm = unsafe { jni::JavaVM::from_raw(ctx.vm().cast()) }
@@ -768,6 +786,7 @@ fn cmd_list_cached_files() -> Result<Vec<CachedFileEntry>, String> {
 
 #[cfg(not(target_os = "android"))]
 #[tauri::command]
+#[cfg_attr(not(test), deny(clippy::unwrap_used, clippy::expect_used))]
 fn cmd_list_cached_files() -> Result<Vec<CachedFileEntry>, String> {
     Ok(Vec::new()) // Share cache is Android-only
 }
@@ -776,6 +795,7 @@ fn cmd_list_cached_files() -> Result<Vec<CachedFileEntry>, String> {
 /// Called by the frontend when the user clears shared files.
 #[cfg(target_os = "android")]
 #[tauri::command]
+#[cfg_attr(not(test), deny(clippy::unwrap_used, clippy::expect_used))]
 fn cmd_remove_cached_path(uri: String) -> Result<(), String> {
     let ctx = ndk_context::android_context();
     let vm = unsafe { jni::JavaVM::from_raw(ctx.vm().cast()) }
@@ -804,6 +824,7 @@ fn cmd_remove_cached_path(uri: String) -> Result<(), String> {
 
 #[cfg(not(target_os = "android"))]
 #[tauri::command]
+#[cfg_attr(not(test), deny(clippy::unwrap_used, clippy::expect_used))]
 fn cmd_remove_cached_path(_uri: String) -> Result<(), String> {
     Ok(()) // No-op on desktop
 }
@@ -811,6 +832,7 @@ fn cmd_remove_cached_path(_uri: String) -> Result<(), String> {
 /// Gather system diagnostics and environment info for debugging.
 /// Returns a formatted string suitable for copying to clipboard.
 #[tauri::command]
+#[cfg_attr(not(test), deny(clippy::unwrap_used, clippy::expect_used))]
 fn cmd_get_system_diagnostics(app: tauri::AppHandle) -> Result<String, String> {
     #[cfg(target_os = "android")]
     {
@@ -936,6 +958,7 @@ fn cmd_get_system_diagnostics(app: tauri::AppHandle) -> Result<String, String> {
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
+#[cfg_attr(not(test), deny(clippy::unwrap_used, clippy::expect_used))]
 pub fn run() {
     let mut context = tauri::generate_context!();
     if let Err(error) = startup_smoke::configure(&mut context) {
@@ -949,7 +972,7 @@ pub fn run() {
     // Shared handle for stopping the Actix streaming server during shutdown
     let server_handle: Arc<std::sync::Mutex<Option<actix_web::dev::ServerHandle>>> =
         Arc::new(std::sync::Mutex::new(None));
-    let server_handle_for_setup = server_handle.clone();
+    let server_handle_for_setup = server_handle;
 
     let builder = tauri::Builder::default();
 
@@ -1195,7 +1218,10 @@ pub fn run() {
                 let start_config = net_config.clone();
                 tauri::async_runtime::spawn(async move {
                     let (enabled, is_http_or_https) = {
-                        let proxy = start_config.proxy.read().unwrap();
+                        let proxy = start_config
+                            .proxy
+                            .read()
+                            .unwrap_or_else(std::sync::PoisonError::into_inner);
                         (proxy.enabled, proxy.proxy_type == "http" || proxy.proxy_type == "https")
                     };
                     if enabled && is_http_or_https {
@@ -1244,9 +1270,9 @@ pub fn run() {
             // route graph on desktop.
             let state = Arc::new(app.state::<TelegramState>().inner().clone());
             let token_for_server = stream_token.clone();
-            let handle_for_runtime = server_handle_for_setup.clone();
-            let db_pool_for_server = db_pool.clone();
-            let transcode_for_server = transcode_arc.clone();
+            let handle_for_runtime = server_handle_for_setup;
+            let db_pool_for_server = db_pool;
+            let transcode_for_server = transcode_arc;
             let crypto_for_server = app.state::<crypto::state::CryptoState>().inner().clone();
             let network_for_server=net_config.clone();
             let bandwidth_for_server=app.state::<Arc<bandwidth::BandwidthManager>>().inner().clone();
@@ -1315,7 +1341,7 @@ pub fn run() {
             // conflict with the platform's background execution limits.
             #[cfg(not(target_os = "android"))]
             {
-                let ka_config = net_config.clone();
+                let ka_config = net_config;
                 tauri::async_runtime::spawn(async move {
                     loop {
                         let interval = ka_config.keep_alive_interval_sec();
