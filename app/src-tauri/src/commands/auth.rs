@@ -1,3 +1,6 @@
+// Command-reachable code: no unwrap()/expect(); poisoned locks are recovered.
+#![cfg_attr(not(test), deny(clippy::unwrap_used, clippy::expect_used))]
+
 use base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine as _};
 use grammers_client::Client;
 use grammers_mtsender::SenderPool;
@@ -10,7 +13,7 @@ use grammers_session::Session;
 use grammers_tl_types as tl;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::Ordering;
-use std::sync::Arc;
+use std::sync::{Arc, Mutex, PoisonError};
 use std::time::Instant;
 use tauri::Manager;
 use tauri::State;
@@ -23,6 +26,31 @@ use crate::models::{AuthCodeDelivery, AuthCodeRequestResult, AuthCodeRequestStat
 use crate::TelegramState;
 use grammers_client::types::PasswordToken;
 use grammers_mtsender::InvocationError;
+
+/// Holds the shutdown sender of the running grammers network runner.
+type RunnerShutdownSlot = Mutex<Option<oneshot::Sender<()>>>;
+
+/// Takes the current runner's shutdown sender, if any, and signals it.
+/// Returns whether a runner was signalled. A poisoned lock is recovered: the
+/// slot only holds a sender, so its value stays valid after a panic elsewhere,
+/// and skipping the shutdown would leak a runner task.
+fn signal_runner_shutdown(slot: &RunnerShutdownSlot, message: &str) -> bool {
+    let sender = slot.lock().unwrap_or_else(PoisonError::into_inner).take();
+    match sender {
+        Some(shutdown_tx) => {
+            log::info!("{message}");
+            let _ = shutdown_tx.send(());
+            true
+        }
+        None => false,
+    }
+}
+
+/// Stores the shutdown sender of a newly started runner, recovering a
+/// poisoned lock so the new runner can still be stopped later.
+fn install_runner_shutdown(slot: &RunnerShutdownSlot, shutdown_tx: oneshot::Sender<()>) {
+    *slot.lock().unwrap_or_else(PoisonError::into_inner) = Some(shutdown_tx);
+}
 
 /// Why the saved session could not be opened, by what the caller should do.
 enum SessionOpenFailure {
@@ -153,16 +181,11 @@ pub async fn ensure_client_initialized(
 
     // CRITICAL: Shutdown existing runner before creating a new one
     // This prevents runner task accumulation which causes stack overflow
-    let did_shutdown_old_runner = {
-        let mut guard = state.runner_shutdown.lock().unwrap();
-        if let Some(shutdown_tx) = guard.take() {
-            log::info!("Signaling old runner to shutdown...");
-            let _ = shutdown_tx.send(());
-            true
-        } else {
-            false
-        }
-    }; // MutexGuard dropped here — before the await
+    // The lock is released inside the helper, before the await.
+    let did_shutdown_old_runner = signal_runner_shutdown(
+        &state.runner_shutdown,
+        "Signaling old runner to shutdown...",
+    );
     if did_shutdown_old_runner {
         tokio::time::sleep(Duration::from_millis(100)).await;
     }
@@ -250,7 +273,10 @@ pub async fn ensure_client_initialized(
 
     let net_config = app_handle.state::<Arc<crate::vpn_optimizer::NetworkConfig>>();
     let preferred_dc = {
-        let vpn = net_config.vpn.read().unwrap();
+        let vpn = net_config
+            .vpn
+            .read()
+            .unwrap_or_else(PoisonError::into_inner);
         if vpn.enabled {
             vpn.preferred_dc.clone()
         } else {
@@ -283,7 +309,7 @@ pub async fn ensure_client_initialized(
 
     // Create shutdown channel for this runner
     let (shutdown_tx, shutdown_rx) = oneshot::channel::<()>();
-    *state.runner_shutdown.lock().unwrap() = Some(shutdown_tx);
+    install_runner_shutdown(&state.runner_shutdown, shutdown_tx);
 
     // Spawn the network runner with shutdown support
     let SenderPool { runner, .. } = pool;
@@ -409,13 +435,10 @@ pub async fn cmd_reconnect_with_network_settings(
     log::info!("Reconnecting with updated network settings...");
 
     // 1. Shutdown existing runner
-    {
-        let mut shutdown_guard = state.runner_shutdown.lock().unwrap();
-        if let Some(shutdown_tx) = shutdown_guard.take() {
-            log::info!("Signaling runner shutdown for reconnect...");
-            let _ = shutdown_tx.send(());
-        }
-    }
+    signal_runner_shutdown(
+        &state.runner_shutdown,
+        "Signaling runner shutdown for reconnect...",
+    );
     tokio::time::sleep(Duration::from_millis(100)).await;
 
     // 2. Clear old client
@@ -493,13 +516,10 @@ pub async fn cmd_logout(
     };
 
     // 2. Stop the network runner now that no further request is needed.
-    {
-        let mut shutdown_guard = state.runner_shutdown.lock().unwrap();
-        if let Some(shutdown_tx) = shutdown_guard.take() {
-            log::info!("Signaling runner shutdown for logout...");
-            let _ = shutdown_tx.send(());
-        }
-    }
+    signal_runner_shutdown(
+        &state.runner_shutdown,
+        "Signaling runner shutdown for logout...",
+    );
 
     // 3. Clear State
     *state.client.lock().await = None;
