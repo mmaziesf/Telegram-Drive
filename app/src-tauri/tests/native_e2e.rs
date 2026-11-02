@@ -9981,3 +9981,25 @@ fn sync_roots_inside_the_apps_own_state_are_refused() {
     }
     app.stop();
 }
+
+#[test]
+fn sync_roots_containing_the_apps_own_state_are_refused() {
+    let fixture = Fixture::new();
+    for dir in [
+        "app-data/sessions",
+        "app-cache/previews",
+        "Documents/Photos",
+    ] {
+        std::fs::create_dir_all(fixture.path(dir)).unwrap();
+    }
+    let mut app = Backend::start(&fixture.0);
+    app.ok(json!({"command":"sync_root_check","local":"Documents/Photos"}));
+    for local in [".", "Documents/..", "Documents/Photos/../.."] {
+        assert!(
+            app.failure(json!({"command":"sync_root_check","local":local}))
+                .contains("does not contain the app's own data"),
+            "local={local}"
+        );
+    }
+    app.stop();
+}

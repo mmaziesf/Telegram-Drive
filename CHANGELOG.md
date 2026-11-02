@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+### Sync folders cannot contain the app's own state
+
+- Previewing, adding or updating a sync mapping now also refuses a local folder that contains the app's data, local data, cache, config or log folder (for example the whole home folder). Such a mapping would upload session and vault files to Telegram, or let remote files overwrite them. This closes the open part of RT-12.
+- A native E2E journey covers the refused ancestor roots, including `..` paths.
+
 ## [4.2.0] - 2026-10-31
 
 ### Encrypted uploads by default
