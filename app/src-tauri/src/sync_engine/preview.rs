@@ -150,13 +150,19 @@ fn summarize_operations(
     (counts, entries)
 }
 
-/// A sync root inside the app's own state would upload session and vault files
-/// to Telegram, or let remote files overwrite them. `local` is canonical.
+/// A sync root inside the app's own state, or one that contains it (for example
+/// the whole home folder), would upload session and vault files to Telegram, or
+/// let remote files overwrite them. `local` is canonical.
 pub(crate) fn refuse_app_state_root(local: &Path, app_dirs: &[PathBuf]) -> Result<(), String> {
     for dir in app_dirs {
         let dir = dir.canonicalize().unwrap_or_else(|_| dir.clone());
         if local.starts_with(&dir) {
             return Err("Choose a folder outside the app's own data and cache folders".into());
+        }
+        if dir.starts_with(local) {
+            return Err(
+                "Choose a folder that does not contain the app's own data and cache folders".into(),
+            );
         }
     }
     Ok(())
