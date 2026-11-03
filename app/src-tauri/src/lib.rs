@@ -70,6 +70,7 @@ mod external_files;
 #[cfg(not(any(target_os = "android", target_os = "ios")))]
 mod heic;
 mod legacy_external;
+pub mod path_grants;
 #[cfg(not(any(target_os = "android", target_os = "ios")))]
 mod process_budget;
 pub mod process_util;
@@ -1007,6 +1008,8 @@ pub fn run() {
     let app = builder
         .setup(move |app| {
             startup_smoke::validate_profile(app.handle())?;
+            // RT-13: remember files the user picks or drops before any command runs.
+            path_grants::install(app.handle());
             // Attach the log file first so every later setup failure is
             // recorded where the startup dialog can point to it.
             match app.path().app_log_dir() {

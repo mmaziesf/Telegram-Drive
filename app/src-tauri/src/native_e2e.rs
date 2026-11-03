@@ -1147,6 +1147,8 @@ impl Driver {
             | "share_metadata_check"
             | "proxy_settings_check"
             | "sync_root_check"
+            | "path_grant"
+            | "path_grant_allows"
             | "capture_account"
             | "validate_account"
             | "save_collection"
@@ -1527,6 +1529,14 @@ impl Driver {
                     Ok(json!({"version": query.read::<i64,_>(0).map_err(error)?}))
                 })
                 .await
+            }
+            "path_grant" => {
+                crate::path_grants::global().record(&self.root.join(text(&request, "local")?));
+                Ok(json!({"grants": crate::path_grants::global().len()}))
+            }
+            "path_grant_allows" => {
+                let local = self.root.join(text(&request, "local")?);
+                Ok(json!({"allowed": crate::path_grants::global().allows(&local)}))
             }
             "sync_root_check" => {
                 let local = self.root.join(text(&request, "local")?);

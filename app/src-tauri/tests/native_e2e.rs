@@ -10003,3 +10003,93 @@ fn sync_roots_containing_the_apps_own_state_are_refused() {
     }
     app.stop();
 }
+
+#[test]
+fn local_files_are_readable_only_after_the_user_picks_them() {
+    let fixture = Fixture::new();
+    for dir in ["picked-folder/nested", "elsewhere"] {
+        std::fs::create_dir_all(fixture.path(dir)).unwrap();
+    }
+    for file in [
+        "picked.txt",
+        "sibling.txt",
+        "picked-folder/nested/a.txt",
+        "elsewhere/secret.txt",
+    ] {
+        std::fs::write(fixture.path(file), b"x").unwrap();
+    }
+    let mut app = Backend::start(&fixture.0);
+    let allowed = |app: &mut Backend, local: &str| {
+        app.ok(json!({"command":"path_grant_allows","local":local}))["allowed"]
+            .as_bool()
+            .unwrap()
+    };
+    assert!(!allowed(&mut app, "picked.txt"), "nothing before a pick");
+
+    app.ok(json!({"command":"path_grant","local":"picked.txt"}));
+    app.ok(json!({"command":"path_grant","local":"picked-folder"}));
+    assert!(allowed(&mut app, "picked.txt"));
+    assert!(allowed(&mut app, "elsewhere/../picked.txt"));
+    assert!(allowed(&mut app, "picked-folder/nested/a.txt"));
+    for local in [
+        "sibling.txt",
+        "elsewhere/secret.txt",
+        "picked-folder/../elsewhere/secret.txt",
+        ".",
+        "picked-folder/missing.txt",
+    ] {
+        assert!(!allowed(&mut app, local), "local={local}");
+    }
+
+    // A "save as" target that does not exist yet grants nothing, even later.
+    let reply = app.ok(json!({"command":"path_grant","local":"later.txt"}));
+    assert_eq!(reply["grants"], 2);
+    std::fs::write(fixture.path("later.txt"), b"x").unwrap();
+    assert!(!allowed(&mut app, "later.txt"));
+
+    // Picking the same file again through another spelling adds nothing.
+    let reply = app.ok(json!({"command":"path_grant","local":"elsewhere/../picked.txt"}));
+    assert_eq!(reply["grants"], 2);
+
+    #[cfg(unix)]
+    {
+        std::os::unix::fs::symlink(
+            fixture.path("elsewhere/secret.txt"),
+            fixture.path("picked-folder/link.txt"),
+        )
+        .unwrap();
+        assert!(
+            !allowed(&mut app, "picked-folder/link.txt"),
+            "a link inside a picked folder cannot reach outside it"
+        );
+    }
+    app.stop();
+}
+
+#[test]
+fn picked_file_grants_are_bounded_and_drop_the_oldest() {
+    let fixture = Fixture::new();
+    let max = app_lib::path_grants::MAX_GRANTS;
+    std::fs::create_dir_all(fixture.path("many")).unwrap();
+    for index in 0..=max {
+        std::fs::write(fixture.path(&format!("many/{index}.txt")), b"x").unwrap();
+    }
+    let mut app = Backend::start(&fixture.0);
+    let mut last = Value::Null;
+    for index in 0..=max {
+        last = app.ok(json!({"command":"path_grant","local":format!("many/{index}.txt")}));
+    }
+    assert_eq!(last["grants"], max);
+    let allowed = |app: &mut Backend, local: &str| {
+        app.ok(json!({"command":"path_grant_allows","local":local}))["allowed"]
+            .as_bool()
+            .unwrap()
+    };
+    assert!(
+        !allowed(&mut app, "many/0.txt"),
+        "the oldest grant is dropped"
+    );
+    assert!(allowed(&mut app, "many/1.txt"));
+    assert!(allowed(&mut app, &format!("many/{max}.txt")));
+    app.stop();
+}
