@@ -1968,8 +1968,21 @@ fn now_millis() -> i64 {
 #[tauri::command]
 pub async fn cmd_transfer_enqueue_many(
     requests: Vec<TransferEnqueueRequest>,
+    app: tauri::AppHandle,
     engine: State<'_, Arc<TransferEngine>>,
 ) -> Result<Vec<TransferJob>, String> {
+    // RT-13: local uploads read only files the user chose or the app made.
+    for request in &requests {
+        if request.kind != TransferKind::LocalUpload {
+            continue;
+        }
+        for path in [request.path.as_deref(), request.temp_zip_path.as_deref()]
+            .into_iter()
+            .flatten()
+        {
+            crate::commands::fs::ensure_user_selected_source(&app, path)?;
+        }
+    }
     engine.enqueue_many(requests).await
 }
 

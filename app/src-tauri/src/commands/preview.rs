@@ -457,7 +457,17 @@ pub async fn cmd_get_display_preview(
     app_handle: tauri::AppHandle,
 ) -> Result<String, String> {
     let original = match local_path {
-        Some(path) => path,
+        Some(path) => {
+            // RT-13: the same files the WebView may already show, no others.
+            #[cfg(not(any(target_os = "android", target_os = "ios")))]
+            if !app_handle
+                .asset_protocol_scope()
+                .is_allowed(std::path::Path::new(&path))
+            {
+                return Err(crate::path_grants::not_selected_error());
+            }
+            path
+        }
         None => compat_asset(app_handle.clone(), folder_id, message_id, false).await?,
     };
     #[cfg(not(any(target_os = "android", target_os = "ios")))]

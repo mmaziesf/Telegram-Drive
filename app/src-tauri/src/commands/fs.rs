@@ -2267,7 +2267,52 @@ async fn validate_dropped_paths(paths: Vec<String>) -> DroppedPathValidation {
 
 #[tauri::command]
 pub async fn cmd_validate_dropped_paths(paths: Vec<String>) -> DroppedPathValidation {
-    validate_dropped_paths(paths).await
+    // RT-13: only paths the user actually dropped or picked count.
+    let (chosen, not_chosen): (Vec<String>, Vec<String>) = paths
+        .into_iter()
+        .partition(|path| user_chose(std::path::Path::new(path)));
+    let mut result = validate_dropped_paths(chosen).await;
+    result
+        .rejected
+        .extend(not_chosen.into_iter().map(|path| DroppedPathRejection {
+            path,
+            reason: "not_selected",
+        }));
+    result
+}
+
+/// Whether the user picked or dropped `path` (or a folder containing it).
+/// Mobile pickers hand over content URIs instead, so this is desktop-only.
+#[cfg(not(any(target_os = "android", target_os = "ios")))]
+fn user_chose(path: &std::path::Path) -> bool {
+    crate::path_grants::global().allows(path)
+}
+
+#[cfg(any(target_os = "android", target_os = "ios"))]
+fn user_chose(_path: &std::path::Path) -> bool {
+    true
+}
+
+/// RT-13: a local file a command reads must be one the user picked or
+/// dropped, or a temporary file the app created itself (folder ZIPs and
+/// registered staging files).
+pub(crate) fn ensure_user_selected_source(
+    app: &tauri::AppHandle,
+    path: &str,
+) -> Result<(), String> {
+    let candidate = std::path::Path::new(path);
+    if user_chose(candidate) {
+        return Ok(());
+    }
+    if let Ok(canonical) = candidate.canonicalize() {
+        if crate::temp_artifacts::is_registered(&canonical).unwrap_or(false) {
+            return Ok(());
+        }
+        if zip_artifact_root(app).is_ok_and(|root| is_owned_zip_artifact(&root, &canonical)) {
+            return Ok(());
+        }
+    }
+    Err(crate::path_grants::not_selected_error())
 }
 
 /// Telegram's regular-account media caption limit is 1024 characters.
@@ -2314,6 +2359,7 @@ pub async fn cmd_upload_file(
     db_pool: State<'_, DbConnection>,
     owner_id: Option<String>,
 ) -> Result<String, String> {
+    ensure_user_selected_source(&app_handle, &path)?;
     upload_local_file(
         path,
         folder_id,
@@ -5146,6 +5192,9 @@ pub async fn cmd_zip_folder(folder_path: String, app: tauri::AppHandle) -> Resul
         .map_err(|e| format!("Invalid folder path: {}", e))?;
     if !src.is_dir() {
         return Err(format!("'{}' is not a directory", folder_path));
+    }
+    if !user_chose(&src) {
+        return Err(crate::path_grants::not_selected_error());
     }
 
     let folder_name = src

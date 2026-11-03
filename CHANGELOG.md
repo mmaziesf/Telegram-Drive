@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+### Local files must come from the user
+
+- On desktop, commands that read a local file (uploads, queued transfers, folder ZIPs and local image previews) now accept only files the user picked in a file dialog or dragged into the window, a file inside a picked or dropped folder, or a temporary file the app made itself. A script running in the app window can no longer name any readable file, such as an SSH key, and upload it. This closes RT-13.
+- Grants are kept in memory until the app quits. Paths are compared after resolving symlinks, so a link inside a picked folder that points outside it is refused. Dropped paths that were not dropped by the user are reported with the new `not_selected` reason.
+- Remaining limits: Android and iOS pickers hand over content URIs, so the check is desktop-only there (tracked with RT-11). Sync folder mappings keep their existing preview-and-confirm review rather than a pick, so saved mappings still work after a restart.
+
 ### Sync folders cannot contain the app's own state
 
 - Previewing, adding or updating a sync mapping now also refuses a local folder that contains the app's data, local data, cache, config or log folder (for example the whole home folder). Such a mapping would upload session and vault files to Telegram, or let remote files overwrite them. This closes the open part of RT-12.

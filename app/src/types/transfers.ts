@@ -26,7 +26,7 @@ export interface QueueItem {
   videoFilenameCaption?: boolean;
 }
 
-export type DroppedPathRejectionReason = 'directory' | 'missing' | 'unreadable' | 'unsupported';
+export type DroppedPathRejectionReason = 'directory' | 'missing' | 'not_selected' | 'unreadable' | 'unsupported';
 
 export interface DroppedPathRejection {
   path: string;
